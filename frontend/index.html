@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beumer Group — Flight Management System</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <!-- ══════════════════════════════════════
+     SHARED NAVBAR
+════════════════════════════════════════ -->
+    <nav class="navbar hidden" id="main-navbar">
+        <div class="nav-logo">
+            <img src="/static/logo_dark_bg.png" alt="Beumer Group">
+        </div>
+        <div class="nav-right">
+            <span class="nav-link active-link" onclick="showPage('airports')">Airports</span>
+            <span class="nav-link hidden" id="nav-register-link" onclick="showPage('register')">Register User</span>
+            <div class="nav-user">
+                <span id="nav-fullname"></span>
+                <span class="role-badge" id="nav-role-badge"></span>
+            </div>
+            <button class="btn-logout" onclick="handleLogout()">Logout</button>
+        </div>
+    </nav>
+
+    <!-- ══════════════════════════════════════
+     PAGE: LANDING
+════════════════════════════════════════ -->
+    <div id="page-landing" class="page">
+        <div class="landing-left">
+            <div class="landing-logo">
+                <img src="/static/logo_raw_white.png" alt="Beumer Group"
+                    style="height:80px;object-fit:contain;">
+            </div>
+            <h1 class="landing-title">Flight Management<br>System</h1>
+            <button class="btn-enter" onclick="showPage('login')">Enter system &rarr;</button>
+        </div>
+        <div class="landing-right">
+            <img src="/static/airport_hero.png" alt="Airport Terminal">
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+     PAGE: LOGIN
+════════════════════════════════════════ -->
+    <div id="page-login" class="page">
+        <div class="login-card">
+            <div class="login-logo">
+                <img src="/static/logo_dark_bg.png" alt="Beumer Group">
+            </div>
+            <h2>Flight Management System</h2>
+            <p>Sign in to your account</p>
+            <div class="login-error" id="login-error"></div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="login-username" placeholder="Enter your username" autofocus>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="login-password" placeholder="Enter your password"
+                    onkeydown="if(event.key==='Enter')handleLogin()">
+            </div>
+            <button class="btn-primary" id="login-btn" onclick="handleLogin()">Sign In</button>
+            <p style="text-align:center;margin-top:16px;font-size:13px;color:var(--text3)">
+                <a onclick="showPage('landing')" style="color:var(--cyan);cursor:pointer">← Back to home</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+     PAGE: AIRPORTS
+════════════════════════════════════════ -->
+    <div id="page-airports" class="page">
+        <div class="page-container">
+            <div class="page-header">
+                <h1>Select an <span>Airport</span></h1>
+                <p>Choose an airport to view and manage flights</p>
+            </div>
+            <div class="airport-grid" id="airports-grid"></div>
+        </div>
+        <footer class="footer">
+            <p>Beumer Group — Flight Management System &copy; 2026</p>
+            <p class="footer-sub">Powered by FastAPI &middot; RabbitMQ &middot; MySQL</p>
+        </footer>
+    </div>
+
+    <!-- ══════════════════════════════════════
+     PAGE: REGISTER
+════════════════════════════════════════ -->
+    <div id="page-register" class="page">
+        <div class="page-container">
+            <button class="btn-back" onclick="showPage('airports')">← Back to Airports</button>
+            <div class="page-header">
+                <h1>Register <span>New User</span></h1>
+                <p>Create accounts for staff and viewers. Credentials are emailed automatically.</p>
+            </div>
+            <div class="register-card">
+                <h2>User Details</h2>
+                <div id="reg-success" class="msg-box msg-success"></div>
+                <div id="reg-error" class="msg-box msg-error"></div>
+                <div class="form-grid">
+                    <div class="form-group"><label>Full Name</label><input type="text" id="r-fullname"
+                            placeholder="e.g. Rahul Sharma"></div>
+                    <div class="form-group"><label>Email Address</label><input type="email" id="r-email"
+                            placeholder="user@company.com"></div>
+                    <div class="form-group"><label>Username</label><input type="text" id="r-username"
+                            placeholder="e.g. rahul_staff"></div>
+                    <div class="form-group"><label>Role</label>
+                        <select id="r-role" onchange="toggleAirportField()">
+                            <option value="viewer">Viewer (Read Only)</option>
+                            <option value="staff">Staff (Read + Create)</option>
+                            <option value="admin">Admin (Full Access)</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="r-airport-group"><label>Assigned Airport</label>
+                        <select id="r-airport">
+                            <option value="">Select Airport…</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Password</label><input type="password" id="r-password"
+                            placeholder="Create a password"></div>
+                    <div class="form-group"><label>Confirm Password</label><input type="password" id="r-confirm"
+                            placeholder="Repeat password"></div>
+                </div>
+                <div style="margin-top:16px;padding:12px 16px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;font-size:13px;color:#0369a1;margin-bottom:16px">
+                    An email with login credentials will be sent automatically after registration.
+                </div>
+                <button class="btn-primary" id="register-btn" onclick="handleRegister()">Register &amp; Send Email</button>
+            </div>
+            <div class="users-table-card">
+                <h2>Registered Users</h2>
+                <div style="overflow:visible;margin-top:16px">
+                    <table class="plain-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Airport</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <footer class="footer">
+            <p>Beumer Group — Flight Management System &copy; 2026</p>
+        </footer>
+    </div>
+
+    <!-- ══════════════════════════════════════
+     PAGE: FLIGHTS
+════════════════════════════════════════ -->
+    <div id="page-flights" class="page">
+        <div class="page-container">
+            <div class="breadcrumb">
+                <a onclick="showPage('airports')">Airports</a>
+                <span>›</span>
+                <span id="bc-airport">Airport</span>
+            </div>
+            <div class="page-header">
+                <h1 id="flight-page-title">Flights</h1>
+                <p id="flight-page-sub"></p>
+                <div id="airline-breadcrumb" style="font-weight:500;color:var(--text2);margin-top:8px;font-size:14px;"></div>
+            </div>
+
+            <div class="category-grid">
+                <div class="category-card active" data-type="arrival" onclick="setCategory('arrival',this)">
+                    <div class="cat-icon">🛬</div>
+                    <h3>Arriving Flights</h3>
+                    <p>Incoming flights</p>
+                </div>
+                <div class="category-card" data-type="departure" onclick="setCategory('departure',this)">
+                    <div class="cat-icon">🛫</div>
+                    <h3>Departing Flights</h3>
+                    <p>Outgoing flights</p>
+                </div>
+                <div class="category-card" data-type="info" onclick="setCategory('info',this)">
+                    <div class="cat-icon">ℹ️</div>
+                    <h3>Airline Info</h3>
+                    <p>5 airlines</p>
+                </div>
+            </div>
+
+            <div id="airline-info-section" class="hidden">
+                <div style="margin-bottom:16px;display:flex;justify-content:flex-end;">
+                    <button class="btn-primary" onclick="clearAirlineFilter()" style="padding:8px 16px;">All Airlines</button>
+                </div>
+                <div class="airline-info-grid">
+                    <div class="airline-info-card" onclick="selectAirline(event,'IndiGo')" style="cursor:pointer;">
+                        <div class="big-badge badge-6E">6E</div>
+                        <h3>IndiGo</h3>
+                        <p id="indigo-stats">India's largest airline</p>
+                    </div>
+                    <div class="airline-info-card" onclick="selectAirline(event,'Akasa Air')" style="cursor:pointer;">
+                        <div class="big-badge badge-QP">QP</div>
+                        <h3>Akasa Air</h3>
+                        <p id="akasa-stats">New low-cost carrier</p>
+                    </div>
+                    <div class="airline-info-card" onclick="selectAirline(event,'Emirates')" style="cursor:pointer;">
+                        <div class="big-badge badge-EK">EK</div>
+                        <h3>Emirates</h3>
+                        <p id="emirates-stats">Dubai-based carrier</p>
+                    </div>
+                    <div class="airline-info-card" onclick="selectAirline(event,'Air India')" style="cursor:pointer;">
+                        <div class="big-badge badge-AI">AI</div>
+                        <h3>Air India</h3>
+                        <p id="airindia-stats">India's flag carrier</p>
+                    </div>
+                    <div class="airline-info-card" onclick="selectAirline(event,'Vistara')" style="cursor:pointer;">
+                        <div class="big-badge badge-UK">UK</div>
+                        <h3>Vistara</h3>
+                        <p id="vistara-stats">Premium full-service</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="flight-board-section">
+                <div class="stats-bar">
+                    <div class="stat-card" data-status="ALL" onclick="filterByStatus('ALL')"><span class="stat-number" id="stat-total">0</span><span class="stat-label">Total</span></div>
+                    <div class="stat-card" data-status="Arrived" onclick="filterByStatus('Arrived')"><span class="stat-number" id="stat-arrived">0</span><span class="stat-label">Arrived</span></div>
+                    <div class="stat-card" data-status="Boarding" onclick="filterByStatus('Boarding')"><span class="stat-number" id="stat-boarding">0</span><span class="stat-label">Boarding</span></div>
+                    <div class="stat-card" data-status="Scheduled" onclick="filterByStatus('Scheduled')"><span class="stat-number" id="stat-scheduled">0</span><span class="stat-label">Scheduled</span></div>
+                    <div class="stat-card" data-status="Delayed" onclick="filterByStatus('Delayed')"><span class="stat-number" id="stat-delayed">0</span><span class="stat-label">Delayed</span></div>
+                </div>
+                <div class="controls-bar">
+                    <div class="terminal-tabs">
+                        <button class="tab-btn active" onclick="setTerminal('ALL',this)">All</button>
+                        <button class="tab-btn" onclick="setTerminal('T1',this)">T1</button>
+                        <button class="tab-btn" onclick="setTerminal('T2',this)">T2</button>
+                        <button class="tab-btn" onclick="setTerminal('T3',this)">T3</button>
+                    </div>
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label>Airline</label>
+                            <select id="airline-filter" onchange="activeAirline=this.value;renderBoard()">
+                                <option value="ALL">All Airlines</option>
+                                <option value="6E">IndiGo (6E)</option>
+                                <option value="QP">Akasa Air (QP)</option>
+                                <option value="EK">Emirates (EK)</option>
+                                <option value="AI">Air India (AI)</option>
+                                <option value="UK">Vistara (UK)</option>
+                            </select>
+                        </div>
+                        <button class="btn-sync" id="btn-sync-live" onclick="syncLiveFlights()">↻ Sync Live</button>
+                        <button class="btn-add hidden" id="btn-add-flight" onclick="toggleForm()">+ Add Flight</button>
+                    </div>
+                </div>
+
+                <div id="add-flight-form" class="form-section hidden">
+                    <h2>Add New Flight</h2>
+                    <div class="form-grid-flight">
+                        <div class="form-field"><label>Flight Number</label><input type="text" id="f-number" placeholder="e.g. 6E-3001"></div>
+                        <div class="form-field"><label>Airline</label>
+                            <select id="f-airline">
+                                <option value="">Select</option>
+                                <option value="6E">IndiGo (6E)</option>
+                                <option value="QP">Akasa Air (QP)</option>
+                                <option value="EK">Emirates (EK)</option>
+                                <option value="AI">Air India (AI)</option>
+                                <option value="UK">Vistara (UK)</option>
+                            </select>
+                        </div>
+                        <div class="form-field"><label>Origin</label><input type="text" id="f-origin" placeholder="e.g. Delhi (DEL)"></div>
+                        <div class="form-field"><label>Destination</label><input type="text" id="f-destination" placeholder="e.g. Mumbai (BOM)"></div>
+                        <div class="form-field"><label>Departure</label><input type="time" id="f-departure"></div>
+                        <div class="form-field"><label>Arrival</label><input type="time" id="f-arrival"></div>
+                        <div class="form-field"><label>Gate</label><input type="text" id="f-gate" placeholder="e.g. G12"></div>
+                        <div class="form-field"><label>Terminal</label>
+                            <select id="f-terminal">
+                                <option value="">Select</option>
+                                <option value="T1">T1</option>
+                                <option value="T2">T2</option>
+                                <option value="T3">T3</option>
+                            </select>
+                        </div>
+                        <div class="form-field"><label>Status</label>
+                            <select id="f-status">
+                                <option value="Scheduled">Scheduled</option>
+                                <option value="Boarding">Boarding</option>
+                                <option value="Departed">Departed</option>
+                                <option value="Arrived">Arrived</option>
+                                <option value="Delayed">Delayed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn-submit" onclick="submitFlight()">Add Flight</button>
+                        <button class="btn-cancel-form" onclick="toggleForm()">Cancel</button>
+                    </div>
+                </div>
+
+                <div class="table-wrapper" id="table-wrapper">
+                    <table class="flights-table">
+                        <thead>
+                            <tr>
+                                <th>Flight</th>
+                                <th>Airline</th>
+                                <th>Route</th>
+                                <th>Departure</th>
+                                <th>Arrival</th>
+                                <th>Gate</th>
+                                <th>Terminal</th>
+                                <th>Status</th>
+                                <th id="actions-th">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="flights-tbody"></tbody>
+                    </table>
+                </div>
+                <div id="empty-state" class="empty-state hidden">
+                    <div class="empty-icon">🛬</div>
+                    <h3>No flights found</h3>
+                    <p>No flights match the current filters. Try syncing live data.</p>
+                </div>
+            </div>
+        </div>
+        <footer class="footer">
+            <p>Beumer Group — Flight Management System &copy; 2026</p>
+            <p class="footer-sub">Data refreshes every 5 seconds</p>
+        </footer>
+    </div>
+
+   <script src="/static/script.js"></script>
+</body>
+
+</html>
