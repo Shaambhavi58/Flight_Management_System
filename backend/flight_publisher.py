@@ -313,21 +313,21 @@ class DailyScheduleGenerator:
 
     def generate(self, airport_id: int, airport_iata: str) -> list:
         flights = []
-        seen = set()
+        seen = set()          # tracks unique (flight_number, airport, type) keys
+        seen_pairs: set = set()   # tracks unordered {origin, destination} city pairs
+                                  # to prevent same-batch mirror routes (A→B then B→A)
 
-        # Build a consistent list of available time slots for the day
+        # Build a consistent list of available time slots for the day.
+        # Fixed seed (date + airport) ensures identical output on repeated runs
+        # for the same calendar day.
         slots = self._build_time_slots()
-
-        # Shuffle the slots using a fixed seed (date + airport) 
-        # This ensures the schedule is randomly distributed but remains exactly the same 
-        # if this script is run multiple times on the same day.
         rng = random.Random(f"{self._today}{airport_id}")
         rng.shuffle(slots)
 
         slot_idx = 0
         used_slots = set()
 
-        # Filter routes for this specific airport
+        # Collect all routes relevant to this airport
         airport_routes = []
         for airline_code, routes in KNOWN_ROUTES.items():
             for idx, (origin, destination, duration) in enumerate(routes):
@@ -340,6 +340,7 @@ class DailyScheduleGenerator:
             if slot_idx >= len(slots):
                 break
 
+            # Advance to an unused time slot
             dep_time = slots[slot_idx]
             while dep_time in used_slots and slot_idx < len(slots) - 1:
                 slot_idx += 1
@@ -348,16 +349,16 @@ class DailyScheduleGenerator:
             used_slots.add(dep_time)
             slot_idx += 1
 
-            dep_dt  = datetime.strptime(f"2000-01-01 {dep_time}", "%Y-%m-%d %H:%M")
-            arr_dt  = dep_dt + timedelta(minutes=duration)
+            dep_dt   = datetime.strptime(f"2000-01-01 {dep_time}", "%Y-%m-%d %H:%M")
+            arr_dt   = dep_dt + timedelta(minutes=duration)
             arr_time = arr_dt.strftime("%H:%M")
 
-            # Determine flight type based on origin/destination
+            # flight_type is relative to THIS airport
             if airport_iata in origin:
-                flight_type = "departure"
+                flight_type     = "departure"
                 terminal_source = origin
             else:
-                flight_type = "arrival"
+                flight_type     = "arrival"
                 terminal_source = destination
 
             fn       = self._make_flight_number(airline_code, route_idx)
@@ -365,9 +366,13 @@ class DailyScheduleGenerator:
             gate     = self._get_gate(fn, terminal)
             status   = self._get_status(dep_time, arr_time)
 
+            # ── Primary leg ──────────────────────────────────────────────────
+            route_pair = frozenset({origin, destination})
             key = f"{fn}-{airport_id}-{flight_type}"
-            if key not in seen:
+
+            if key not in seen and route_pair not in seen_pairs:
                 seen.add(key)
+                seen_pairs.add(route_pair)
                 flights.append({
                     "flight_number":   fn,
                     "airline_code":    airline_code,
@@ -382,36 +387,12 @@ class DailyScheduleGenerator:
                     "flight_type":     flight_type,
                 })
 
-            # Also create the return leg
-            dep_slot_dt  = dep_dt + timedelta(minutes=50)
-            dep_dep_time = dep_slot_dt.strftime("%H:%M")
-            dep_arr_dt   = dep_slot_dt + timedelta(minutes=duration)
-            dep_arr_time = dep_arr_dt.strftime("%H:%M")
-
-            return_type = "arrival" if flight_type == "departure" else "departure"
-            return_term_source = destination if flight_type == "departure" else origin
-
-            fn2     = self._make_flight_number(airline_code, route_idx, offset=500)
-            term2   = self._get_terminal(airline_code, return_term_source)
-            gate2   = self._get_gate(fn2, term2)
-            status2 = self._get_status(dep_dep_time, dep_arr_time)
-
-            key2 = f"{fn2}-{airport_id}-{return_type}"
-            if key2 not in seen:
-                seen.add(key2)
-                flights.append({
-                    "flight_number":   fn2,
-                    "airline_code":    airline_code,
-                    "airport_id":      airport_id,
-                    "origin":          destination,
-                    "destination":     origin,
-                    "departure_time":  dep_dep_time,
-                    "arrival_time":    dep_arr_time,
-                    "gate_number":     gate2,
-                    "terminal_number": term2,
-                    "status":          status2,
-                    "flight_type":     return_type,
-                })
+            # ── Return leg ───────────────────────────────────────────────────
+            # The reverse pair is the same frozenset, so it is already in
+            # seen_pairs after the primary leg was added.  Skip it to avoid
+            # "Delhi→Chennai / Chennai→Delhi" appearing in the same batch.
+            # (The reverse will appear naturally when the opposite route entry
+            # in KNOWN_ROUTES is processed for a later airport or batch.)
 
         print(f"[Schedule] {airport_iata} (id={airport_id}): {len(flights)} flights for {self._today}")
         return flights

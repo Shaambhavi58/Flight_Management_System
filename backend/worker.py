@@ -97,6 +97,7 @@ def _send_batch_email(batch_id: str, flights: list):
     smtp_user     = os.getenv("SMTP_USER", "")
     smtp_password = os.getenv("SMTP_PASSWORD", "")
     report_email  = os.getenv("BATCH_REPORT_EMAIL", "")
+    dashboard_url = os.getenv("DASHBOARD_URL", "http://127.0.0.1:8000")
 
     if not smtp_user or not smtp_password or not report_email:
         print("[BatchEmail] SMTP or BATCH_REPORT_EMAIL not configured. Skipping email.")
@@ -116,27 +117,35 @@ def _send_batch_email(batch_id: str, flights: list):
     }
     time_range = time_ranges.get(batch_id, "")
 
-    rows_html = ""
-    for i, f in enumerate(flights, 1):
-        status_color = {
-            "Scheduled": "#2196F3",
-            "Boarding":  "#FF9800",
-            "Departed":  "#4CAF50",
-            "Arrived":   "#4CAF50",
-            "Delayed":   "#F44336",
-            "Cancelled": "#9E9E9E",
-        }.get(f.get("status", ""), "#333")
+    # ── Cap table at 30 rows ──────────────────────────────────────────────────
+    MAX_ROWS  = 30
+    displayed = flights[:MAX_ROWS]
+    remaining = total - MAX_ROWS
 
+    STATUS_COLORS = {
+        "Scheduled": "#2196F3",
+        "Boarding":  "#FF9800",
+        "Departed":  "#4CAF50",
+        "Arrived":   "#4CAF50",
+        "Delayed":   "#F44336",
+        "Cancelled": "#9E9E9E",
+    }
+
+    rows_html = ""
+    for i, f in enumerate(displayed, 1):
+        status_color = STATUS_COLORS.get(f.get("status", ""), "#333")
+        row_bg = "#f9f9f9" if i % 2 == 0 else "white"
         rows_html += f"""
-        <tr style="background: {'#f9f9f9' if i % 2 == 0 else 'white'};">
+        <tr style="background:{row_bg};">
             <td style="padding:10px 14px; border-bottom:1px solid #eee;">{i}</td>
-            <td style="padding:10px 14px; border-bottom:1px solid #eee; font-weight:600;">
+            <td style="padding:10px 14px; border-bottom:1px solid #eee; font-weight:600;
+                       font-family:monospace; color:#0f3460;">
                 {f.get('flight_number', '—')}
             </td>
             <td style="padding:10px 14px; border-bottom:1px solid #eee;">
                 {f.get('airline_name', f.get('airline_code', '—'))}
             </td>
-            <td style="padding:10px 14px; border-bottom:1px solid #eee;">
+            <td style="padding:10px 14px; border-bottom:1px solid #eee; color:#444;">
                 {f.get('origin', '—')} → {f.get('destination', '—')}
             </td>
             <td style="padding:10px 14px; border-bottom:1px solid #eee; text-align:center;">
@@ -148,26 +157,59 @@ def _send_batch_email(batch_id: str, flights: list):
         </tr>
         """
 
+    # ── Overflow link (only when flights > 30) ────────────────────────────────
+    overflow_html = ""
+    if remaining > 0:
+        batch_link = f"{dashboard_url}?batch={batch_id}"
+        overflow_html = f"""
+        <div style="text-align:center; margin-top:16px;">
+            <a href="{batch_link}"
+               style="display:inline-block; padding:10px 24px;
+                      background:#00a0d2; color:white; border-radius:8px;
+                      text-decoration:none; font-size:14px; font-weight:600;">
+                +{remaining} more flights processed — View Full Dashboard →
+            </a>
+        </div>
+        """
+
     html_body = f"""
     <html>
     <body style="font-family: Arial, sans-serif; background: #f5f5f5; padding: 30px;">
-        <div style="max-width: 700px; margin: 0 auto; background: white; border-radius: 12px;
-                    padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.1);">
-            <div style="text-align: center; margin-bottom: 24px;">
-                <h1 style="color: #00a0d2; margin: 0;">BEUMER Group</h1>
-                <p style="color: #1a2b49; font-size: 14px; margin-top: 4px;">
+        <div style="max-width: 720px; margin: 0 auto; background: white;
+                    border-radius: 12px; padding: 32px;
+                    box-shadow: 0 2px 12px rgba(0,0,0,0.1);">
+
+            <!-- Header -->
+            <div style="text-align:center; margin-bottom:24px;">
+                <h1 style="color:#00a0d2; margin:0; font-size:26px;">BEUMER Group</h1>
+                <p style="color:#1a2b49; font-size:13px; margin-top:4px;">
                     Flight Management System — Batch Report
                 </p>
             </div>
-            <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 16px 0;">
-            <h2 style="color: #1a2b49; margin-bottom: 4px;">
+
+            <hr style="border:none; border-top:1px solid #e0e0e0; margin:16px 0;">
+
+            <!-- Summary -->
+            <h2 style="color:#1a2b49; margin-bottom:8px; font-size:20px;">
                 {label} Batch — Flight Summary
             </h2>
-            <p style="color: #555; margin-top: 4px;">
-                Time slot: <strong>{time_range}</strong> &nbsp;|&nbsp;
-                Total flights processed: <strong>{total}</strong>
-            </p>
-            <table style="width:100%; border-collapse:collapse; margin-top:16px; font-size:14px;">
+            <table style="font-size:14px; color:#555; margin-bottom:20px; border-collapse:collapse;">
+                <tr>
+                    <td style="padding:4px 12px 4px 0;"><strong>Time slot</strong></td>
+                    <td>{time_range}</td>
+                </tr>
+                <tr>
+                    <td style="padding:4px 12px 4px 0;"><strong>Total flights</strong></td>
+                    <td>{total}</td>
+                </tr>
+                <tr>
+                    <td style="padding:4px 12px 4px 0;"><strong>Showing</strong></td>
+                    <td>Top {min(total, MAX_ROWS)} flights</td>
+                </tr>
+            </table>
+
+            <!-- Flight table -->
+            <table style="width:100%; border-collapse:collapse; font-size:14px;">
                 <thead>
                     <tr style="background:#1a2b49; color:white;">
                         <th style="padding:10px 14px; text-align:left;">#</th>
@@ -179,8 +221,11 @@ def _send_batch_email(batch_id: str, flights: list):
                 </thead>
                 <tbody>{rows_html}</tbody>
             </table>
-            <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 24px 0 16px;">
-            <p style="color: #999; font-size: 12px; text-align: center;">
+
+            {overflow_html}
+
+            <hr style="border:none; border-top:1px solid #e0e0e0; margin:24px 0 16px;">
+            <p style="color:#999; font-size:12px; text-align:center;">
                 Beumer Group — Flight Management System &copy; 2026
             </p>
         </div>
@@ -199,9 +244,12 @@ def _send_batch_email(batch_id: str, flights: list):
             server.starttls()
             server.login(smtp_user, smtp_password)
             server.send_message(msg)
-        print(f"[BatchEmail] ✅ {label} summary sent to {report_email} ({total} flights)")
+        print(f"[BatchEmail] ✅ {label} summary sent to {report_email} "
+              f"({total} total, {min(total, MAX_ROWS)} shown in email)")
     except Exception as e:
         print(f"[BatchEmail] ❌ Failed to send {label} email: {e}")
+
+
 
 
 # ── Batch Email Scheduler ─────────────────────────────────────────────────────
