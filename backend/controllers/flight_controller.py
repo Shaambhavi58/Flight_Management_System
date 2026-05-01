@@ -13,7 +13,7 @@ Access rules (enforced at BOTH controller and service layer for defence-in-depth
   DELETE /flights/clear-all        → admin only
 """
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from services.service import FlightService                      # flight business logic
 from models.schemas import FlightCreateSchema, FlightUpdateSchema, FlightSerializer  # validation & serialization
 from controllers.auth_controller import get_current_user, require_admin, require_staff_or_admin  # RBAC deps
@@ -157,6 +157,32 @@ def update_flight(
         raise HTTPException(status_code=404, detail="Flight not found")
 
     return result
+
+
+@router.post("/flights/sync-live")
+def sync_live_flights(
+    background_tasks: BackgroundTasks,
+    user: dict = Depends(require_admin),   # admin only — triggers mass publish
+):
+    """
+    Trigger a full live-flight sync via RabbitMQ (admin only).
+
+    Internally instantiates FlightDataOrchestrator from flight_publisher.py and
+    calls run_once() as a FastAPI BackgroundTask.  The HTTP response is returned
+    immediately; flights appear on the board within seconds once worker.py
+    consumes the RabbitMQ messages.
+
+    This endpoint replaces the old port-8001 publisher server — the frontend
+    Sync Live button now calls POST /flights/sync-live on port 8000 only.
+    """
+    from flight_publisher import FlightDataOrchestrator  # lazy import — avoids circular deps
+    orchestrator = FlightDataOrchestrator()
+    background_tasks.add_task(orchestrator.run_once)
+    return {
+        "message": "Generating today's full flight schedule for all 5 airports",
+        "date":    str(__import__("datetime").datetime.now().date()),
+        "note":    "Flights appear on board within seconds via RabbitMQ",
+    }
 
 
 @router.delete("/flights/clear-all")

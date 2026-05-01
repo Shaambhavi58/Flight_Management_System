@@ -1,5 +1,4 @@
 const API = window.location.origin;
-const PUB = 'http://127.0.0.1:8001';
 
 let token = localStorage.getItem('token');
 let role = localStorage.getItem('role');
@@ -12,6 +11,7 @@ let activeAirline = 'ALL';
 let selectedAirline = null;
 let activeCategory = 'arrival';
 let lastFlightCategory = 'arrival'; // remembers last real tab (arrival/departure)
+let activeStatusFilter = 'ALL'; // stat-card status filter (ALL | Arrived | Boarding | Scheduled | Delayed)
 let refreshTimer = null;
 
 const AIRPORT_ICONS = { DEL: '<img src="/static/delhi.jpg" style="width:100%;height:100%;object-fit:cover;">', BOM: '<img src="/static/mumbai.jpg" style="width:100%;height:100%;object-fit:cover;">', NMIA: '<img src="/static/nmia.jpg" style="width:100%;height:100%;object-fit:cover;">', BLR: '<img src="/static/banglore.jpg" style="width:100%;height:100%;object-fit:cover;">', HYD: '<img src="/static/hyderabad.jpg" style="width:100%;height:100%;object-fit:cover;">' };
@@ -384,6 +384,7 @@ function setupFlightPage() {
     }
     activeTerminal = 'ALL';
     activeAirline = 'ALL';
+    activeStatusFilter = 'ALL'; // reset stat-card filter on page setup
     document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
     const activeCatEl = document.querySelector(`[data-type="${activeCategory}"]`);
     if (activeCatEl) activeCatEl.classList.add('active');
@@ -391,6 +392,8 @@ function setupFlightPage() {
     document.getElementById('airline-info-section').classList.add('hidden');
     document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
     document.getElementById('airline-filter').value = 'ALL';
+    // Clear any active stat card highlight
+    document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active-stat'));
 }
 
 function setCategory(type, el) {
@@ -500,6 +503,26 @@ function updateAllAirlineCards() {
     updateAirlineCard("akasa-stats", "Akasa Air");
 }
 
+// ── Status-card filter ────────────────────────────────────────────
+// Called when a stat card is clicked. Toggles the status filter and
+// re-renders the board without re-fetching from the server.
+function filterByStatus(status) {
+    // Toggle OFF if the same card is clicked again → show all
+    activeStatusFilter = (activeStatusFilter === status) ? 'ALL' : status;
+
+    // Update active-stat class on all cards
+    document.querySelectorAll('.stat-card').forEach(card => {
+        const cardStatus = card.getAttribute('data-status');
+        if (activeStatusFilter !== 'ALL' && cardStatus === activeStatusFilter) {
+            card.classList.add('active-stat');
+        } else {
+            card.classList.remove('active-stat');
+        }
+    });
+
+    renderBoard();
+}
+
 function renderBoard() {
     // 1. Filter by category (arrival / departure)
     let filtered = allFlights.filter(f => f.flight_type === activeCategory);
@@ -516,18 +539,38 @@ function renderBoard() {
     // 5. Sort flights by departure time chronologically
     filtered.sort((a, b) => a.departure_time.localeCompare(b.departure_time));
 
-    // Update statistics dashboard before any further filtering
+    // Update stat card counts BEFORE applying the status filter so totals are never broken.
+    // Counts always reflect all flights for the current category/terminal/airline selection.
     document.getElementById('stat-total').textContent = filtered.length;
-    document.getElementById('stat-arrived').textContent = filtered.filter(f => f.status === 'Arrived').length;
-    document.getElementById('stat-boarding').textContent = filtered.filter(f => f.status === 'Boarding').length;
-    document.getElementById('stat-scheduled').textContent = filtered.filter(f => f.status === 'Scheduled').length;
-    document.getElementById('stat-delayed').textContent = filtered.filter(f => f.status === 'Delayed').length;
+    document.getElementById('stat-arrived').textContent  = filtered.filter(f => f.status.toLowerCase() === 'arrived').length;
+    document.getElementById('stat-boarding').textContent = filtered.filter(f => f.status.toLowerCase() === 'boarding').length;
+    document.getElementById('stat-scheduled').textContent = filtered.filter(f => f.status.toLowerCase() === 'scheduled').length;
+    document.getElementById('stat-delayed').textContent  = filtered.filter(f => f.status.toLowerCase() === 'delayed').length;
+
+    // 6. Apply status card filter (case-insensitive) — AFTER counting totals
+    if (activeStatusFilter !== 'ALL') {
+        const target = activeStatusFilter.toLowerCase();
+        filtered = filtered.filter(f => f.status.toLowerCase() === target);
+    }
 
     const tbody = document.getElementById('flights-tbody');
     const empty = document.getElementById('empty-state');
     const wrapper = document.getElementById('table-wrapper');
 
     if (filtered.length === 0) {
+        // Customise empty-state message when a status filter is active
+        const emptyIcon = empty.querySelector('.empty-icon');
+        const emptyTitle = empty.querySelector('h3');
+        const emptyDesc = empty.querySelector('p');
+        if (activeStatusFilter !== 'ALL') {
+            if (emptyIcon) emptyIcon.textContent = '🔍';
+            if (emptyTitle) emptyTitle.textContent = 'No flights found';
+            if (emptyDesc) emptyDesc.textContent = `No flights found for status "${activeStatusFilter}". Try a different filter.`;
+        } else {
+            if (emptyIcon) emptyIcon.textContent = '🛬';
+            if (emptyTitle) emptyTitle.textContent = 'No flights found';
+            if (emptyDesc) emptyDesc.textContent = 'No flights match the current filters. Try syncing live data.';
+        }
         empty.classList.remove('hidden');
         wrapper.style.display = 'none';
     } else {
@@ -636,15 +679,19 @@ async function editFlight(id) {
 
 async function syncLiveFlights() {
     try {
-        const res = await fetch(`${PUB}/publish`, { method: 'POST' });
+        const res = await fetch(`${API}/flights/sync-live`, {
+            method: 'POST',
+            headers: authHeaders(),
+        });
         if (res.ok) {
             showToast('Live flights syncing via RabbitMQ...', 'success');
             setTimeout(fetchFlights, 3000);
         } else {
-            showToast('Publisher not available on port 8001', 'error');
+            const err = await res.json().catch(() => ({}));
+            showToast(err.detail || 'Sync failed — check backend logs', 'error');
         }
     } catch (err) {
-        showToast('Start flight_publisher on port 8001 first', 'error');
+        showToast('Cannot reach backend — ensure uvicorn is running on port 8000', 'error');
     }
 }
 

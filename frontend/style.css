@@ -599,19 +599,81 @@ body {
     border-radius: 12px;
     padding: 16px;
     text-align: center;
-    border: 1px solid var(--gray2);
+    border: 2px solid var(--gray2);
     cursor: pointer;
-    transition: 0.2s ease;
+    transition: all 0.2s ease;
+    user-select: none;
 }
 
 .stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.10);
+    border-color: var(--gray3);
 }
 
+/* Generic active — fallback */
 .stat-card.active-stat {
-    border: 2px solid #0f172a;
-    background: #f8fafc;
+    border-color: var(--navy);
+    background: #f0f7ff;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Total — navy accent */
+.stat-card[data-status="ALL"].active-stat {
+    border-color: var(--navy);
+    background: #eff6ff;
+}
+.stat-card[data-status="ALL"].active-stat .stat-number {
+    color: var(--navy);
+}
+
+/* Arrived — green accent */
+.stat-card[data-status="Arrived"].active-stat {
+    border-color: #10b981;
+    background: #ecfdf5;
+}
+.stat-card[data-status="Arrived"].active-stat .stat-number {
+    color: #065f46;
+}
+.stat-card[data-status="Arrived"].active-stat .stat-label {
+    color: #10b981;
+}
+
+/* Boarding — blue-green accent */
+.stat-card[data-status="Boarding"].active-stat {
+    border-color: #0ea5e9;
+    background: #f0f9ff;
+}
+.stat-card[data-status="Boarding"].active-stat .stat-number {
+    color: #0369a1;
+}
+.stat-card[data-status="Boarding"].active-stat .stat-label {
+    color: #0ea5e9;
+}
+
+/* Scheduled — indigo accent */
+.stat-card[data-status="Scheduled"].active-stat {
+    border-color: #6366f1;
+    background: #eef2ff;
+}
+.stat-card[data-status="Scheduled"].active-stat .stat-number {
+    color: #4338ca;
+}
+.stat-card[data-status="Scheduled"].active-stat .stat-label {
+    color: #6366f1;
+}
+
+/* Delayed — amber accent */
+.stat-card[data-status="Delayed"].active-stat {
+    border-color: #f59e0b;
+    background: #fffbeb;
+}
+.stat-card[data-status="Delayed"].active-stat .stat-number {
+    color: #92400e;
+}
+.stat-card[data-status="Delayed"].active-stat .stat-label {
+    color: #f59e0b;
 }
 
 .stat-number {

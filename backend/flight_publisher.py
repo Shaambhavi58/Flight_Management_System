@@ -9,7 +9,9 @@ Resets at midnight with fresh day's schedule.
 Usage:
   1. Manual once:   python flight_publisher.py
   2. Daily auto:    python flight_publisher.py --daily
-  3. As API:        uvicorn flight_publisher:app --port 8001
+
+  Sync Live trigger is now handled by POST /flights/sync-live
+  on the main FastAPI backend (port 8000) — no separate server needed.
 """
 
 import os
