@@ -90,7 +90,7 @@ The system manages flight schedules across **5 major Indian airports** and **5 a
 ┌─────────────────────────────────────────────────────────────────┐
 │              flight_publisher.py (Daily Scheduler)              │
 │   KNOWN_ROUTES → DailyScheduleGenerator → RabbitMQ Queue       │
-│   Runs at midnight · Generates full 24hr schedule               │
+│   Sync Live triggered via POST /flights/sync-live (port 8000)   │
 └─────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────┐
@@ -276,15 +276,7 @@ cd backend
 python worker.py
 ```
 
-### Terminal 3 — Daily Flight Publisher
-```bash
-cd Beumer_Flight_Management_System
-.\.venv\Scripts\Activate.ps1
-cd backend
-python flight_publisher.py --daily
-```
-
-### Terminal 4 — OpenSky Status Updater
+### Terminal 3 — OpenSky Status Updater
 ```bash
 cd Beumer_Flight_Management_System
 .\.venv\Scripts\Activate.ps1

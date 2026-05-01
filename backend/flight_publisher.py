@@ -1,17 +1,17 @@
 """
-flight_publisher.py — External Flight Data Publisher v2
-=======================================================
-Fetches REAL flight routes from AviationStack API.
+flight_publisher.py — Flight Data Publisher Library
+=====================================================
+Pure library module — imported by the main FastAPI backend (port 8000).
 Generates today's FULL DAY schedule (00:00 to 23:59).
 Statuses update automatically based on current time.
-Resets at midnight with fresh day's schedule.
 
-Usage:
-  1. Manual once:   python flight_publisher.py
-  2. Daily auto:    python flight_publisher.py --daily
+Sync Live endpoint: POST /flights/sync-live  →  app.py → flight_controller.py
+                    This file is NOT run as a standalone server.
 
-  Sync Live trigger is now handled by POST /flights/sync-live
-  on the main FastAPI backend (port 8000) — no separate server needed.
+CLI (optional, for manual testing only):
+  python flight_publisher.py           # publish once
+  python flight_publisher.py --daily   # run daily loop
+  python flight_publisher.py --airport DEL
 """
 
 import os
@@ -19,26 +19,16 @@ import json
 import time
 import random
 import argparse
-import requests
 import pika
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
-try:
-    from fastapi import FastAPI, HTTPException, BackgroundTasks
-    from fastapi.middleware.cors import CORSMiddleware
-    HAS_FASTAPI = True
-except ImportError:
-    HAS_FASTAPI = False
-
 load_dotenv()
 
-AVIATIONSTACK_KEY = os.getenv("AVIATIONSTACK_KEY", "1a7d8a5e7f3bcbce8f1e0f9eaf564f60")
-AVIATIONSTACK_URL = "http://api.aviationstack.com/v1/flights"
-RABBITMQ_HOST     = os.getenv("RABBITMQ_HOST", "localhost")
-EXCHANGE_NAME     = "flights.morning"
-QUEUE_NAME        = "morning_flights_queue"
-ROUTING_KEY       = "flight.morning.data"
+RABBITMQ_HOST = os.getenv("RABBITMQ_HOST", "localhost")
+EXCHANGE_NAME = "flights.morning"
+QUEUE_NAME    = "morning_flights_queue"
+ROUTING_KEY   = "flight.morning.data"
 
 AIRPORTS = [
     {"iata": "DEL",  "airport_id": 1, "city": "Delhi"},
@@ -47,8 +37,6 @@ AIRPORTS = [
     {"iata": "BLR",  "airport_id": 4, "city": "Bangalore"},
     {"iata": "HYD",  "airport_id": 5, "city": "Hyderabad"},
 ]
-
-SUPPORTED_AIRLINES = {"6E", "QP", "EK", "AI", "UK"}
 
 TERMINAL_MAP = {
     ("6E", False): "T1", ("6E", True): "T1",
@@ -217,6 +205,7 @@ KNOWN_ROUTES = {
         ("Hyderabad (HYD)",   "Chennai (MAA)",        70),
     ],
 }
+
 FLIGHT_PREFIXES = {
     "6E": ("6E", 100,  9999),
     "QP": ("QP", 1000, 1999),
@@ -231,11 +220,10 @@ FLIGHT_PREFIXES = {
 class DailyScheduleGenerator:
     """
     Generates a full day's realistic flight schedule.
-    - Uses real routes (from AviationStack or known routes)
-    - Spreads flights across 00:00-23:59 with morning/evening peaks
-    - Computes live status based on current time
-    - Same flight number every day (consistent), different timings
-    - Resets completely at midnight
+    - Spreads flights across 00:00-23:59 with morning/evening peaks.
+    - Computes live status based on current time.
+    - Same flight numbers every day (consistent seed), different timings.
+    - Resets completely at midnight.
     """
 
     def __init__(self):
@@ -255,33 +243,28 @@ class DailyScheduleGenerator:
         return f"G{gate_num}"
 
     def _get_status(self, dep_time: str, arr_time: str) -> str:
-        # Get the current time to calculate live status dynamically
+        """Compute live flight status based on current wall-clock time."""
         now = datetime.now()
         today_str = now.strftime("%Y-%m-%d")
         try:
-            # Parse departure and arrival times using today's date
             dep_dt = datetime.strptime(f"{today_str} {dep_time}", "%Y-%m-%d %H:%M")
             arr_dt = datetime.strptime(f"{today_str} {arr_time}", "%Y-%m-%d %H:%M")
-            
-            # If arrival time is earlier than departure time, the flight lands the next day
+            # Handle overnight arrivals
             if arr_dt < dep_dt:
                 arr_dt += timedelta(days=1)
         except Exception:
             return "Scheduled"
 
-        # Calculate time difference in minutes from now until departure
         diff_dep = (dep_dt - now).total_seconds() / 60
 
-        # Assign status based on the current time vs departure/arrival times
         if now > arr_dt:
-            return "Arrived"      # Flight has already landed
+            return "Arrived"
         elif now > dep_dt:
-            return "Departed"     # Flight has taken off but not yet landed
+            return "Departed"
         elif -5 <= diff_dep <= 45:
-            # Flight is departing very soon; assign randomly as Delayed or Boarding
             return "Delayed" if random.random() < 0.12 else "Boarding"
         else:
-            return "Scheduled"    # Flight is still in the future
+            return "Scheduled"
 
     def _make_flight_number(self, airline_code: str, route_idx: int, offset: int = 0) -> str:
         prefix, low, high = FLIGHT_PREFIXES[airline_code]
@@ -291,63 +274,51 @@ class DailyScheduleGenerator:
 
     def _build_time_slots(self) -> list:
         slots = []
-        # 04:00-06:00 international arrivals
-        for h in range(4, 6):
+        for h in range(4, 6):      # 04:00-06:00 international arrivals
             for m in [0, 20, 45]:
                 slots.append(f"{h:02d}:{m:02d}")
-        # 06:00-10:00 morning peak
-        for h in range(6, 10):
+        for h in range(6, 10):     # 06:00-10:00 morning peak
             for m in [0, 10, 20, 35, 50]:
                 slots.append(f"{h:02d}:{m:02d}")
-        # 10:00-15:00 midday
-        for h in range(10, 15):
+        for h in range(10, 15):    # 10:00-15:00 midday
             for m in [0, 20, 45]:
                 slots.append(f"{h:02d}:{m:02d}")
-        # 15:00-21:00 evening peak
-        for h in range(15, 21):
+        for h in range(15, 21):    # 15:00-21:00 evening peak
             for m in [0, 15, 30, 50]:
                 slots.append(f"{h:02d}:{m:02d}")
-        # 21:00-23:30 night
-        for h in range(21, 24):
+        for h in range(21, 24):    # 21:00-23:30 night
             for m in [0, 30]:
                 slots.append(f"{h:02d}:{m:02d}")
         return slots
 
     def generate(self, airport_id: int, airport_iata: str) -> list:
-        flights = []
-        seen = set()          # tracks unique (flight_number, airport, type) keys
-        seen_pairs: set = set()   # tracks unordered {origin, destination} city pairs
-                                  # to prevent same-batch mirror routes (A→B then B→A)
+        """Generate all flights for one airport for today."""
+        flights    = []
+        seen       = set()
+        seen_pairs: set = set()
 
-        # Build a consistent list of available time slots for the day.
-        # Fixed seed (date + airport) ensures identical output on repeated runs
-        # for the same calendar day.
         slots = self._build_time_slots()
-        rng = random.Random(f"{self._today}{airport_id}")
+        rng   = random.Random(f"{self._today}{airport_id}")
         rng.shuffle(slots)
 
-        slot_idx = 0
+        slot_idx   = 0
         used_slots = set()
 
-        # Collect all routes relevant to this airport
         airport_routes = []
         for airline_code, routes in KNOWN_ROUTES.items():
             for idx, (origin, destination, duration) in enumerate(routes):
                 if airport_iata in origin or airport_iata in destination:
                     airport_routes.append((airline_code, origin, destination, duration, idx))
-
         rng.shuffle(airport_routes)
 
         for (airline_code, origin, destination, duration, route_idx) in airport_routes:
             if slot_idx >= len(slots):
                 break
 
-            # Advance to an unused time slot
             dep_time = slots[slot_idx]
             while dep_time in used_slots and slot_idx < len(slots) - 1:
                 slot_idx += 1
                 dep_time = slots[slot_idx]
-
             used_slots.add(dep_time)
             slot_idx += 1
 
@@ -355,7 +326,6 @@ class DailyScheduleGenerator:
             arr_dt   = dep_dt + timedelta(minutes=duration)
             arr_time = arr_dt.strftime("%H:%M")
 
-            # flight_type is relative to THIS airport
             if airport_iata in origin:
                 flight_type     = "departure"
                 terminal_source = origin
@@ -363,14 +333,12 @@ class DailyScheduleGenerator:
                 flight_type     = "arrival"
                 terminal_source = destination
 
-            fn       = self._make_flight_number(airline_code, route_idx)
-            terminal = self._get_terminal(airline_code, terminal_source)
-            gate     = self._get_gate(fn, terminal)
-            status   = self._get_status(dep_time, arr_time)
-
-            # ── Primary leg ──────────────────────────────────────────────────
+            fn         = self._make_flight_number(airline_code, route_idx)
+            terminal   = self._get_terminal(airline_code, terminal_source)
+            gate       = self._get_gate(fn, terminal)
+            status     = self._get_status(dep_time, arr_time)
             route_pair = frozenset({origin, destination})
-            key = f"{fn}-{airport_id}-{flight_type}"
+            key        = f"{fn}-{airport_id}-{flight_type}"
 
             if key not in seen and route_pair not in seen_pairs:
                 seen.add(key)
@@ -389,46 +357,17 @@ class DailyScheduleGenerator:
                     "flight_type":     flight_type,
                 })
 
-            # ── Return leg ───────────────────────────────────────────────────
-            # The reverse pair is the same frozenset, so it is already in
-            # seen_pairs after the primary leg was added.  Skip it to avoid
-            # "Delhi→Chennai / Chennai→Delhi" appearing in the same batch.
-            # (The reverse will appear naturally when the opposite route entry
-            # in KNOWN_ROUTES is processed for a later airport or batch.)
-
-        print(f"[Schedule] {airport_iata} (id={airport_id}): {len(flights)} flights for {self._today}")
         return flights
-
-
-# ── AviationStack Fetcher ──────────────────────────────────────────
-
-class AviationStackFetcher:
-
-    def __init__(self, api_key: str):
-        self._key = api_key
-
-    def ping(self, airport_iata: str) -> bool:
-        params = {"access_key": self._key, "arr_iata": airport_iata, "limit": 1}
-        try:
-            resp = requests.get(AVIATIONSTACK_URL, params=params, timeout=10)
-            data = resp.json()
-            if "error" in data:
-                print(f"[AviationStack] API error: {data['error'].get('info','')}")
-                return False
-            print(f"[AviationStack] API reachable — {len(data.get('data',[]))} flights returned")
-            return True
-        except Exception as e:
-            print(f"[AviationStack] Unreachable: {e}")
-            return False
 
 
 # ── RabbitMQ Publisher ─────────────────────────────────────────────
 
 class FlightPublisher:
+    """Connects to RabbitMQ and publishes flight dicts as durable JSON messages."""
 
     def __init__(self):
         self._connection = None
-        self._channel = None
+        self._channel    = None
 
     def connect(self):
         self._connection = pika.BlockingConnection(
@@ -438,18 +377,17 @@ class FlightPublisher:
         self._channel.exchange_declare(exchange=EXCHANGE_NAME, exchange_type="direct", durable=True)
         self._channel.queue_declare(queue=QUEUE_NAME, durable=True)
         self._channel.queue_bind(queue=QUEUE_NAME, exchange=EXCHANGE_NAME, routing_key=ROUTING_KEY)
-        print(f"[Publisher] Connected to RabbitMQ")
 
     def publish_batch(self, flights: list) -> int:
         """
-        Publishes a list of flight dictionaries to the RabbitMQ exchange.
-        Each flight is sent as a separate JSON message.
+        Publish a list of flight dicts to RabbitMQ.
+        Returns the number of messages successfully published.
         """
         if not self._connection or self._connection.is_closed:
             try:
                 self.connect()
             except Exception as e:
-                print(f"[Publisher] Cannot connect: {e}")
+                print(f"[Sync Live] RabbitMQ connection failed: {e}")
                 return 0
 
         if not self._channel:
@@ -465,11 +403,8 @@ class FlightPublisher:
                     properties=pika.BasicProperties(delivery_mode=2, content_type="application/json"),
                 )
                 published += 1
-                airline_names = {"6E": "IndiGo", "QP": "Akasa Air", "EK": "Emirates", "AI": "Air India", "UK": "Vistara"}
-                airline_name = airline_names.get(f['airline_code'], f['airline_code'])
-                print(f"[+] {f['flight_number']:10} | {airline_name:10} | {f['flight_type']:9} | {f['terminal_number']} | {f['gate_number']:4} | {f['status']:10} | {f['departure_time']}")
             except Exception as e:
-                print(f"[Publisher] Error: {e}")
+                print(f"[Sync Live] Publish error for {f.get('flight_number', '?')}: {e}")
 
         self.close()
         return published
@@ -485,113 +420,122 @@ class FlightPublisher:
 # ── Orchestrator ───────────────────────────────────────────────────
 
 class FlightDataOrchestrator:
+    """
+    Coordinates schedule generation + RabbitMQ publishing for all airports.
+    Triggered by POST /flights/sync-live on the main backend.
+    """
 
     def __init__(self):
         self._last_run_date = None
 
-    def run_once(self) -> dict:
+    def run_once(self, triggered_by: str = "system") -> dict:
+        """
+        Generate today's full flight schedule and publish to RabbitMQ.
+        Emits structured [Sync Live] log lines for observability.
+
+        Args:
+            triggered_by: username of the admin who triggered the sync (for logs).
+
+        Returns:
+            Summary dict with date, counts, and execution time.
+        """
+        start_time = time.monotonic()
+        today      = datetime.now()
+
         print(f"\n{'='*60}")
-        print(f"[Orchestrator] Generating daily schedule — {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        print(f"{'='*60}\n")
+        print(f"[Sync Live] Started by {triggered_by} — {today.strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"{'='*60}")
 
-        generator = DailyScheduleGenerator()
-        all_flights = []
+        generator       = DailyScheduleGenerator()
+        publisher       = FlightPublisher()
+        all_flights     = []
+        airport_summary = {}   # iata → count published
 
+        # Connect once for the whole batch
+        try:
+            publisher.connect()
+            print(f"[Sync Live] RabbitMQ connected")
+        except Exception as e:
+            print(f"[Sync Live] RabbitMQ connection failed — aborting: {e}")
+            return {"error": str(e), "published": 0}
+
+        # Generate + publish per airport, tracking counts
         for airport in AIRPORTS:
-            flights = generator.generate(airport["airport_id"], airport["iata"])
+            iata       = airport["iata"]
+            airport_id = airport["airport_id"]
+            city       = airport["city"]
+
+            flights = generator.generate(airport_id, iata)
+            count   = 0
+
+            for f in flights:
+                try:
+                    publisher._channel.basic_publish(
+                        exchange=EXCHANGE_NAME,
+                        routing_key=ROUTING_KEY,
+                        body=json.dumps(f),
+                        properties=pika.BasicProperties(delivery_mode=2, content_type="application/json"),
+                    )
+                    count += 1
+                except Exception as e:
+                    print(f"[Sync Live] Error publishing {f.get('flight_number', '?')}: {e}")
+
             all_flights.extend(flights)
+            airport_summary[iata] = count
+            print(f"[Sync Live] {iata} ({city}) → {count} flights published")
 
-        print(f"\n[Orchestrator] Total: {len(all_flights)} flights across {len(AIRPORTS)} airports")
-        published = FlightPublisher().publish_batch(all_flights)
-        self._last_run_date = datetime.now().date()
+        publisher.close()
 
-        summary = {
-            "date":      str(self._last_run_date),
-            "timestamp": datetime.now().isoformat(),
-            "generated": len(all_flights),
-            "published": published,
-        }
-        print(f"\n[Orchestrator] Done — {published} flights published to RabbitMQ")
+        total_published = sum(airport_summary.values())
+        elapsed_ms      = int((time.monotonic() - start_time) * 1000)
+        self._last_run_date = today.date()
+
+        print(f"[Sync Live] Total published: {total_published} flights across {len(AIRPORTS)} airports")
+        print(f"[Sync Live] Completed successfully in {elapsed_ms}ms")
         print(f"{'='*60}\n")
-        return summary
+
+        return {
+            "date":       str(self._last_run_date),
+            "timestamp":  today.isoformat(),
+            "generated":  len(all_flights),
+            "published":  total_published,
+            "by_airport": airport_summary,
+            "elapsed_ms": elapsed_ms,
+            "triggered_by": triggered_by,
+        }
 
     def run_daily(self):
-        """Runs at startup and resets at midnight every day."""
-        print(f"[Orchestrator] Daily mode — auto-resets at midnight")
+        """Runs at startup and resets at midnight every day (CLI --daily mode)."""
+        print(f"[Sync Live] Daily mode — auto-resets at midnight")
         while True:
             try:
                 today = datetime.now().date()
                 if self._last_run_date != today:
-                    print(f"[Orchestrator] New day: {today} — generating fresh schedule")
-                    self.run_once()
-                now = datetime.now()
+                    print(f"[Sync Live] New day: {today} — generating fresh schedule")
+                    self.run_once(triggered_by="daily-scheduler")
+                now      = datetime.now()
                 midnight = datetime.combine(today + timedelta(days=1), datetime.min.time())
                 sleep_secs = (midnight - now).total_seconds()
-                print(f"[Orchestrator] Next reset at midnight ({int(sleep_secs//3600)}h {int((sleep_secs%3600)//60)}m away)")
+                print(f"[Sync Live] Next reset at midnight "
+                      f"({int(sleep_secs // 3600)}h {int((sleep_secs % 3600) // 60)}m away)")
                 time.sleep(min(sleep_secs + 5, 1800))
             except KeyboardInterrupt:
-                print("\n[Orchestrator] Stopped.")
+                print("\n[Sync Live] Daily mode stopped.")
                 break
             except Exception as e:
-                print(f"[Orchestrator] Error: {e}")
+                print(f"[Sync Live] Error in daily loop: {e}")
                 time.sleep(300)
 
 
-# ── FastAPI ────────────────────────────────────────────────────────
-
-if HAS_FASTAPI:
-    app = FastAPI(
-        title="Flight Data Publisher",
-        description="Generates realistic daily flight schedules and publishes to RabbitMQ",
-        version="2.0.0",
-    )
-    app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
-    _orch = FlightDataOrchestrator()
-
-    @app.get("/")
-    def root():
-        return {
-            "service": "Flight Data Publisher v2",
-            "status":  "running",
-            "date":    str(datetime.now().date()),
-            "time":    datetime.now().strftime("%H:%M:%S"),
-        }
-
-    @app.get("/health")
-    def health():
-        return {"status": "ok", "timestamp": datetime.now().isoformat()}
-
-    @app.post("/publish")
-    def trigger_publish(background_tasks: BackgroundTasks):
-        background_tasks.add_task(_orch.run_once)
-        return {
-            "message": "Generating today's full flight schedule for all 5 airports",
-            "date":    str(datetime.now().date()),
-            "note":    "Flights appear on board within seconds via RabbitMQ",
-        }
-
-    @app.post("/publish/{airport_iata}")
-    def trigger_airport(airport_iata: str, background_tasks: BackgroundTasks):
-        airport_iata = airport_iata.upper()
-        matched = [a for a in AIRPORTS if a["iata"] == airport_iata]
-        if not matched:
-            raise HTTPException(404, f"Airport '{airport_iata}' not found")
-        def _run():
-            gen = DailyScheduleGenerator()
-            flights = []
-            for a in matched:
-                flights.extend(gen.generate(a["airport_id"], a["iata"]))
-            FlightPublisher().publish_batch(flights)
-        background_tasks.add_task(_run)
-        return {"message": f"Generating schedule for {airport_iata}"}
-
-
-# ── CLI ────────────────────────────────────────────────────────────
+# ── CLI (manual testing only) ──────────────────────────────────────
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Flight Data Publisher v2")
+    parser = argparse.ArgumentParser(
+        description="Flight Data Publisher — CLI for manual testing",
+        epilog="For Sync Live via UI, use POST /flights/sync-live on the main backend."
+    )
     parser.add_argument("--daily",   action="store_true", help="Run daily mode (auto-resets at midnight)")
-    parser.add_argument("--airport", type=str, default=None, help="Single airport IATA (e.g. DEL)")
+    parser.add_argument("--airport", type=str, default=None, help="Publish for a single airport IATA (e.g. DEL)")
     args = parser.parse_args()
 
     orch = FlightDataOrchestrator()
@@ -599,14 +543,26 @@ if __name__ == "__main__":
     if args.daily:
         orch.run_daily()
     elif args.airport:
-        gen = DailyScheduleGenerator()
-        matched = [a for a in AIRPORTS if a["iata"] == args.airport.upper()]
+        iata    = args.airport.upper()
+        matched = [a for a in AIRPORTS if a["iata"] == iata]
         if not matched:
-            print(f"Airport '{args.airport}' not found")
+            print(f"[CLI] Airport '{iata}' not found. Available: {[a['iata'] for a in AIRPORTS]}")
         else:
-            flights = []
+            gen   = DailyScheduleGenerator()
+            pub   = FlightPublisher()
+            pub.connect()
+            total = 0
             for a in matched:
-                flights.extend(gen.generate(a["airport_id"], a["iata"]))
-            FlightPublisher().publish_batch(flights)
+                flights = gen.generate(a["airport_id"], a["iata"])
+                for f in flights:
+                    pub._channel.basic_publish(
+                        exchange=EXCHANGE_NAME,
+                        routing_key=ROUTING_KEY,
+                        body=json.dumps(f),
+                        properties=pika.BasicProperties(delivery_mode=2, content_type="application/json"),
+                    )
+                    total += 1
+            pub.close()
+            print(f"[CLI] Published {total} flights for {iata}")
     else:
-        orch.run_once()
+        orch.run_once(triggered_by="cli")

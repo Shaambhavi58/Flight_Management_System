@@ -176,12 +176,14 @@ def sync_live_flights(
     Sync Live button now calls POST /flights/sync-live on port 8000 only.
     """
     from flight_publisher import FlightDataOrchestrator  # lazy import — avoids circular deps
-    orchestrator = FlightDataOrchestrator()
-    background_tasks.add_task(orchestrator.run_once)
+    orchestrator  = FlightDataOrchestrator()
+    triggered_by  = user.get("username", "admin")          # pass username for structured logs
+    background_tasks.add_task(orchestrator.run_once, triggered_by)
     return {
         "message": "Generating today's full flight schedule for all 5 airports",
         "date":    str(__import__("datetime").datetime.now().date()),
         "note":    "Flights appear on board within seconds via RabbitMQ",
+        "triggered_by": triggered_by,
     }
 
 

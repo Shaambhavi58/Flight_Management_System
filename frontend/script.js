@@ -171,15 +171,21 @@ async function loadAirports() {
 
         const grid = document.getElementById('airports-grid');
         grid.innerHTML = '';
+
+        // Render cards first with a loading placeholder for stats
         airports.forEach(a => {
             const card = document.createElement('div');
             card.className = 'airport-card';
+            card.id = `airport-card-${a.id}`;
             card.innerHTML = `
 <div class="airport-card-img">${AIRPORT_ICONS[a.code] || '✈️'}</div>
 <div class="airport-card-body">
   <span class="airport-code-badge">${a.code}</span>
   <h3>${a.name}</h3>
   <p>${a.city}</p>
+  <div class="airport-mini-stats" id="airport-stats-${a.id}">
+    <span class="mini-stat-loading">⏳ Loading stats...</span>
+  </div>
 </div>`;
             card.onclick = () => {
                 selectedAirport = a;
@@ -188,6 +194,38 @@ async function loadAirports() {
             };
             grid.appendChild(card);
         });
+
+        // Fetch stats for all airports in parallel
+        const now = Date.now();
+        await Promise.all(airports.map(async a => {
+            try {
+                const fr = await fetch(`${API}/airports/${a.id}/flights`, { headers: authHeaders() });
+                if (!fr.ok) return;
+                const flights = await fr.json();
+
+                const total    = flights.length;
+                const delayed  = flights.filter(f => f.status?.toLowerCase() === 'delayed').length;
+                const boarding = flights.filter(f => f.status?.toLowerCase() === 'boarding').length;
+                const secAgo   = Math.round((Date.now() - now) / 1000);
+                const updated  = secAgo < 5 ? 'just now' : `${secAgo}s ago`;
+
+                const statsEl = document.getElementById(`airport-stats-${a.id}`);
+                if (!statsEl) return;
+
+                if (total === 0) {
+                    statsEl.innerHTML = `<span class="mini-stat-empty">No flights today</span>`;
+                } else {
+                    statsEl.innerHTML = `
+<div class="mini-stat-row">
+  <span class="mini-stat-item">${total} flights</span>
+  ${delayed  ? `<span class="mini-stat-item mini-stat-delayed">⚠ ${delayed} delayed</span>`   : ''}
+  ${boarding ? `<span class="mini-stat-item mini-stat-boarding">✈ ${boarding} boarding</span>` : ''}
+</div>
+<div class="mini-stat-updated">Updated ${updated}</div>`;
+                }
+            } catch (_) { /* silent fail — stats are non-critical */ }
+        }));
+
     } catch (err) { console.error(err); }
 }
 
@@ -678,20 +716,33 @@ async function editFlight(id) {
 }
 
 async function syncLiveFlights() {
+    const btn = document.getElementById('btn-sync-live');
+    if (!btn) return;
+
+    // ── Loading state ──────────────────────────────────────────
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.innerHTML = '<span class="btn-spinner"></span> Syncing...';
+
     try {
         const res = await fetch(`${API}/flights/sync-live`, {
             method: 'POST',
             headers: authHeaders(),
         });
+
         if (res.ok) {
-            showToast('Live flights syncing via RabbitMQ...', 'success');
-            setTimeout(fetchFlights, 3000);
+            showToast('✅ Live flight sync completed successfully', 'success');
+            setTimeout(fetchFlights, 4000);   // allow worker a moment to process
         } else {
             const err = await res.json().catch(() => ({}));
-            showToast(err.detail || 'Sync failed — check backend logs', 'error');
+            showToast(err.detail || '❌ Sync failed — check backend logs', 'error');
         }
     } catch (err) {
-        showToast('Cannot reach backend — ensure uvicorn is running on port 8000', 'error');
+        showToast('❌ Cannot reach backend — ensure uvicorn is running on port 8000', 'error');
+    } finally {
+        // ── Restore button regardless of outcome ───────────────
+        btn.disabled = false;
+        btn.innerHTML = originalText;
     }
 }
 
