@@ -178,13 +178,18 @@ async function loadAirports() {
             card.className = 'airport-card';
             card.id = `airport-card-${a.id}`;
             card.innerHTML = `
-<div class="airport-card-img">${AIRPORT_ICONS[a.code] || '✈️'}</div>
+<div class="airport-card-img-wrapper">
+  <div class="airport-card-img">${AIRPORT_ICONS[a.code] || '✈️'}</div>
+</div>
 <div class="airport-card-body">
   <span class="airport-code-badge">${a.code}</span>
   <h3>${a.name}</h3>
-  <p>${a.city}</p>
+  <p class="text-muted">${a.city}</p>
   <div class="airport-mini-stats" id="airport-stats-${a.id}">
     <span class="mini-stat-loading">⏳ Loading stats...</span>
+  </div>
+  <div class="airport-card-footer">
+    <button class="btn-view-flights">View Flights &rarr;</button>
   </div>
 </div>`;
             card.onclick = () => {
@@ -217,9 +222,9 @@ async function loadAirports() {
                 } else {
                     statsEl.innerHTML = `
 <div class="mini-stat-row">
-  <span class="mini-stat-item">${total} flights</span>
-  ${delayed  ? `<span class="mini-stat-item mini-stat-delayed">⚠ ${delayed} delayed</span>`   : ''}
-  ${boarding ? `<span class="mini-stat-item mini-stat-boarding">✈ ${boarding} boarding</span>` : ''}
+  <span class="mini-stat-item mini-stat-total">✈ ${total} Flights</span>
+  ${delayed  ? `<span class="mini-stat-item mini-stat-delayed">⚠ ${delayed} Delayed</span>`   : ''}
+  ${boarding ? `<span class="mini-stat-item mini-stat-boarding">🛫 ${boarding} Boarding</span>` : ''}
 </div>
 <div class="mini-stat-updated">Updated ${updated}</div>`;
                 }
