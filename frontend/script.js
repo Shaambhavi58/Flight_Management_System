@@ -185,12 +185,6 @@ async function loadAirports() {
   <span class="airport-code-badge">${a.code}</span>
   <h3>${a.name}</h3>
   <p class="text-muted">${a.city}</p>
-  <div class="airport-mini-stats" id="airport-stats-${a.id}">
-    <span class="mini-stat-loading">⏳ Loading stats...</span>
-  </div>
-  <div class="airport-card-footer">
-    <button class="btn-view-flights">View Flights &rarr;</button>
-  </div>
 </div>`;
             card.onclick = () => {
                 selectedAirport = a;
@@ -200,36 +194,6 @@ async function loadAirports() {
             grid.appendChild(card);
         });
 
-        // Fetch stats for all airports in parallel
-        const now = Date.now();
-        await Promise.all(airports.map(async a => {
-            try {
-                const fr = await fetch(`${API}/airports/${a.id}/flights`, { headers: authHeaders() });
-                if (!fr.ok) return;
-                const flights = await fr.json();
-
-                const total    = flights.length;
-                const delayed  = flights.filter(f => f.status?.toLowerCase() === 'delayed').length;
-                const boarding = flights.filter(f => f.status?.toLowerCase() === 'boarding').length;
-                const secAgo   = Math.round((Date.now() - now) / 1000);
-                const updated  = secAgo < 5 ? 'just now' : `${secAgo}s ago`;
-
-                const statsEl = document.getElementById(`airport-stats-${a.id}`);
-                if (!statsEl) return;
-
-                if (total === 0) {
-                    statsEl.innerHTML = `<span class="mini-stat-empty">No flights today</span>`;
-                } else {
-                    statsEl.innerHTML = `
-<div class="mini-stat-row">
-  <span class="mini-stat-item mini-stat-total">✈ ${total} Flights</span>
-  ${delayed  ? `<span class="mini-stat-item mini-stat-delayed">⚠ ${delayed} Delayed</span>`   : ''}
-  ${boarding ? `<span class="mini-stat-item mini-stat-boarding">🛫 ${boarding} Boarding</span>` : ''}
-</div>
-<div class="mini-stat-updated">Updated ${updated}</div>`;
-                }
-            } catch (_) { /* silent fail — stats are non-critical */ }
-        }));
 
     } catch (err) { console.error(err); }
 }
