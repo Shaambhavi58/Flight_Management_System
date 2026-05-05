@@ -941,10 +941,16 @@ function renderAirlineChart(data) {
 
     const palette = ['#0ea5e9', '#6366f1', '#10b981', '#f59e0b', '#ef4444'];
 
+    const airlineLabels = data.map(d => {
+        const code = d.airline_code || d.code || '';
+        const name = d.airline_name || d.name || d.airline || '';
+        return code && name ? `${code} • ${name}` : (name || code || 'Unknown');
+    });
+
     airlineChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: data.map(d => `${d.airline_code || d.code || ''} • ${d.airline_name || d.airline}`),
+            labels: airlineLabels,
             datasets: [{
                 label: 'Flights',
                 data: data.map(d => d.count),
@@ -963,7 +969,7 @@ function renderAirlineChart(data) {
                         label: function(context) {
                             const d = data[context.dataIndex];
                             const code = d.airline_code || d.code || '??';
-                            const name = d.airline_name || d.airline || 'Unknown';
+                            const name = d.airline_name || d.name || d.airline || 'Unknown';
                             return [
                                 `Airline: ${code} • ${name}`,
                                 `Total Flights: ${d.count}`
