@@ -33,20 +33,46 @@ class AnalyticsService:
     def get_status_distribution(self):
         with self.db.session_scope() as session:
             result = session.query(FlightModel.status, func.count(FlightModel.id)).group_by(FlightModel.status).all()
+            
+            print("\n[Analytics] Status Distribution:")
+            for status, count in result:
+                print(f"  {status}: {count}")
+                
             return [{"status": status, "count": count} for status, count in result]
 
     def get_flights_per_airline(self):
         with self.db.session_scope() as session:
-            result = session.query(AirlineModel.name, func.count(FlightModel.id)).join(FlightModel).group_by(AirlineModel.id).all()
+            # Group by airline ID and name to show real counts from DB
+            result = session.query(
+                AirlineModel.name, 
+                func.count(FlightModel.id)
+            ).join(FlightModel).group_by(AirlineModel.id, AirlineModel.name).all()
+            
+            print("\n[Analytics] Flights per Airline:")
+            for name, count in result:
+                print(f"  {name}: {count}")
+                
             return [{"airline": name, "count": count} for name, count in result]
 
     def get_airport_comparison(self):
         with self.db.session_scope() as session:
             # Active flights per airport (Boarding, Departed, Delayed)
-            result = session.query(AirportModel.code, func.count(FlightModel.id)).outerjoin(
-                FlightModel, (AirportModel.id == FlightModel.airport_id) & (FlightModel.status.in_(["Boarding", "Departed", "Delayed"]))
-            ).group_by(AirportModel.id).all()
-            return [{"airport": code, "active_flights": count} for code, count in result]
+            # Must join flights.airport_id with airports.id to get codes
+            result = session.query(
+                AirportModel.id,
+                AirportModel.code, 
+                func.count(FlightModel.id)
+            ).outerjoin(
+                FlightModel, 
+                (AirportModel.id == FlightModel.airport_id) & 
+                (FlightModel.status.in_(["Boarding", "Departed", "Delayed"]))
+            ).group_by(AirportModel.id, AirportModel.code).all()
+            
+            print("\n[Analytics] Active Flights by Airport (Audit):")
+            for aid, code, count in result:
+                print(f"  airport_id: {aid} | airport_code: {code} | active_flights: {count}")
+            
+            return [{"airport": code, "active_flights": count} for _, code, count in result]
 
     def get_live_alerts(self):
         with self.db.session_scope() as session:
