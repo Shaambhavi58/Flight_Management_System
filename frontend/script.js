@@ -944,7 +944,7 @@ function renderAirlineChart(data) {
     airlineChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: data.map(d => d.airline),
+            labels: data.map(d => `${d.airline_code || d.code || ''} • ${d.airline_name || d.airline}`),
             datasets: [{
                 label: 'Flights',
                 data: data.map(d => d.count),
@@ -956,7 +956,22 @@ function renderAirlineChart(data) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
+            plugins: { 
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const d = data[context.dataIndex];
+                            const code = d.airline_code || d.code || '??';
+                            const name = d.airline_name || d.airline || 'Unknown';
+                            return [
+                                `Airline: ${code} • ${name}`,
+                                `Total Flights: ${d.count}`
+                            ];
+                        }
+                    }
+                }
+            },
             scales: {
                 y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
                 x: { grid: { display: false }, ticks: { font: { size: 11 } } }
