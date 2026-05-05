@@ -49,6 +49,25 @@ BATCH_SCHEDULE = [
     ("evening",   23, 59),
 ]
 
+def get_batch_id(departure_time: str) -> str:
+    """
+    Determine which email batch a flight belongs to based on its departure time.
+    Morning:   00:00 - 11:59
+    Afternoon: 12:00 - 17:59
+    Evening:   18:00 - 23:59
+    """
+    try:
+        hour = int(departure_time.split(":")[0])
+        if 0 <= hour < 12:
+            return "morning"
+        if 12 <= hour < 18:
+            return "afternoon"
+        if 18 <= hour < 24:
+            return "evening"
+    except (ValueError, IndexError, AttributeError):
+        pass
+    return "general"
+
 
 # ── BatchStore ────────────────────────────────────────────────────────────────
 
@@ -338,7 +357,8 @@ class FlightWorker:
             flight_data = json.loads(body)
             flight_number = flight_data.get("flight_number", "?")
             airport_id    = flight_data.get("airport_id", "?")
-            batch_id      = flight_data.get("batch_id", "general")
+            # Determine batch using the canonical get_batch_id logic if not provided
+            batch_id = flight_data.get("batch_id") or get_batch_id(flight_data.get("departure_time"))
 
             print(f"[Worker] Processing: flight={flight_number}  airport_id={airport_id}  batch={batch_id}")
 

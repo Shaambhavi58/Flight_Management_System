@@ -47,6 +47,15 @@ function showPage(name) {
     // Scroll to top
     window.scrollTo(0, 0);
 
+    // Update active nav link
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active-link');
+        // If the onclick contains showPage('name'), mark it active
+        if (link.getAttribute('onclick') === `showPage('${name}')`) {
+            link.classList.add('active-link');
+        }
+    });
+
     // Page-specific setup
     if (name === 'airports') loadAirports();
     if (name === 'register') { if (role !== 'admin') { showPage('airports'); return; } loadUsers(); loadRegisterAirports(); }
@@ -55,6 +64,11 @@ function showPage(name) {
         setupFlightPage();
         fetchFlights();
         refreshTimer = setInterval(fetchFlights, 5000);
+    }
+    if (name === 'analytics') {
+        if (role !== 'admin' && role !== 'staff') { showPage('airports'); return; }
+        loadAnalytics();
+        refreshTimer = setInterval(loadAnalytics, 5000);
     }
 }
 
@@ -116,10 +130,16 @@ function setupNavbar() {
     badge.textContent = role || '';
     badge.className = 'role-badge role-' + (role || '');
     const regLink = document.getElementById('nav-register-link');
+    const analyticsLink = document.getElementById('nav-analytics-link');
     if (role === 'admin') {
         regLink.classList.remove('hidden');
     } else {
         regLink.classList.add('hidden');
+    }
+    if (role === 'admin' || role === 'staff') {
+        if (analyticsLink) analyticsLink.classList.remove('hidden');
+    } else {
+        if (analyticsLink) analyticsLink.classList.add('hidden');
     }
 }
 
@@ -549,10 +569,10 @@ function renderBoard() {
     // Update stat card counts BEFORE applying the status filter so totals are never broken.
     // Counts always reflect all flights for the current category/terminal/airline selection.
     document.getElementById('stat-total').textContent = filtered.length;
-    document.getElementById('stat-arrived').textContent  = filtered.filter(f => f.status.toLowerCase() === 'arrived').length;
+    document.getElementById('stat-arrived').textContent = filtered.filter(f => f.status.toLowerCase() === 'arrived').length;
     document.getElementById('stat-boarding').textContent = filtered.filter(f => f.status.toLowerCase() === 'boarding').length;
     document.getElementById('stat-scheduled').textContent = filtered.filter(f => f.status.toLowerCase() === 'scheduled').length;
-    document.getElementById('stat-delayed').textContent  = filtered.filter(f => f.status.toLowerCase() === 'delayed').length;
+    document.getElementById('stat-delayed').textContent = filtered.filter(f => f.status.toLowerCase() === 'delayed').length;
 
     // 6. Apply status card filter (case-insensitive) — AFTER counting totals
     if (activeStatusFilter !== 'ALL') {
@@ -773,3 +793,204 @@ function showToast(msg, type) {
         showPage('landing');
     }
 })();
+
+// ── Analytics ────────────────────────────────────────────────────
+let statusChartInstance = null;
+let airlineChartInstance = null;
+let airportChartInstance = null;
+
+async function loadAnalytics() {
+    const kpiGrid = document.getElementById('analytics-kpis');
+    if (kpiGrid && !kpiGrid.innerHTML.trim()) {
+        kpiGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text3);">Loading operational data…</div>';
+    }
+
+    try {
+        const res = await fetch(`${API}/analytics/dashboard`, { headers: authHeaders() });
+        if (res.status === 401) { handleLogout(); return; }
+        if (!res.ok) throw new Error('Failed to load analytics');
+        const data = await res.json();
+
+        const updEl = document.getElementById('dash-last-updated');
+        if (updEl) {
+            const now = new Date();
+            updEl.textContent = 'Updated ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        renderKPIs(data.kpis);
+        renderAlerts(data.live_alerts);
+        renderEmailBatches(data.batch_emails);
+
+        if (window.Chart) {
+            renderStatusChart(data.status_distribution);
+            renderAirlineChart(data.airline_flights);
+            renderAirportChart(data.airport_comparison);
+        } else {
+            console.error('[Analytics] Chart.js not loaded.');
+            document.querySelectorAll('.chart-wrapper').forEach(c => {
+                c.innerHTML = '<p style="text-align:center;padding:20px;color:var(--text3)">Chart engine unavailable.</p>';
+            });
+        }
+    } catch (err) {
+        console.error('[Analytics]', err);
+        if (kpiGrid) kpiGrid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ef4444;">Failed to load dashboard: ${err.message}</div>`;
+    }
+}
+
+function renderKPIs(kpis) {
+    const grid = document.getElementById('analytics-kpis');
+    if (!grid) return;
+
+    const cards = [
+        { icon: '✈️', label: 'Total Flights', value: kpis.total_flights, color: '#0f3460' },
+        { icon: '🟢', label: 'Active Flights', value: kpis.active_flights, color: '#0ea5e9' },
+        { icon: '⚠️', label: 'Delayed Flights', value: kpis.delayed_flights, color: '#f59e0b' },
+        { icon: '🛫', label: 'Boarding Flights', value: kpis.boarding_flights, color: '#10b981' },
+        { icon: '✅', label: 'Arrived Flights', value: kpis.arrived_flights, color: '#065f46' },
+        { icon: '🏢', label: 'Active Airlines', value: kpis.active_airlines, color: '#6366f1' },
+    ];
+
+    grid.innerHTML = cards.map(c => `
+        <div class="kpi-card" style="--kpi-accent:${c.color}">
+            <span class="kpi-icon">${c.icon}</span>
+            <div class="kpi-value" style="color:${c.color}">${c.value}</div>
+            <div class="kpi-label">${c.label}</div>
+        </div>
+    `).join('');
+}
+
+function renderAlerts(alerts) {
+    const container = document.getElementById('alerts-container');
+    const badge = document.getElementById('alerts-count-badge');
+    if (!container) return;
+
+    if (!alerts || alerts.length === 0) {
+        container.innerHTML = '<p style="color:var(--text3);font-size:13px;padding:12px 0">✅ No active alerts — all operations nominal.</p>';
+        if (badge) { badge.textContent = ''; badge.classList.remove('visible'); }
+        return;
+    }
+
+    if (badge) {
+        badge.textContent = alerts.length;
+        badge.classList.add('visible');
+    }
+
+    container.innerHTML = alerts.map(a => `
+        <div class="live-alert-item alert-${a.type}">
+            ${a.message}
+        </div>
+    `).join('');
+}
+
+function renderEmailBatches(batches) {
+    const container = document.getElementById('email-batches-container');
+    if (!container) return;
+    if (!batches || batches.length === 0) {
+        container.innerHTML = '<p class="text-muted">No batch data available.</p>';
+        return;
+    }
+    container.innerHTML = batches.map(b => `
+        <div class="email-batch-item">
+            <div class="email-batch-info">
+                <h4>${b.batch}</h4>
+                <p>${b.time} &bull; ${b.flights} flights</p>
+            </div>
+            <div class="batch-status batch-${b.status}">${b.status}</div>
+        </div>
+    `).join('');
+}
+
+function renderStatusChart(data) {
+    const ctx = document.getElementById('statusChart');
+    if (!ctx) return;
+    if (statusChartInstance) { statusChartInstance.destroy(); statusChartInstance = null; }
+
+    const labels = data.map(d => d.status);
+    const counts = data.map(d => d.count);
+    const colors = labels.map(s => {
+        if (s === 'Scheduled') return '#0369a1';
+        if (s === 'Boarding') return '#10b981';
+        if (s === 'Departed') return '#6366f1';
+        if (s === 'Arrived') return '#065f46';
+        if (s === 'Delayed') return '#f59e0b';
+        if (s === 'Cancelled') return '#ef4444';
+        return '#cbd5e1';
+    });
+
+    statusChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels,
+            datasets: [{ data: counts, backgroundColor: colors, borderWidth: 2, borderColor: '#fff' }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { padding: 12, font: { size: 11 } } }
+            },
+            cutout: '62%'
+        }
+    });
+}
+
+function renderAirlineChart(data) {
+    const ctx = document.getElementById('airlineChart');
+    if (!ctx) return;
+    if (airlineChartInstance) { airlineChartInstance.destroy(); airlineChartInstance = null; }
+
+    const palette = ['#0ea5e9', '#6366f1', '#10b981', '#f59e0b', '#ef4444'];
+
+    airlineChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.map(d => d.airline),
+            datasets: [{
+                label: 'Flights',
+                data: data.map(d => d.count),
+                backgroundColor: data.map((_, i) => palette[i % palette.length]),
+                borderRadius: 6,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
+                x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+            }
+        }
+    });
+}
+
+function renderAirportChart(data) {
+    const ctx = document.getElementById('airportChart');
+    if (!ctx) return;
+    if (airportChartInstance) { airportChartInstance.destroy(); airportChartInstance = null; }
+
+    airportChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.map(d => d.airport),
+            datasets: [{
+                label: 'Active Flights',
+                data: data.map(d => d.active_flights),
+                backgroundColor: '#f59e0b',
+                borderRadius: 6,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
+                y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+            }
+        }
+    });
+}

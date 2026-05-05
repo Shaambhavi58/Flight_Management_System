@@ -26,6 +26,7 @@ from utils.status_updater import status_update_loop
 from controllers.auth_controller import router as auth_router
 from controllers.airport_controller import router as airport_router
 from controllers.flight_controller import router as flight_router
+from controllers.analytics_controller import router as analytics_router
 
 
 # ── Seed Data ────────────────────────────────────────────────────
@@ -166,6 +167,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(airport_router)
 app.include_router(flight_router)
+app.include_router(analytics_router)
 
 
 # ── Users Endpoint (Admin Only) ───────────────────────────────────────────────

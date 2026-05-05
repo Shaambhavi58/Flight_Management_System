@@ -1,7 +1,7 @@
 """
 opensky_status_updater.py — Real-Time Flight Status Updater
 ============================================================
-Polls the OpenSky Network API every 60 seconds to fetch live
+Polls the OpenSky Network API every 300 seconds to fetch live
 aircraft transponder data and updates matching flight statuses
 in the MySQL database.
 
@@ -36,7 +36,8 @@ load_dotenv()
 OPENSKY_URL      = "https://opensky-network.org/api/states/all"
 OPENSKY_USERNAME = os.getenv("OPENSKY_USERNAME", "")
 OPENSKY_PASSWORD = os.getenv("OPENSKY_PASSWORD", "")
-POLL_INTERVAL    = 60          # seconds between each update cycle
+# Poll OpenSky every 5 minutes to avoid HTTP 429 rate limits
+POLL_INTERVAL    = 300          # seconds between each update cycle
 REQUEST_TIMEOUT  = 30          # seconds before HTTP request times out
 
 # ICAO airline prefix → IATA airline code used in our DB flight numbers
