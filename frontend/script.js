@@ -839,44 +839,53 @@ function showToast(msg, type) {
     }
 })();
 
-// ── Analytics ────────────────────────────────────────────────────
-let statusChartInstance = null;
+// ── Analytics Dashboard ───────────────────────────────────────────
+// Chart instances are stored at module scope so we can destroy/recreate
+// them on each refresh without creating memory leaks in Chart.js.
+let statusChartInstance  = null;
 let airlineChartInstance = null;
 let airportChartInstance = null;
 
 async function loadAnalytics() {
+    // Show a loading placeholder in the KPI grid on the first render
     const kpiGrid = document.getElementById('analytics-kpis');
     if (kpiGrid && !kpiGrid.innerHTML.trim()) {
         kpiGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text3);">Loading operational data…</div>';
     }
 
     try {
+        // Fetch all dashboard data in a single API call — the backend aggregates it
         const res = await fetch(`${API}/analytics/dashboard`, { headers: authHeaders() });
-        if (res.status === 401) { handleLogout(); return; }
+        if (res.status === 401) { handleLogout(); return; }  // token expired — force re-login
         if (!res.ok) throw new Error('Failed to load analytics');
         const data = await res.json();
 
+        // Update "last refreshed" timestamp shown in the dashboard header
         const updEl = document.getElementById('dash-last-updated');
         if (updEl) {
             const now = new Date();
             updEl.textContent = 'Updated ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         }
 
-        renderKPIs(data.kpis);
-        renderAlerts(data.live_alerts);
-        renderEmailBatches(data.batch_emails);
+        // Render each dashboard section with its data slice
+        renderKPIs(data.kpis);                        // top headline cards
+        renderAlerts(data.live_alerts);               // live alert feed
+        renderEmailBatches(data.batch_emails);        // batch email monitor
 
+        // Only render Chart.js charts if the library is loaded on the page
         if (window.Chart) {
-            renderStatusChart(data.status_distribution);
-            renderAirlineChart(data.airline_flights);
-            renderAirportChart(data.airport_comparison);
+            renderStatusChart(data.status_distribution);   // doughnut: flight status breakdown
+            renderAirlineChart(data.airline_flights);       // bar: flights per airline
+            renderAirportChart(data.airport_comparison);   // horizontal bar: flights per airport
         } else {
+            // Chart.js CDN failed to load — show a fallback message
             console.error('[Analytics] Chart.js not loaded.');
             document.querySelectorAll('.chart-wrapper').forEach(c => {
                 c.innerHTML = '<p style="text-align:center;padding:20px;color:var(--text3)">Chart engine unavailable.</p>';
             });
         }
     } catch (err) {
+        // Show error in the KPI grid so the dashboard doesn't silently break
         console.error('[Analytics]', err);
         if (kpiGrid) kpiGrid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ef4444;">Failed to load dashboard: ${err.message}</div>`;
     }
@@ -886,15 +895,17 @@ function renderKPIs(kpis) {
     const grid = document.getElementById('analytics-kpis');
     if (!grid) return;
 
+    // Define KPI card metadata — icon, label, value from API, and accent color
     const cards = [
-        { icon: '✈️', label: 'Total Flights', value: kpis.total_flights, color: '#0f3460' },
-        { icon: '🟢', label: 'Active Flights', value: kpis.active_flights, color: '#0ea5e9' },
-        { icon: '⚠️', label: 'Delayed Flights', value: kpis.delayed_flights, color: '#f59e0b' },
-        { icon: '🛫', label: 'Boarding Flights', value: kpis.boarding_flights, color: '#10b981' },
-        { icon: '✅', label: 'Arrived Flights', value: kpis.arrived_flights, color: '#065f46' },
-        { icon: '🏢', label: 'Active Airlines', value: kpis.active_airlines, color: '#6366f1' },
+        { icon: '✈️',  label: 'Total Flights',   value: kpis.total_flights,   color: '#0f3460' },
+        { icon: '🟢',  label: 'Active Flights',  value: kpis.active_flights,  color: '#0ea5e9' },
+        { icon: '⚠️',  label: 'Delayed Flights', value: kpis.delayed_flights, color: '#f59e0b' },
+        { icon: '🛫',  label: 'Boarding Flights',value: kpis.boarding_flights, color: '#10b981' },
+        { icon: '✅',  label: 'Arrived Flights', value: kpis.arrived_flights,  color: '#065f46' },
+        { icon: '🏢',  label: 'Active Airlines', value: kpis.active_airlines,  color: '#6366f1' },
     ];
 
+    // Render each card as a styled div with a CSS custom property for the accent border color
     grid.innerHTML = cards.map(c => `
         <div class="kpi-card" style="--kpi-accent:${c.color}">
             <span class="kpi-icon">${c.icon}</span>
@@ -906,20 +917,23 @@ function renderKPIs(kpis) {
 
 function renderAlerts(alerts) {
     const container = document.getElementById('alerts-container');
-    const badge = document.getElementById('alerts-count-badge');
+    const badge     = document.getElementById('alerts-count-badge');
     if (!container) return;
 
+    // Show a "no alerts" message when everything is operating normally
     if (!alerts || alerts.length === 0) {
         container.innerHTML = '<p style="color:var(--text3);font-size:13px;padding:12px 0">✅ No active alerts — all operations nominal.</p>';
         if (badge) { badge.textContent = ''; badge.classList.remove('visible'); }
         return;
     }
 
+    // Update the alert count badge in the sidebar/header
     if (badge) {
-        badge.textContent = alerts.length;
-        badge.classList.add('visible');
+        badge.textContent = alerts.length;   // show number of active alerts
+        badge.classList.add('visible');       // make badge visible
     }
 
+    // Render each alert with its CSS class for color coding (warning=orange, info=blue)
     container.innerHTML = alerts.map(a => `
         <div class="live-alert-item alert-${a.type}">
             ${a.message}
@@ -930,16 +944,22 @@ function renderAlerts(alerts) {
 function renderEmailBatches(batches) {
     const container = document.getElementById('email-batches-container');
     if (!container) return;
+
+    // Show placeholder if no batch data is available from the backend
     if (!batches || batches.length === 0) {
         container.innerHTML = '<p class="text-muted">No batch data available.</p>';
         return;
     }
+
+    // Each batch object: { batch, time, flights, status }
+    // status is SCHEDULED / PENDING / SENT — CSS class batch-{status} controls the color
     container.innerHTML = batches.map(b => `
         <div class="email-batch-item">
             <div class="email-batch-info">
                 <h4>${b.batch}</h4>
                 <p>${b.time} &bull; ${b.flights} flights</p>
             </div>
+            <!-- batch-SENT = green, batch-PENDING = orange, batch-SCHEDULED = grey -->
             <div class="batch-status batch-${b.status}">${b.status}</div>
         </div>
     `).join('');
@@ -948,33 +968,44 @@ function renderEmailBatches(batches) {
 function renderStatusChart(data) {
     const ctx = document.getElementById('statusChart');
     if (!ctx) return;
+
+    // Destroy the previous chart instance before creating a new one.
+    // Without this, Chart.js throws a "Canvas already in use" error on each refresh.
     if (statusChartInstance) { statusChartInstance.destroy(); statusChartInstance = null; }
 
-    const labels = data.map(d => d.status);
-    const counts = data.map(d => d.count);
+    const labels = data.map(d => d.status);  // e.g. ['Scheduled', 'Boarding', 'Delayed']
+    const counts = data.map(d => d.count);   // corresponding counts
+
+    // Map each status to its branded color (matches status badges in the flight table)
     const colors = labels.map(s => {
         if (s === 'Scheduled') return '#0369a1';
-        if (s === 'Boarding') return '#10b981';
-        if (s === 'Departed') return '#6366f1';
-        if (s === 'Arrived') return '#065f46';
-        if (s === 'Delayed') return '#f59e0b';
+        if (s === 'Boarding')  return '#10b981';
+        if (s === 'Departed')  return '#6366f1';
+        if (s === 'Arrived')   return '#065f46';
+        if (s === 'Delayed')   return '#f59e0b';
         if (s === 'Cancelled') return '#ef4444';
-        return '#cbd5e1';
+        return '#cbd5e1';  // fallback grey for unknown statuses
     });
 
+    // Doughnut chart — good for showing proportional distribution at a glance
     statusChartInstance = new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels,
-            datasets: [{ data: counts, backgroundColor: colors, borderWidth: 2, borderColor: '#fff' }]
+            datasets: [{
+                data: counts,
+                backgroundColor: colors,
+                borderWidth: 2,       // thin white border between segments
+                borderColor: '#fff',
+            }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: false,  // fills the container div's height
             plugins: {
                 legend: { position: 'bottom', labels: { padding: 12, font: { size: 11 } } }
             },
-            cutout: '62%'
+            cutout: '62%'  // larger cutout = thinner ring (donut style)
         }
     });
 }
@@ -982,10 +1013,14 @@ function renderStatusChart(data) {
 function renderAirlineChart(data) {
     const ctx = document.getElementById('airlineChart');
     if (!ctx) return;
+
+    // Destroy stale chart before re-rendering to avoid the "Canvas already in use" error
     if (airlineChartInstance) { airlineChartInstance.destroy(); airlineChartInstance = null; }
 
+    // Rotating color palette — up to 5 airlines, cycles if more are added
     const palette = ['#0ea5e9', '#6366f1', '#10b981', '#f59e0b', '#ef4444'];
 
+    // Build human-readable labels: "6E • IndiGo" format for each airline
     const airlineLabels = data.map(d => {
         const code = d.airline_code || d.code || '';
         const name = d.airline_name || d.name || d.airline || '';
@@ -993,26 +1028,27 @@ function renderAirlineChart(data) {
     });
 
     airlineChartInstance = new Chart(ctx, {
-        type: 'bar',
+        type: 'bar',   // vertical bar chart — easy to compare airline sizes
         data: {
             labels: airlineLabels,
             datasets: [{
                 label: 'Flights',
                 data: data.map(d => d.count),
-                backgroundColor: data.map((_, i) => palette[i % palette.length]),
-                borderRadius: 6,
-                borderSkipped: false,
+                backgroundColor: data.map((_, i) => palette[i % palette.length]),  // cycle palette
+                borderRadius: 6,       // rounded top corners on bars
+                borderSkipped: false,  // apply radius to all corners (not just top)
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { 
-                legend: { display: false },
+            plugins: {
+                legend: { display: false },   // labels are already on the X axis
                 tooltip: {
                     callbacks: {
+                        // Custom tooltip showing both airline code+name and flight count
                         label: function(context) {
-                            const d = data[context.dataIndex];
+                            const d    = data[context.dataIndex];
                             const code = d.airline_code || d.code || '??';
                             const name = d.airline_name || d.name || d.airline || 'Unknown';
                             return [
@@ -1034,28 +1070,30 @@ function renderAirlineChart(data) {
 function renderAirportChart(data) {
     const ctx = document.getElementById('airportChart');
     if (!ctx) return;
+
+    // Destroy stale instance to prevent Chart.js canvas conflicts on re-render
     if (airportChartInstance) { airportChartInstance.destroy(); airportChartInstance = null; }
 
     airportChartInstance = new Chart(ctx, {
-        type: 'bar',
+        type: 'bar',   // horizontal bar — better for comparing named categories
         data: {
-            labels: data.map(d => d.airport),
+            labels: data.map(d => d.airport),           // IATA codes on Y axis
             datasets: [{
                 label: 'Active Flights',
-                data: data.map(d => d.active_flights),
-                backgroundColor: '#f59e0b',
+                data: data.map(d => d.active_flights),  // count on X axis
+                backgroundColor: '#f59e0b',  // amber — stands out, represents active/live traffic
                 borderRadius: 6,
                 borderSkipped: false,
             }]
         },
         options: {
-            indexAxis: 'y',
+            indexAxis: 'y',    // flip to horizontal bar layout
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
+            plugins: { legend: { display: false } },   // label is self-explanatory
             scales: {
                 x: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
-                y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+                y: { grid: { display: false },          ticks: { font: { size: 11 } } }
             }
         }
     });
