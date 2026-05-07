@@ -1,7 +1,7 @@
 """
-worker.py — RabbitMQ Consumer for flight_create_queue.
+worker.py — RabbitMQ Consumer for morning_flights_queue.
 
-Listens for flight creation requests published by POST /flights
+Listens for flight messages published by flight_publisher / Sync Live
 and inserts them into the database via FlightService.
 
 Batch Email Schedule (clock-based):
@@ -13,9 +13,9 @@ Usage:
     python worker.py
 
 Architecture:
-    Frontend → POST /flights → RabbitMQ (flight_create_queue) → worker.py → DB
-                                                                      ↓
-                                                    Clock-based Batch Summary Email
+    flight_publisher → RabbitMQ (morning_flights_queue) → worker.py → DB
+                                                                ↓
+                                              Clock-based Batch Summary Email
 """
 
 import pika
@@ -29,25 +29,38 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# ── Settings ─────────────────────────────────────────────────────────────────
-QUEUE_NAME    = "flight_create_queue"
+# ── Settings ──────────────────────────────────────────────────────────────────
+QUEUE_NAME    = "morning_flights_queue"
+EXCHANGE_NAME = "flights.morning"
+ROUTING_KEY   = "flight.morning.data"
 RABBITMQ_HOST = os.getenv("RABBITMQ_HOST", "localhost")
 RABBITMQ_PORT = int(os.getenv("RABBITMQ_PORT", "5672"))
 RABBITMQ_USER = os.getenv("RABBITMQ_USER", "guest")
 RABBITMQ_PASS = os.getenv("RABBITMQ_PASS", "guest")
 
-MAX_RETRIES   = 10
-PREFETCH      = 1
+MAX_RETRIES = 10
+PREFETCH    = 1
 
-# ── Batch email schedule ──────────────────────────────────────────────────────
-# Morning   flights (00:00–11:59) → email at 12:00 PM
-# Afternoon flights (12:00–17:59) → email at 06:00 PM
-# Evening   flights (18:00–23:59) → email at 11:59 PM
+# How many seconds after startup before the scheduler starts checking.
+# This prevents firing an empty email when the worker starts exactly at a
+# scheduled send hour (e.g. started at 10:00 before any flights are loaded).
+# Override via env for testing: SCHEDULER_STARTUP_DELAY=5
+SCHEDULER_STARTUP_DELAY = int(os.getenv("SCHEDULER_STARTUP_DELAY", "120"))
+
+# ── Batch email schedule ───────────────────────────────────────────────────────
+# Batch windows:
+#   Morning   00:00–11:59 → email sent at 12:00 PM
+#   Afternoon 12:00–17:59 → email sent at 06:00 PM
+#   Evening   18:00–23:59 → email sent at 11:59 PM
+#
+# To test quickly, set SCHEDULER_STARTUP_DELAY=5 in .env and temporarily
+# change the send hour/minute to 2 minutes from now — restart worker — it will fire.
 BATCH_SCHEDULE = [
     ("morning",   12,  0),
     ("afternoon", 18,  0),
     ("evening",   23, 59),
 ]
+
 
 def get_batch_id(departure_time: str) -> str:
     """
@@ -74,7 +87,7 @@ def get_batch_id(departure_time: str) -> str:
 class BatchStore:
     """
     Thread-safe store that accumulates processed flights per batch_id.
-    Flights are stored throughout the day.
+    Flights accumulate throughout the day.
     Emails are sent by the scheduler at fixed clock times.
     """
 
@@ -87,7 +100,6 @@ class BatchStore:
         self._lock = threading.Lock()
 
     def record(self, batch_id: str, flight_info: dict):
-        """Record a processed flight under its batch_id."""
         with self._lock:
             if batch_id not in self._batches:
                 self._batches[batch_id] = []
@@ -96,11 +108,14 @@ class BatchStore:
         print(f"[BatchStore] {batch_id.capitalize()} batch now has {count} flights.")
 
     def get_and_clear(self, batch_id: str) -> list:
-        """Return all flights for a batch and clear the store."""
         with self._lock:
             flights = list(self._batches.get(batch_id, []))
             self._batches[batch_id] = []
         return flights
+
+    def counts(self) -> dict:
+        with self._lock:
+            return {k: len(v) for k, v in self._batches.items()}
 
 
 # ── Email Sender ──────────────────────────────────────────────────────────────
@@ -136,10 +151,10 @@ def _send_batch_email(batch_id: str, flights: list):
     }
     time_range = time_ranges.get(batch_id, "")
 
-    # ── Cap table at 30 rows ──────────────────────────────────────────────────
     MAX_ROWS  = 30
     displayed = flights[:MAX_ROWS]
     remaining = total - MAX_ROWS
+    extra     = flights[MAX_ROWS:]
 
     STATUS_COLORS = {
         "Scheduled": "#2196F3",
@@ -176,19 +191,43 @@ def _send_batch_email(batch_id: str, flights: list):
         </tr>
         """
 
-    # ── Overflow link (only when flights > 30) ────────────────────────────────
     overflow_html = ""
     if remaining > 0:
-        batch_link = f"{dashboard_url}?batch={batch_id}"
+        extra_rows_html = ""
+        for i, f in enumerate(extra, MAX_ROWS + 1):
+            status_color = STATUS_COLORS.get(f.get("status", ""), "#333")
+            row_bg = "#f9f9f9" if i % 2 == 0 else "white"
+            extra_rows_html += f"""
+            <tr style="background:{row_bg};">
+                <td style="padding:10px 14px; border-bottom:1px solid #eee;">{i}</td>
+                <td style="padding:10px 14px; border-bottom:1px solid #eee; font-weight:600;
+                           font-family:monospace; color:#0f3460;">
+                    {f.get('flight_number', '—')}
+                </td>
+                <td style="padding:10px 14px; border-bottom:1px solid #eee;">
+                    {f.get('airline_name', f.get('airline_code', '—'))}
+                </td>
+                <td style="padding:10px 14px; border-bottom:1px solid #eee; color:#444;">
+                    {f.get('origin', '—')} → {f.get('destination', '—')}
+                </td>
+                <td style="padding:10px 14px; border-bottom:1px solid #eee; text-align:center;">
+                    <span style="background:{status_color}; color:white; padding:3px 10px;
+                                 border-radius:12px; font-size:12px; font-weight:600;">
+                        {f.get('status', '—')}
+                    </span>
+                </td>
+            </tr>
+            """
         overflow_html = f"""
-        <div style="text-align:center; margin-top:16px;">
-            <a href="{batch_link}"
-               style="display:inline-block; padding:10px 24px;
-                      background:#00a0d2; color:white; border-radius:8px;
-                      text-decoration:none; font-size:14px; font-weight:600;">
-                +{remaining} more flights processed — View Full Dashboard →
-            </a>
-        </div>
+        <details style="margin-top:12px;">
+            <summary style="cursor:pointer; color:#00a0d2; font-size:14px;
+                            font-weight:600; padding:8px 0; list-style:none;">
+                ▶ Show +{remaining} more flights
+            </summary>
+            <table style="width:100%; border-collapse:collapse; font-size:14px; margin-top:8px;">
+                <tbody>{extra_rows_html}</tbody>
+            </table>
+        </details>
         """
 
     html_body = f"""
@@ -197,18 +236,13 @@ def _send_batch_email(batch_id: str, flights: list):
         <div style="max-width: 720px; margin: 0 auto; background: white;
                     border-radius: 12px; padding: 32px;
                     box-shadow: 0 2px 12px rgba(0,0,0,0.1);">
-
-            <!-- Header -->
             <div style="text-align:center; margin-bottom:24px;">
                 <h1 style="color:#00a0d2; margin:0; font-size:26px;">BEUMER Group</h1>
                 <p style="color:#1a2b49; font-size:13px; margin-top:4px;">
                     Flight Management System — Batch Report
                 </p>
             </div>
-
             <hr style="border:none; border-top:1px solid #e0e0e0; margin:16px 0;">
-
-            <!-- Summary -->
             <h2 style="color:#1a2b49; margin-bottom:8px; font-size:20px;">
                 {label} Batch — Flight Summary
             </h2>
@@ -226,8 +260,6 @@ def _send_batch_email(batch_id: str, flights: list):
                     <td>Top {min(total, MAX_ROWS)} flights</td>
                 </tr>
             </table>
-
-            <!-- Flight table -->
             <table style="width:100%; border-collapse:collapse; font-size:14px;">
                 <thead>
                     <tr style="background:#1a2b49; color:white;">
@@ -240,9 +272,7 @@ def _send_batch_email(batch_id: str, flights: list):
                 </thead>
                 <tbody>{rows_html}</tbody>
             </table>
-
             {overflow_html}
-
             <hr style="border:none; border-top:1px solid #e0e0e0; margin:24px 0 16px;">
             <p style="color:#999; font-size:12px; text-align:center;">
                 Beumer Group — Flight Management System &copy; 2026
@@ -269,26 +299,29 @@ def _send_batch_email(batch_id: str, flights: list):
         print(f"[BatchEmail] ❌ Failed to send {label} email: {e}")
 
 
-
-
-# ── Batch Email Scheduler ─────────────────────────────────────────────────────
+# ── Batch Email Scheduler ──────────────────────────────────────────────────────
 
 class BatchEmailScheduler:
     """
     Runs in a background thread.
     Checks the clock every 30 seconds.
     Fires summary email at the scheduled time for each batch.
+
+    KEY FIX: Waits SCHEDULER_STARTUP_DELAY seconds before starting to check.
+    This prevents firing an empty email when the worker starts exactly at a
+    scheduled hour — before any messages have been consumed from the queue.
     """
 
     def __init__(self, batch_store: BatchStore):
-        self._store = batch_store
-        self._sent_today: set = set()
+        self._store             = batch_store
+        self._sent_today: set   = set()
         self._last_checked_date = None
+        self._ready             = False   # becomes True after startup delay
 
     def _reset_if_new_day(self):
         today = datetime.now().date()
         if self._last_checked_date != today:
-            self._sent_today = set()
+            self._sent_today        = set()
             self._last_checked_date = today
             print(f"[Scheduler] New day {today} — batch tracker reset.")
 
@@ -300,16 +333,34 @@ class BatchEmailScheduler:
             if batch_id in self._sent_today:
                 continue
             if now.hour == send_hour and now.minute >= send_minute:
-                print(f"[Scheduler] ⏰ {now.strftime('%H:%M')} — Sending {batch_id} batch email...")
+                counts = self._store.counts()
+                print(f"[Scheduler] ⏰ {now.strftime('%H:%M')} — "
+                      f"Sending {batch_id} batch email "
+                      f"({counts.get(batch_id, 0)} flights)...")
                 flights = self._store.get_and_clear(batch_id)
                 _send_batch_email(batch_id, flights)
                 self._sent_today.add(batch_id)
 
     def run(self):
+        # Print the actual schedule (derived from BATCH_SCHEDULE)
         print(f"[Scheduler] Started. Email schedule:")
-        print(f"[Scheduler]   Morning   (12:00 AM–11:59 AM) → email at 12:00 PM")
-        print(f"[Scheduler]   Afternoon (12:00 PM–05:59 PM) → email at 06:00 PM")
-        print(f"[Scheduler]   Evening   (06:00 PM–11:59 PM) → email at 11:59 PM")
+        for batch_id, h, m in BATCH_SCHEDULE:
+            window = {
+                "morning":   "12:00 AM–11:59 AM",
+                "afternoon": "12:00 PM–05:59 PM",
+                "evening":   "06:00 PM–11:59 PM",
+            }.get(batch_id, "")
+            print(f"[Scheduler]   {batch_id.capitalize():10s} ({window}) → email at {h:02d}:{m:02d}")
+
+        # ── Startup delay: don't check until flights are loaded ────────────────
+        if SCHEDULER_STARTUP_DELAY > 0:
+            print(f"[Scheduler] Waiting {SCHEDULER_STARTUP_DELAY}s startup delay "
+                  f"before activating (set SCHEDULER_STARTUP_DELAY=0 to skip)...")
+            time.sleep(SCHEDULER_STARTUP_DELAY)
+
+        self._ready = True
+        print(f"[Scheduler] Active — checking every 30s.")
+
         while True:
             try:
                 self._check_and_send()
@@ -318,15 +369,15 @@ class BatchEmailScheduler:
             time.sleep(30)
 
 
-# ── FlightWorker ──────────────────────────────────────────────────────────────
+# ── FlightWorker ───────────────────────────────────────────────────────────────
 
 class FlightWorker:
 
     def __init__(self):
         from services.service import FlightService
-        self._service = FlightService()
+        self._service    = FlightService()
         self._connection = None
-        self._channel = None
+        self._channel    = None
 
         self._batch_store = BatchStore()
         self._scheduler   = BatchEmailScheduler(self._batch_store)
@@ -346,26 +397,41 @@ class FlightWorker:
             blocked_connection_timeout=300,
         )
         self._connection = pika.BlockingConnection(params)
-        self._channel = self._connection.channel()
+        self._channel    = self._connection.channel()
+
+        self._channel.exchange_declare(
+            exchange=EXCHANGE_NAME, exchange_type="direct", durable=True
+        )
         self._channel.queue_declare(queue=QUEUE_NAME, durable=True)
+        self._channel.queue_bind(
+            queue=QUEUE_NAME,
+            exchange=EXCHANGE_NAME,
+            routing_key=ROUTING_KEY,
+        )
         self._channel.basic_qos(prefetch_count=PREFETCH)
+
         print(f"[Worker] Connected to RabbitMQ at {RABBITMQ_HOST}:{RABBITMQ_PORT}")
         print(f"[Worker] Listening on queue: '{QUEUE_NAME}'")
 
     def _on_message(self, channel, method, properties, body):
         try:
-            flight_data = json.loads(body)
+            flight_data   = json.loads(body)
             flight_number = flight_data.get("flight_number", "?")
             airport_id    = flight_data.get("airport_id", "?")
-            # Determine batch using the canonical get_batch_id logic if not provided
-            batch_id = flight_data.get("batch_id") or get_batch_id(flight_data.get("departure_time"))
 
-            print(f"[Worker] Processing: flight={flight_number}  airport_id={airport_id}  batch={batch_id}")
+            # Determine batch: use publisher-supplied field first, else infer from time
+            raw_batch = flight_data.get("batch_name") or flight_data.get("batch_id")
+            batch_id  = raw_batch.lower() if raw_batch else get_batch_id(
+                flight_data.get("departure_time", "")
+            )
+
+            print(f"[Worker] Processing: flight={flight_number}  "
+                  f"airport_id={airport_id}  batch={batch_id}")
 
             system_user = {
-                "id": 0,
-                "username": "system_worker",
-                "role": "admin",
+                "id":         0,
+                "username":   "system_worker",
+                "role":       "admin",
                 "airport_id": None,
             }
 
@@ -373,7 +439,6 @@ class FlightWorker:
             print(f"[Worker] Saved flight ID={result['id']}  "
                   f"number={result['flight_number']}  airport={result['airport_id']}")
 
-            # Record in batch store for scheduled email
             if batch_id in ("morning", "afternoon", "evening"):
                 self._batch_store.record(batch_id, {
                     "flight_number": result.get("flight_number"),
@@ -389,7 +454,6 @@ class FlightWorker:
         except json.JSONDecodeError as e:
             print(f"[Worker] Invalid JSON message, dropping: {e}")
             channel.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
-
         except Exception as e:
             print(f"[Worker] Error processing flight: {e}")
             channel.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
@@ -433,7 +497,7 @@ class FlightWorker:
             sys.exit(1)
 
 
-# ──Entry Point ───────────────────────────────────────────────────────────────
+# ── Entry Point ────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
     print("=" * 60)

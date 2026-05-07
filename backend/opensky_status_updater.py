@@ -7,7 +7,8 @@ in the MySQL database.
 
 Status Logic:
   on_ground == True  → "Arrived"
-  on_ground == False → "In Air"
+  on_ground == False → "Departed"
+  on_ground is None  → "Scheduled"
 
 Callsign Normalization (ICAO → IATA):
   AIC → AI   (Air India)
@@ -284,7 +285,7 @@ class FlightStatusUpdater:
     def _resolve_status(on_ground: bool | None) -> str:
         if on_ground is True:
             return "Arrived"
-        return "In Air"
+        return "Departed" if on_ground is False else "Scheduled"  # treat None as unknown future flight
 
     def update(self, aircraft: list[dict]) -> int:
         if not aircraft:

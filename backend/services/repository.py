@@ -38,7 +38,7 @@ class FlightRepository:
         # Remove publisher metadata keys that should not be persisted to the DB
         clean_data = {
             k: v for k, v in flight_data.items()
-            if not k.startswith("_") and k != "batch_id"  # strip _created_by_*, batch_id
+            if not k.startswith("_") and k not in ("batch_id", "batch_name")
         }
 
         # ── Resolve airline_code → airline_id ─────────────────────────────────

@@ -42,17 +42,18 @@ class AnalyticsService:
 
     def get_flights_per_airline(self):
         with self.db.session_scope() as session:
-            # Group by airline ID and name to show real counts from DB
+            # Group by airline ID, code and name to show real counts from DB
             result = session.query(
+                AirlineModel.code,
                 AirlineModel.name, 
                 func.count(FlightModel.id)
-            ).join(FlightModel).group_by(AirlineModel.id, AirlineModel.name).all()
+            ).join(FlightModel).group_by(AirlineModel.id, AirlineModel.code, AirlineModel.name).all()
             
             print("\n[Analytics] Flights per Airline:")
-            for name, count in result:
-                print(f"  {name}: {count}")
+            for code, name, count in result:
+                print(f"  {code} | {name}: {count}")
                 
-            return [{"airline": name, "count": count} for name, count in result]
+            return [{"code": code, "name": name, "count": count} for code, name, count in result]
 
     def get_airport_comparison(self):
         with self.db.session_scope() as session:

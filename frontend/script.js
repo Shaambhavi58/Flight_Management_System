@@ -550,6 +550,49 @@ function filterByStatus(status) {
     renderBoard();
 }
 
+// ── Route Formatter ──────────────────────────────────────────────
+// Converts strings like "Indira Gandhi International (DEL)" or 
+// "Chhatrapati Shivaji Intl (BOM)" into "Delhi (DEL)" and "Mumbai (BOM)".
+const IATA_CITY_MAP = {
+    'DEL': 'Delhi',
+    'BOM': 'Mumbai',
+    'BLR': 'Bengaluru',
+    'HYD': 'Hyderabad',
+    'MAA': 'Chennai',
+    'CCU': 'Kolkata',
+    'PNQ': 'Pune',
+    'AMD': 'Ahmedabad',
+    'JAI': 'Jaipur',
+    'LKO': 'Lucknow',
+    'GOI': 'Goa',
+    'COK': 'Kochi',
+    'DXB': 'Dubai',
+    'LHR': 'London',
+    'JFK': 'New York',
+    'SIN': 'Singapore',
+    'NRT': 'Tokyo',
+    'CDG': 'Paris',
+    'FRA': 'Frankfurt',
+    'AMS': 'Amsterdam',
+    'DOH': 'Doha',
+    'KUL': 'Kuala Lumpur',
+    'BKK': 'Bangkok',
+    'SYD': 'Sydney',
+    'LAX': 'Los Angeles',
+    'YYZ': 'Toronto'
+};
+
+function formatRoute(origin, destination) {
+    const getCleanName = (str) => {
+        const iataMatch = str.match(/\(([A-Z]{3})\)/);
+        if (!iataMatch) return str;
+        const iata = iataMatch[1];
+        const city = IATA_CITY_MAP[iata] || str.split('(')[0].trim();
+        return `${city} (${iata})`;
+    };
+    return `${getCleanName(origin)} &rarr; ${getCleanName(destination)}`;
+}
+
 function renderBoard() {
     // 1. Filter by category (arrival / departure)
     let filtered = allFlights.filter(f => f.flight_type === activeCategory);
@@ -611,20 +654,22 @@ function renderBoard() {
         let actions = '';
         if (role === 'admin') {
             actions = `
-            <td>
-                <button class="action-btn" onclick="editFlight(${f.id})">Edit</button>
-                <button class="action-btn btn-delete" onclick="deleteFlight(${f.id})">Delete</button>
-            </td>`;
+  <td class="cell-actions">
+    <div class="action-container">
+        <button class="action-btn btn-edit" onclick="editFlight(${f.id})">Edit</button>
+        <button class="action-btn btn-delete" onclick="deleteFlight(${f.id})">Delete</button>
+    </div>
+  </td>`;
         }
         tr.innerHTML = `
   <td class="cell-flight">${f.flight_number}</td>
-  <td><div class="cell-airline"><span class="airline-badge badge-${f.airline_code}">${f.airline_code}</span>${f.airline_name}</div></td>
-  <td>${f.origin} &rarr; ${f.destination}</td>
+  <td class="cell-airline-info"><div class="cell-airline"><span class="airline-badge badge-${f.airline_code}">${f.airline_code}</span>${f.airline_name}</div></td>
+  <td class="cell-route">${formatRoute(f.origin, f.destination)}</td>
   <td class="cell-time">${f.departure_time}</td>
   <td class="cell-time">${f.arrival_time}</td>
   <td class="cell-gate">${f.gate_number}</td>
-  <td class="cell-terminal terminal-${f.terminal_number}">${f.terminal_number}</td>
-  <td><span class="status-badge status-${f.status}">${f.status}</span></td>
+  <td class="cell-terminal-info"><span class="terminal-badge terminal-${f.terminal_number}">${f.terminal_number}</span></td>
+  <td class="cell-status"><span class="status-badge status-${f.status.replace(/\s+/g, '-')}">${f.status}</span></td>
   ${role === 'admin' ? actions : ''}`;
         tbody.appendChild(tr);
     });
