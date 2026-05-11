@@ -129,6 +129,67 @@ def get_me(user: dict = Depends(get_current_user)):
     return user  # already resolved by get_current_user dependency
 
 
+@router.put("/me/profile")
+def update_own_profile(data: dict, user: dict = Depends(get_current_user)):
+    """
+    Allow any authenticated user to update their own profile (full_name, email).
+    """
+    try:
+        full_name = data.get("full_name")
+        email = data.get("email")
+        if not full_name or not email:
+            raise ValueError("Full Name and Email are required.")
+            
+        return auth_service.update_profile(user["id"], full_name, email)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.put("/me/change-password")
+def change_own_password(data: dict, user: dict = Depends(get_current_user)):
+    """
+    Allow any authenticated user to change their own password.
+
+    Request body (JSON):
+        {
+          "current_password": "<user's existing password>",
+          "new_password":     "<desired new password>"
+        }
+
+    Security guarantees:
+      - current_password is verified against the stored bcrypt hash before the
+        update is accepted — prevents unauthorized changes if a session token
+        is compromised.
+      - new_password is bcrypt-hashed before storage — never saved in plain text.
+      - A security-alert email is sent to the configured admin address after a
+        successful change. The email contains only audit metadata (name, username,
+        role, airport, timestamp) — the new password is NOT included.
+
+    Returns HTTP 400 if:
+      - current_password is wrong
+      - new_password is missing or shorter than 6 characters
+
+    Available to: admin, staff, viewer (any authenticated user)
+    """
+    current_password = data.get("current_password", "")
+    new_password     = data.get("new_password", "")
+
+    # Validate inputs before hitting the service layer
+    if not current_password:
+        raise HTTPException(status_code=400, detail="Current password is required")
+    if not new_password or len(new_password) < 8:
+        raise HTTPException(status_code=400, detail="New password must be at least 8 characters")
+
+    try:
+        return auth_service.change_own_password(
+            user_id=user["id"],
+            current_password=current_password,
+            new_password=new_password,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
 @router.put("/users/{user_id}")
 def update_user(user_id: int, data: dict, admin: dict = Depends(require_admin)):
     """
@@ -151,6 +212,27 @@ def reset_password(user_id: int, data: dict, admin: dict = Depends(require_admin
     try:
         # Extract the new plaintext password from the JSON body {"password": "..."}
         return auth_service.reset_password(user_id, data["password"])
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.post("/users/{user_id}/send-reset-email")
+def send_reset_email(user_id: int, admin: dict = Depends(require_admin)):
+    """
+    Generate a cryptographically random temporary password, set it on the
+    user's account (bcrypt-hashed), and email it to their registered email.
+
+    This is the correct backend for the admin "Send Reset Email" button in the
+    user edit view. No request body is required — the temp password is
+    generated server-side so it is never visible to the admin either.
+
+    Returns:
+        {"message": "Temporary password emailed to <email>. ..."}
+
+    Available to: admin only (require_admin dependency)
+    """
+    try:
+        return auth_service.send_reset_email(user_id)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
 

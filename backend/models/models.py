@@ -29,12 +29,30 @@ class UserModel(Base):
     is_active = Column(Boolean, default=True, nullable=False)
     created_by = Column(Integer, ForeignKey("users.id"), nullable=True)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    last_login_at = Column(DateTime, nullable=True)
+    last_password_changed_at = Column(DateTime, nullable=True)
 
     creator = relationship("UserModel", remote_side=[id], foreign_keys=[created_by])
     airport = relationship("AirportModel", foreign_keys=[airport_id])
 
     def __repr__(self):
         return f"<UserModel(id={self.id}, username='{self.username}', role='{self.role}', airport_id={self.airport_id})>"
+
+
+class AuditLogModel(Base):
+    """ORM model for the 'audit_logs' table."""
+    __tablename__ = "audit_logs"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    action = Column(String(255), nullable=False)
+    details = Column(Text, nullable=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+    user = relationship("UserModel")
+
+    def __repr__(self):
+        return f"<AuditLogModel(id={self.id}, user_id={self.user_id}, action='{self.action}')>"
 
 
 class AirportModel(Base):

@@ -58,6 +58,21 @@ function showPage(name) {
 
     // Page-specific setup
     if (name === 'airports') loadAirports();
+    if (name === 'admin-profile') {
+        if (role !== 'admin') { showPage('airports'); return; }
+        document.getElementById('admin-current-password').value = '';
+        document.getElementById('admin-new-password').value = '';
+        document.getElementById('admin-confirm-password').value = '';
+        const msgBox = document.getElementById('admin-msg-pw');
+        if (msgBox) msgBox.style.display = 'none';
+        
+        const menu = document.getElementById('nav-user-menu');
+        const wrap = document.getElementById('nav-user-wrap');
+        if (menu) menu.classList.remove('open');
+        if (wrap) wrap.classList.remove('open');
+        
+        loadAdminProfile();
+    }
     if (name === 'register') { if (role !== 'admin') { showPage('airports'); return; } loadUsers(); loadRegisterAirports(); }
     if (name === 'flights') {
         if (!selectedAirport) { showPage('airports'); return; }
@@ -129,7 +144,7 @@ function setupNavbar() {
     const badge = document.getElementById('nav-role-badge');
     badge.textContent = role || '';
     badge.className = 'role-badge role-' + (role || '');
-    const regLink = document.getElementById('nav-register-link');
+    const regLink      = document.getElementById('nav-register-link');
     const analyticsLink = document.getElementById('nav-analytics-link');
     if (role === 'admin') {
         regLink.classList.remove('hidden');
@@ -140,6 +155,241 @@ function setupNavbar() {
         if (analyticsLink) analyticsLink.classList.remove('hidden');
     } else {
         if (analyticsLink) analyticsLink.classList.add('hidden');
+    }
+
+    // ── User pill dropdown visibility ──
+    // admin: show the informational "⚙ Admin Account" item (non-clickable)
+    // staff / viewer / other: show the "🔒 Change Password" item
+    const changePwItem = document.getElementById('nav-changepw-item');
+    const adminInfo    = document.getElementById('nav-admin-info');
+    if (role === 'admin') {
+        if (changePwItem) changePwItem.classList.add('hidden');
+        if (adminInfo)    adminInfo.style.display = 'flex';
+    } else {
+        if (changePwItem) changePwItem.classList.remove('hidden');
+        if (adminInfo)    adminInfo.style.display = 'none';
+    }
+}
+
+// ── Nav user pill dropdown ──────────────────────────────────────
+function toggleUserPillMenu(event) {
+    event.stopPropagation();
+    const wrap = document.getElementById('nav-user-wrap');
+    const menu = document.getElementById('nav-user-menu');
+    const isOpen = menu.classList.contains('open');
+    // Close any other dropdowns (user-action menus)
+    document.querySelectorAll('.user-action-menu.show').forEach(m => m.classList.remove('show'));
+    if (isOpen) {
+        menu.classList.remove('open');
+        wrap.classList.remove('open');
+    } else {
+        menu.classList.add('open');
+        wrap.classList.add('open');
+    }
+}
+
+// Close the pill dropdown when clicking anywhere outside it
+document.addEventListener('click', (e) => {
+    const wrap = document.getElementById('nav-user-wrap');
+    const menu = document.getElementById('nav-user-menu');
+    if (wrap && menu && !wrap.contains(e.target)) {
+        menu.classList.remove('open');
+        wrap.classList.remove('open');
+    }
+});
+
+// ── Change Password Modal ───────────────────────────────────
+
+/** Open the change-password modal and reset all fields/messages. */
+function openChangePwModal() {
+    // Close the nav pill dropdown first
+    const menu = document.getElementById('nav-user-menu');
+    const wrap = document.getElementById('nav-user-wrap');
+    if (menu) menu.classList.remove('open');
+    if (wrap) wrap.classList.remove('open');
+
+    // Reset all fields
+    ['cpw-current', 'cpw-new', 'cpw-confirm'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+
+    // Hide message + strength meter
+    setCpwMsg('', '');
+    const sw = document.getElementById('cpw-strength-wrap');
+    if (sw) sw.style.display = 'none';
+    const fill = document.getElementById('cpw-strength-fill');
+    if (fill) { fill.style.width = '0%'; fill.style.background = ''; }
+
+    // Re-enable submit button
+    const btn = document.getElementById('cpw-submit-btn');
+    if (btn) btn.disabled = false;
+
+    // Show the modal overlay
+    const overlay = document.getElementById('modal-changepw');
+    if (overlay) overlay.classList.add('open');
+
+    // Focus the first field
+    setTimeout(() => {
+        const cur = document.getElementById('cpw-current');
+        if (cur) cur.focus();
+    }, 80);
+}
+
+/** Close the change-password modal. */
+function closeChangePwModal() {
+    const overlay = document.getElementById('modal-changepw');
+    if (overlay) overlay.classList.remove('open');
+}
+
+/** Allow clicking the dark overlay (but not the modal card) to close. */
+function closeCpwModalOnBackdrop(event) {
+    if (event.target.id === 'modal-changepw') closeChangePwModal();
+}
+
+/**
+ * updatePwStrength(value)
+ * Drives the password strength meter under the "New Password" field.
+ * Scores the password by length, upper/lower case, digits, and symbols.
+ */
+function updatePwStrength(value) {
+    const wrap  = document.getElementById('cpw-strength-wrap');
+    const fill  = document.getElementById('cpw-strength-fill');
+    const label = document.getElementById('cpw-strength-label');
+    if (!wrap || !fill || !label) return;
+
+    if (!value) {
+        wrap.style.display = 'none';
+        return;
+    }
+    wrap.style.display = 'flex';
+
+    let score = 0;
+    if (value.length >= 6)  score++;
+    if (value.length >= 10) score++;
+    if (/[A-Z]/.test(value)) score++;
+    if (/[0-9]/.test(value)) score++;
+    if (/[^A-Za-z0-9]/.test(value)) score++;
+
+    const levels = [
+        { pct: '20%',  bg: '#ef4444', text: 'Weak',      color: '#ef4444' },
+        { pct: '40%',  bg: '#f97316', text: 'Fair',      color: '#f97316' },
+        { pct: '60%',  bg: '#eab308', text: 'Good',      color: '#eab308' },
+        { pct: '80%',  bg: '#22c55e', text: 'Strong',    color: '#22c55e' },
+        { pct: '100%', bg: '#10b981', text: 'Very Strong', color: '#10b981' },
+    ];
+    const lvl = levels[Math.max(0, Math.min(score - 1, 4))];
+    fill.style.width      = lvl.pct;
+    fill.style.background = lvl.bg;
+    label.textContent     = lvl.text;
+    label.style.color     = lvl.color;
+}
+
+/**
+ * setCpwMsg(text, type)
+ * Shows a feedback message ('success' or 'error') inside the modal,
+ * or hides the bar when text is empty.
+ */
+function setCpwMsg(text, type) {
+    const el = document.getElementById('cpw-msg');
+    if (!el) return;
+    if (!text) {
+        el.style.display = 'none';
+        el.textContent   = '';
+        el.className     = 'cpw-msg';
+        return;
+    }
+    el.textContent   = text;
+    el.className     = `cpw-msg msg-${type}`;
+    el.style.display = 'block';
+}
+
+/**
+ * Validates a password against strong security rules.
+ * Returns an error string if invalid, or null if valid.
+ */
+function validateStrongPassword(pw, username = '', email = '', fullName = '') {
+    if (pw.length < 8) return 'Password must be at least 8 characters.';
+    if (!/[A-Z]/.test(pw)) return 'Password must contain at least one uppercase letter.';
+    if (!/[a-z]/.test(pw)) return 'Password must contain at least one lowercase letter.';
+    if (!/\d/.test(pw)) return 'Password must contain at least one number.';
+    if (!/[^a-zA-Z0-9]/.test(pw)) return 'Password must contain at least one special character.';
+    
+    const lowerPw = pw.toLowerCase();
+    if (username && lowerPw.includes(username.toLowerCase())) return 'Password must not contain the username.';
+    if (email && lowerPw.includes(email.split('@')[0].toLowerCase())) return 'Password must not contain the email address.';
+    if (fullName) {
+        const parts = fullName.toLowerCase().split(' ');
+        for (const part of parts) {
+            if (part.length > 2 && lowerPw.includes(part)) return 'Password must not contain parts of your name.';
+        }
+    }
+    return null;
+}
+
+/**
+ * submitChangePw()
+ * Validates the form fields client-side, then calls
+ * PUT /auth/me/change-password with { current_password, new_password }.
+ * On success: closes modal after 1.5 s and shows a toast notification.
+ * On failure: displays the server-returned error message inline.
+ */
+async function submitChangePw() {
+    const current = document.getElementById('cpw-current').value;
+    const newPw   = document.getElementById('cpw-new').value;
+    const confirm = document.getElementById('cpw-confirm').value;
+    const btn     = document.getElementById('cpw-submit-btn');
+
+    // ── Client-side validation ──
+    if (!current) {
+        setCpwMsg('Please enter your current password.', 'error'); return;
+    }
+    
+    // User info for validation (from localStorage)
+    const storedUsername = localStorage.getItem('username') || '';
+    const storedEmail = localStorage.getItem('email') || '';
+    
+    const pwError = validateStrongPassword(newPw, storedUsername, storedEmail, fullName);
+    if (pwError) {
+        setCpwMsg(pwError, 'error'); return;
+    }
+    if (newPw !== confirm) {
+        setCpwMsg('New passwords do not match.', 'error'); return;
+    }
+    if (current === newPw) {
+        setCpwMsg('New password must differ from the current one.', 'error'); return;
+    }
+
+    // ── Submit to backend ──
+    btn.disabled     = true;
+    btn.textContent  = 'Updating…';
+
+    try {
+        const res = await fetch(`${API}/auth/me/change-password`, {
+            method:  'PUT',
+            headers: { 'Content-Type': 'application/json', ...authHeaders() },
+            body:    JSON.stringify({
+                current_password: current,
+                new_password:     newPw,
+            }),
+        });
+
+        if (!res.ok) {
+            const e = await res.json().catch(() => ({}));
+            throw new Error(parseApiError(e, 'Password update failed'));
+        }
+
+        // ── Success ──
+        setCpwMsg('✓ Password updated successfully! An admin has been notified.', 'success');
+        showToast('Password changed successfully', 'success');
+
+        // Auto-close after 1.5 s
+        setTimeout(closeChangePwModal, 1500);
+
+    } catch (err) {
+        setCpwMsg(err.message, 'error');
+        btn.disabled    = false;
+        btn.textContent = 'Update Password';
     }
 }
 
@@ -288,26 +538,34 @@ async function loadUsers() {
         const users = await res.json();
         const tbody = document.getElementById('users-tbody');
         tbody.innerHTML = '';
-        users.forEach(u => {
-            const isAdminSelf = u.username === localStorage.getItem('username');
-            const menuItems = isAdminSelf
-                ? `<div onclick="editUser(${u.id})"> Edit Profile</div>
-                   <div onclick="resetPassword(${u.id},'${u.username}')"> Reset Password</div>`
-                : `<div onclick="editUser(${u.id})"> Edit</div>
-                   <div onclick="resetPassword(${u.id},'${u.username}')"> Reset Password</div>
-                   <div onclick="deactivateUser(${u.id},'${u.username}')"> Deactivate</div>
-                   <div class="danger" onclick="deleteUser(${u.id},'${u.username}')"> Delete</div>`;
-
+        users.filter(u => u.role !== 'admin').forEach(u => {
             const tr = document.createElement('tr');
+            const statusIndicator = u.is_active === false
+                ? '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;margin-right:6px;" title="Inactive"></span>'
+                : '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;margin-right:6px;" title="Active"></span>';
+
+            // ── Role-based dropdown items ──────────────────────────────────
+            // Admin-role users: only the original prompt-based Edit + Reset Password.
+            // All other roles (staff, viewer, operator, …): new full-page edit view.
+            let menuItems;
+            if (u.role === 'admin') {
+                // Original behaviour — kept exactly as before for admin accounts
+                menuItems = `<div onclick="editUser(${u.id},'${u.username}')">Edit</div>
+                             <div onclick="resetPassword(${u.id},'${u.username}')">Reset Password</div>`;
+            } else {
+                // New full-page edit view for non-admin users
+                menuItems = `<div onclick="openUserEdit(${u.id})">Edit</div>`;
+            }
+
             tr.innerHTML = `
-<td>${u.full_name}</td>
+<td>${statusIndicator}${u.full_name}</td>
 <td style="font-family:var(--mono);color:var(--cyan)">${u.username}</td>
 <td>${u.email}</td>
 <td><span class="role-badge role-${u.role}">${u.role}</span></td>
 <td style="font-family:var(--mono);color:var(--text3);font-size:12px">${u.airport_id ? 'Airport #' + u.airport_id : '<em>All Airports</em>'}</td>
 <td>
   <div class="user-action-dropdown">
-    <button class="user-action-btn" onclick="toggleUserMenu(event,${u.id})">Actions ▾</button>
+    <button class="user-action-btn" onclick="toggleUserMenu(event,${u.id})">Actions &#9662;</button>
     <div class="user-action-menu" id="user-menu-${u.id}">
       ${menuItems}
     </div>
@@ -332,14 +590,292 @@ document.addEventListener('click', () => {
     document.querySelectorAll('.user-action-menu.show').forEach(m => m.classList.remove('show'));
 });
 
-async function editUser(userId) {
-    const newName = prompt('Enter new full name (leave blank to skip):');
-    const newRole = prompt('Enter new role (admin/staff/viewer, leave blank to skip):');
-    if (!newName && !newRole) return;
+// ── User Edit View State ──────────────────────────────────────────
+let currentEditUser = null; // stores the full user object being edited
+
+// Opens the full-page user edit view, pre-populating all fields
+async function openUserEdit(userId) {
+    // Close any open dropdowns first
+    document.querySelectorAll('.user-action-menu.show').forEach(m => m.classList.remove('show'));
+
+    try {
+        // Fetch up-to-date user list and find the target user
+        const res = await fetch(`${API}/users`, { headers: authHeaders() });
+        if (!res.ok) throw new Error('Could not load user data');
+        const users = await res.json();
+        const u = users.find(x => x.id === userId);
+        if (!u) { showToast('User not found', 'error'); return; }
+        currentEditUser = u;
+
+        // Populate header
+        document.getElementById('ue-header-name').textContent = u.full_name || u.username;
+        document.getElementById('ue-header-sub').textContent =
+            `@${u.username} · ${u.role.charAt(0).toUpperCase() + u.role.slice(1)}`;
+
+        // Populate User Information fields
+        document.getElementById('ue-fullname').value  = u.full_name  || '';
+        document.getElementById('ue-email').value     = u.email      || '';
+        document.getElementById('ue-username').value  = u.username   || '';
+        document.getElementById('ue-role').value      = u.role       || 'viewer';
+
+        // Status badge
+        const badge = document.getElementById('ue-status-badge');
+        const isActive = u.is_active !== false;
+        badge.textContent = isActive ? '● Active' : '● Inactive';
+        badge.className = isActive ? 'ue-status-badge ue-status-active' : 'ue-status-badge ue-status-inactive';
+
+        // Deactivate/Reactivate button label
+        const deactivateLabel = document.getElementById('ue-deactivate-label');
+        const deactivateBtn   = document.getElementById('ue-deactivate-btn');
+        if (isActive) {
+            deactivateLabel.textContent = 'Deactivate User';
+            deactivateBtn.textContent   = 'Deactivate';
+            deactivateBtn.className     = 'btn-ue-deactivate';
+        } else {
+            deactivateLabel.textContent = 'Reactivate User';
+            deactivateBtn.textContent   = 'Reactivate';
+            deactivateBtn.className     = 'btn-ue-reactivate';
+        }
+
+        // Clear password fields & all messages
+        document.getElementById('ue-new-password').value     = '';
+        document.getElementById('ue-confirm-password').value = '';
+        ['ue-msg-info','ue-msg-pw','ue-msg-airport'].forEach(id => {
+            const el = document.getElementById(id);
+            el.style.display = 'none'; el.textContent = '';
+            el.className = 'msg-box';
+        });
+
+        // Load airports into the select + set current airport display
+        await loadUEAirports(u.airport_id);
+
+        // Navigate to the edit page
+        showPage('user-edit');
+    } catch (err) {
+        showToast(err.message, 'error');
+    }
+}
+
+// Loads airports into the reassign-airport dropdown and sets the current-airport read-only field
+async function loadUEAirports(currentAirportId) {
+    const sel = document.getElementById('ue-airport-select');
+    const currentDisplay = document.getElementById('ue-current-airport');
+    sel.innerHTML = '<option value="">— All Airports (Admin) —</option>';
+    try {
+        const res = await fetch(`${API}/airports`, { headers: authHeaders() });
+        if (!res.ok) return;
+        const airports = await res.json();
+        airports.forEach(a => {
+            const opt = document.createElement('option');
+            opt.value = a.id;
+            opt.textContent = `${a.name} (${a.code})`;
+            if (a.id === currentAirportId) opt.selected = true;
+            sel.appendChild(opt);
+        });
+        // Set read-only display
+        if (currentAirportId) {
+            const found = airports.find(a => a.id === currentAirportId);
+            currentDisplay.value = found ? `${found.name} (${found.code})` : `Airport #${currentAirportId}`;
+        } else {
+            currentDisplay.value = 'All Airports (Admin)';
+        }
+    } catch (e) { console.error(e); }
+}
+
+// Helper: show a message inside one of the edit-view cards
+function showUEMsg(id, text, type) {
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.className = `msg-box msg-${type}`;
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+
+// Saves full-name, email, and role changes
+async function saveUserInfo() {
+    if (!currentEditUser) return;
+    const payload = {
+        full_name: document.getElementById('ue-fullname').value.trim(),
+        email:     document.getElementById('ue-email').value.trim(),
+        role:      document.getElementById('ue-role').value,
+    };
+    if (!payload.full_name || !payload.email) {
+        showUEMsg('ue-msg-info', 'Name and email are required.', 'error'); return;
+    }
+    try {
+        const res = await fetch(`${API}/auth/users/${currentEditUser.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', ...authHeaders() },
+            body: JSON.stringify(payload),
+        });
+        if (!res.ok) {
+            const e = await res.json().catch(() => ({}));
+            throw new Error(parseApiError(e, 'Update failed'));
+        }
+        currentEditUser = { ...currentEditUser, ...payload };
+        document.getElementById('ue-header-name').textContent = payload.full_name;
+        document.getElementById('ue-header-sub').textContent =
+            `@${currentEditUser.username} · ${payload.role.charAt(0).toUpperCase() + payload.role.slice(1)}`;
+        showUEMsg('ue-msg-info', '✓ Profile updated successfully.', 'success');
+        showToast('User info updated', 'success');
+    } catch (err) { showUEMsg('ue-msg-info', err.message, 'error'); }
+}
+
+// Changes the user's password (manual entry)
+async function changeUserPassword() {
+    if (!currentEditUser) return;
+    const pw  = document.getElementById('ue-new-password').value;
+    const cfm = document.getElementById('ue-confirm-password').value;
+    if (!pw) { showUEMsg('ue-msg-pw', 'Please enter a new password.', 'error'); return; }
+    if (pw !== cfm) { showUEMsg('ue-msg-pw', 'Passwords do not match.', 'error'); return; }
+    const pwError = validateStrongPassword(pw, currentEditUser.username, currentEditUser.email, currentEditUser.full_name);
+    if (pwError) { showUEMsg('ue-msg-pw', pwError, 'error'); return; }
+    try {
+        const res = await fetch(`${API}/auth/users/${currentEditUser.id}/reset-password`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', ...authHeaders() },
+            body: JSON.stringify({ password: pw }),  // ← backend requires { "password": "..." }
+        });
+        if (!res.ok) {
+            const e = await res.json().catch(() => ({}));
+            throw new Error(parseApiError(e, 'Password change failed'));
+        }
+        document.getElementById('ue-new-password').value     = '';
+        document.getElementById('ue-confirm-password').value = '';
+        showUEMsg('ue-msg-pw', '✓ Password changed successfully.', 'success');
+        showToast('Password updated', 'success');
+    } catch (err) { showUEMsg('ue-msg-pw', err.message, 'error'); }
+}
+
+// Sends a system-generated temporary password to the user's registered email.
+// Calls POST /auth/users/{id}/send-reset-email (admin-only, no request body).
+// The backend generates a random 12-char password, bcrypt-hashes and stores it,
+// then emails the new credentials. The admin never sees the generated password.
+async function resetPasswordFromEdit() {
+    if (!currentEditUser) return;
+    const email = currentEditUser.email || currentEditUser.username;
+    if (!confirm(
+        `Send a system-generated temporary password to ${currentEditUser.username}?\n\n` +
+        `A new random password will be emailed to their registered address.\n` +
+        `Their current password will be replaced immediately.`
+    )) return;
+
+    try {
+        const res = await fetch(
+            `${API}/auth/users/${currentEditUser.id}/send-reset-email`,
+            {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json', ...authHeaders() },
+            }
+        );
+
+        if (!res.ok) {
+            const e = await res.json().catch(() => ({}));
+            throw new Error(parseApiError(e, 'Reset email failed'));
+        }
+
+        // Surface the backend message — it includes the target email address
+        const data = await res.json().catch(() => ({}));
+        const msg  = data.message || 'Reset password email sent successfully.';
+        showUEMsg('ue-msg-pw', `\u2713 ${msg}`, 'success');
+        showToast('Reset email sent', 'success');
+
+    } catch (err) {
+        showUEMsg('ue-msg-pw', err.message, 'error');
+    }
+}
+
+
+// Reassigns the user to a different airport
+async function changeUserAirport() {
+    if (!currentEditUser) return;
+    const airportIdRaw = document.getElementById('ue-airport-select').value;
+    const airportId = airportIdRaw ? parseInt(airportIdRaw) : null;
+    try {
+        const res = await fetch(`${API}/auth/users/${currentEditUser.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', ...authHeaders() },
+            body: JSON.stringify({ airport_id: airportId }),
+        });
+        if (!res.ok) {
+            const e = await res.json().catch(() => ({}));
+            throw new Error(parseApiError(e, 'Airport update failed'));
+        }
+        currentEditUser.airport_id = airportId;
+        const sel = document.getElementById('ue-airport-select');
+        const selectedText = sel.options[sel.selectedIndex].text;
+        document.getElementById('ue-current-airport').value = selectedText;
+        showUEMsg('ue-msg-airport', '✓ Airport updated successfully.', 'success');
+        showToast('Airport assignment updated', 'success');
+    } catch (err) { showUEMsg('ue-msg-airport', err.message, 'error'); }
+}
+
+// Toggles between deactivate and reactivate
+async function toggleUserDeactivate() {
+    if (!currentEditUser) return;
+    const isActive = currentEditUser.is_active !== false;
+    const action   = isActive ? 'Deactivate' : 'Reactivate';
+    if (!confirm(`${action} account for "${currentEditUser.username}"?`)) return;
+    try {
+        // Backend uses /deactivate and /activate (not /reactivate)
+        const endpoint = isActive
+            ? `${API}/auth/users/${currentEditUser.id}/deactivate`
+            : `${API}/auth/users/${currentEditUser.id}/activate`;
+        const res = await fetch(endpoint, { method: 'PUT', headers: authHeaders() });
+        if (!res.ok) {
+            const e = await res.json().catch(() => ({}));
+            throw new Error(parseApiError(e, `${action} failed`));
+        }
+        currentEditUser.is_active = !isActive;
+        const newActive = currentEditUser.is_active;
+        const badge = document.getElementById('ue-status-badge');
+        badge.textContent = newActive ? '● Active' : '● Inactive';
+        badge.className   = newActive ? 'ue-status-badge ue-status-active' : 'ue-status-badge ue-status-inactive';
+        const btn = document.getElementById('ue-deactivate-btn');
+        const lbl = document.getElementById('ue-deactivate-label');
+        if (newActive) {
+            lbl.textContent = 'Deactivate User';
+            btn.textContent = 'Deactivate';
+            btn.className   = 'btn-ue-deactivate';
+        } else {
+            lbl.textContent = 'Reactivate User';
+            btn.textContent = 'Reactivate';
+            btn.className   = 'btn-ue-reactivate';
+        }
+        showToast(`${currentEditUser.username} ${newActive ? 'reactivated' : 'deactivated'}`, 'success');
+    } catch (err) { showToast(err.message, 'error'); }
+}
+
+// Deletes the user then returns to the users list
+async function deleteUserFromEdit() {
+    if (!currentEditUser) return;
+    if (!confirm(`Permanently delete user "${currentEditUser.username}"? This cannot be undone.`)) return;
+    if (!confirm(`Are you absolutely sure? All data for "${currentEditUser.username}" will be lost.`)) return;
+    try {
+        const res = await fetch(`${API}/auth/users/${currentEditUser.id}`, {
+            method: 'DELETE',
+            headers: authHeaders(),
+        });
+        if (!res.ok) {
+            const e = await res.json().catch(() => ({}));
+            throw new Error(parseApiError(e, 'Delete failed'));
+        }
+        showToast(`${currentEditUser.username} deleted`, 'success');
+        currentEditUser = null;
+        showPage('register');
+    } catch (err) { showToast(err.message, 'error'); }
+}
+
+// ── Admin Edit (original prompt-based flow — used for admin-role accounts only) ──
+// Mirrors the original editUser() that existed before the full-page edit view was added.
+async function editUser(userId, username) {
+    const newName = prompt(`Edit admin "${username}"\nNew full name (leave blank to skip):`);
+    // If the user pressed Cancel on the first prompt, abort entirely
+    if (newName === null) return;
 
     const payload = {};
-    if (newName && newName.trim()) payload.full_name = newName.trim();
-    if (newRole && newRole.trim()) payload.role = newRole.trim();
+    if (newName.trim()) payload.full_name = newName.trim();
+    if (!Object.keys(payload).length) return; // nothing to update
 
     try {
         const res = await fetch(`${API}/auth/users/${userId}`, {
@@ -347,47 +883,56 @@ async function editUser(userId) {
             headers: { 'Content-Type': 'application/json', ...authHeaders() },
             body: JSON.stringify(payload),
         });
-        if (!res.ok) { const e = await res.json(); throw new Error(e.detail || 'Update failed'); }
-        showToast('User updated', 'success');
+        if (!res.ok) {
+            const e = await res.json().catch(() => ({}));
+            throw new Error(parseApiError(e, 'Update failed'));
+        }
+        showToast('Admin user updated successfully', 'success');
         loadUsers();
     } catch (err) { showToast(err.message, 'error'); }
 }
 
+// ── Admin Reset Password ──
+// The backend endpoint PUT /auth/users/{id}/reset-password expects a JSON body:
+//   { "password": "<new_plaintext_password>" }
+// This function prompts the admin for the new password, validates it,
+// then posts it to the backend for bcrypt hashing and storage.
 async function resetPassword(userId, username) {
-    if (!confirm(`Reset password for "${username}"? A new password will be sent to their email.`)) return;
+    // Step 1: confirm intent
+    if (!confirm(`Reset password for "${username}"?\n\nYou will be prompted to enter a new password.`)) return;
+
+    // Step 2: collect new password
+    const newPw = prompt(`Enter the NEW password for "${username}":`);
+    if (newPw === null) return;            // user pressed Cancel
+    if (!newPw.trim()) {
+        showToast('Password cannot be empty.', 'error');
+        return;
+    }
+    if (newPw.length < 6) {
+        showToast('Password must be at least 6 characters.', 'error');
+        return;
+    }
+
+    // Step 3: confirm new password
+    const confirmPw = prompt(`Confirm new password for "${username}":`);
+    if (confirmPw === null) return;        // cancelled
+    if (newPw !== confirmPw) {
+        showToast('Passwords do not match. Reset cancelled.', 'error');
+        return;
+    }
+
+    // Step 4: call backend with the required { "password": "..." } body
     try {
         const res = await fetch(`${API}/auth/users/${userId}/reset-password`, {
             method: 'PUT',
-            headers: authHeaders(),
+            headers: { 'Content-Type': 'application/json', ...authHeaders() },
+            body: JSON.stringify({ password: newPw }),  // ← required by the backend
         });
-        if (!res.ok) { const e = await res.json(); throw new Error(e.detail || 'Reset failed'); }
-        showToast(`Password reset for ${username}`, 'success');
-    } catch (err) { showToast(err.message, 'error'); }
-}
-
-async function deactivateUser(userId, username) {
-    if (!confirm(`Deactivate account for "${username}"?`)) return;
-    try {
-        const res = await fetch(`${API}/auth/users/${userId}/deactivate`, {
-            method: 'PUT',
-            headers: authHeaders(),
-        });
-        if (!res.ok) { const e = await res.json(); throw new Error(e.detail || 'Deactivate failed'); }
-        showToast(`${username} deactivated`, 'success');
-        loadUsers();
-    } catch (err) { showToast(err.message, 'error'); }
-}
-
-async function deleteUser(userId, username) {
-    if (!confirm(`Permanently delete user "${username}"? This cannot be undone.`)) return;
-    try {
-        const res = await fetch(`${API}/auth/users/${userId}`, {
-            method: 'DELETE',
-            headers: authHeaders(),
-        });
-        if (!res.ok) { const e = await res.json(); throw new Error(e.detail || 'Delete failed'); }
-        showToast(`${username} deleted`, 'success');
-        loadUsers();
+        if (!res.ok) {
+            const e = await res.json().catch(() => ({}));
+            throw new Error(parseApiError(e, 'Password reset failed'));
+        }
+        showToast(`✓ Password reset for "${username}" successfully`, 'success');
     } catch (err) { showToast(err.message, 'error'); }
 }
 
@@ -785,6 +1330,41 @@ function authHeaders() {
     return token ? { 'Authorization': `Bearer ${token}` } : {};
 }
 
+/**
+ * parseApiError(e)
+ * Safely extracts a readable error string from any FastAPI/HTTP response object.
+ * FastAPI returns `detail` as:
+ *   - a plain string  → "User not found"
+ *   - an array        → Pydantic validation errors [{loc,msg,type}, ...]
+ *   - an object       → rare custom shapes
+ * Falls back to `e.message` (JS Error), then a provided fallback string.
+ */
+function parseApiError(e, fallback = 'Request failed') {
+    // e is the parsed JSON body from the API response
+    if (!e) return fallback;
+
+    const detail = e.detail;
+
+    if (!detail) {
+        // Try common alternative keys
+        if (e.message && typeof e.message === 'string') return e.message;
+        return fallback;
+    }
+
+    if (typeof detail === 'string') return detail;   // plain string — most common
+
+    if (Array.isArray(detail)) {
+        // Pydantic validation error array — each item has {loc, msg, type}
+        return detail.map(d => {
+            const field = Array.isArray(d.loc) ? d.loc.slice(-1)[0] : '';
+            return field ? `${field}: ${d.msg}` : d.msg;
+        }).join('; ');
+    }
+
+    // Unexpected object shape — stringify gracefully
+    try { return JSON.stringify(detail); } catch { return fallback; }
+}
+
 function showToast(msg, type) {
     const existing = document.querySelector('.toast');
     if (existing) existing.remove();
@@ -1097,4 +1677,164 @@ function renderAirportChart(data) {
             }
         }
     });
+}
+
+// ── Admin Profile ────────────────────────────────────────────────
+let originalAdminData = {};
+
+async function loadAdminProfile() {
+    try {
+        const res = await fetch(`${API}/auth/me`, { headers: authHeaders() });
+        if (!res.ok) return;
+        const user = await res.json();
+        
+        originalAdminData = {
+            full_name: user.full_name || '',
+            email: user.email || ''
+        };
+
+        document.getElementById('admin-fullname').value = user.full_name || '';
+        document.getElementById('admin-username').value = user.username || '';
+        document.getElementById('admin-email').value = user.email || '';
+        
+        document.getElementById('admin-created-at').value = user.created_at || 'N/A';
+        document.getElementById('admin-last-login').value = user.last_login_at || 'N/A';
+        document.getElementById('admin-last-password-change').value = user.last_password_changed_at || 'N/A';
+        
+        toggleAdminEditMode(false); // Reset to read-only
+    } catch (err) { console.error(err); }
+}
+
+function toggleAdminEditMode(isEditing) {
+    const fn = document.getElementById('admin-fullname');
+    const em = document.getElementById('admin-email');
+    const actions = document.getElementById('admin-profile-actions');
+    const editBtn = document.getElementById('admin-edit-btn');
+    const msg = document.getElementById('admin-msg-profile');
+
+    if (isEditing) {
+        fn.disabled = false;
+        fn.style.background = '#fff';
+        fn.style.color = 'var(--text)';
+        
+        em.disabled = false;
+        em.style.background = '#fff';
+        em.style.color = 'var(--text)';
+        
+        actions.style.display = 'flex';
+        editBtn.style.display = 'none';
+        if (msg) msg.style.display = 'none';
+    } else {
+        // Restore original if cancelling
+        fn.value = originalAdminData.full_name || '';
+        em.value = originalAdminData.email || '';
+        
+        fn.disabled = true;
+        fn.style.background = '#f8f9fc';
+        fn.style.color = '#718096';
+        
+        em.disabled = true;
+        em.style.background = '#f8f9fc';
+        em.style.color = '#718096';
+        
+        actions.style.display = 'none';
+        editBtn.style.display = 'block';
+    }
+}
+
+async function saveAdminProfile() {
+    const fn = document.getElementById('admin-fullname').value.trim();
+    const em = document.getElementById('admin-email').value.trim();
+    const msgBox = document.getElementById('admin-msg-profile');
+
+    if (!fn || !em) {
+        msgBox.textContent = "Full Name and Email are required.";
+        msgBox.className = "msg-box msg-error";
+        msgBox.style.display = "block";
+        return;
+    }
+
+    if (!window.confirm("Are you sure you want to update your profile information?")) return;
+
+    try {
+        const res = await fetch(`${API}/auth/me/profile`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', ...authHeaders() },
+            body: JSON.stringify({ full_name: fn, email: em })
+        });
+        if (!res.ok) {
+            const e = await res.json();
+            throw new Error(e.detail || "Update failed");
+        }
+        
+        msgBox.textContent = "Profile updated successfully!";
+        msgBox.className = "msg-box msg-success";
+        msgBox.style.display = "block";
+        
+        // Update original data
+        originalAdminData.full_name = fn;
+        originalAdminData.email = em;
+        
+        // Update top-right pill
+        fullName = fn;
+        localStorage.setItem('fullName', fn);
+        setupNavbar();
+        
+        setTimeout(() => toggleAdminEditMode(false), 1500);
+    } catch (err) {
+        msgBox.textContent = err.message;
+        msgBox.className = "msg-box msg-error";
+        msgBox.style.display = "block";
+    }
+}
+
+async function changeAdminPassword() {
+    const current = document.getElementById('admin-current-password').value;
+    const newPw = document.getElementById('admin-new-password').value;
+    const confirm = document.getElementById('admin-confirm-password').value;
+    const btn = document.getElementById('btn-admin-pw');
+    const msgBox = document.getElementById('admin-msg-pw');
+
+    const showMsg = (msg, type) => {
+        msgBox.textContent = msg;
+        msgBox.className = `msg-box msg-${type}`;
+        msgBox.style.display = 'block';
+    };
+
+    if (!current) { showMsg('Please enter your current password.', 'error'); return; }
+    if (newPw !== confirm) { showMsg('New passwords do not match.', 'error'); return; }
+    
+    const adminUsername = document.getElementById('admin-username').value;
+    const adminEmail = document.getElementById('admin-email').value;
+    const adminFullName = document.getElementById('admin-fullname').value;
+    
+    const pwError = validateStrongPassword(newPw, adminUsername, adminEmail, adminFullName);
+    if (pwError) { showMsg(pwError, 'error'); return; }
+    
+    if (!window.confirm('Are you sure you want to change your password?')) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Updating...';
+
+    try {
+        const res = await fetch(`${API}/auth/me/change-password`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', ...authHeaders() },
+            body: JSON.stringify({ current_password: current, new_password: newPw }),
+        });
+        if (!res.ok) {
+            const e = await res.json().catch(() => ({}));
+            throw new Error(parseApiError(e, 'Password update failed'));
+        }
+        
+        showMsg('Password updated successfully! Confirmation email sent.', 'success');
+        document.getElementById('admin-current-password').value = '';
+        document.getElementById('admin-new-password').value = '';
+        document.getElementById('admin-confirm-password').value = '';
+    } catch (err) {
+        showMsg(err.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Update Password';
+    }
 }

@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 from core.database import DatabaseManager  # singleton DB engine and session factory
-from models.models import UserModel         # SQLAlchemy ORM model for the users table
+from models.models import UserModel, AuditLogModel  # SQLAlchemy ORM models
 from models.schemas import UserSerializer   # converts ORM objects to plain response dicts
 from services.email_service import EmailService  # sends credential emails after registration
 
@@ -61,6 +61,40 @@ class AuthService:
             password.encode("utf-8"),   # encode candidate password to bytes
             hashed.encode("utf-8")      # encode stored hash to bytes
         )
+
+    @staticmethod
+    def validate_password_strength(password: str, username: str = "", email: str = "", full_name: str = "") -> None:
+        """
+        Validate that the password meets strong security requirements:
+        - Minimum 8 characters
+        - At least 1 uppercase letter
+        - At least 1 lowercase letter
+        - At least 1 number
+        - At least 1 special character
+        - Must not contain username, email, or full name
+        """
+        import re
+        
+        if len(password) < 8:
+            raise ValueError("Password must be at least 8 characters long.")
+        if not re.search(r'[A-Z]', password):
+            raise ValueError("Password must contain at least one uppercase letter.")
+        if not re.search(r'[a-z]', password):
+            raise ValueError("Password must contain at least one lowercase letter.")
+        if not re.search(r'\d', password):
+            raise ValueError("Password must contain at least one number.")
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>\-\_=\+\[\]\\/\']', password):
+            raise ValueError("Password must contain at least one special character.")
+            
+        password_lower = password.lower()
+        if username and username.lower() in password_lower:
+            raise ValueError("Password must not contain the username.")
+        if email and email.split('@')[0].lower() in password_lower:
+            raise ValueError("Password must not contain the email address.")
+        if full_name:
+            for part in full_name.lower().split():
+                if len(part) > 2 and part in password_lower:
+                    raise ValueError("Password must not contain parts of the user's name.")
 
     # ── JWT Utilities ──────────────────────────────────────────────────────────
 
@@ -117,6 +151,8 @@ class AuthService:
             # Verify the provided password against the stored bcrypt hash
             if not self.verify_password(password, user.password_hash):
                 return None  # wrong password
+
+            user.last_login_at = datetime.utcnow()
 
             # All checks passed — generate a signed JWT for this session
             token = self.create_token(user.id, user.username, user.role, user.airport_id)
@@ -302,10 +338,222 @@ class AuthService:
             if not user:
                 raise ValueError("User not found")
 
+            # Validate the new password
+            self.validate_password_strength(password, user.username, user.email, user.full_name)
+
             # Hash the new password and overwrite the stored hash
             user.password_hash = self.hash_password(password)
+            email = user.email
+            username = user.username
+            full_name = user.full_name
+            role = user.role
 
-        return {"message": "Password updated"}
+        # Email the updated password to the user
+        self._email_service.send_credentials_email(
+            to_email=email,
+            full_name=full_name,
+            username=username,
+            password=password,
+            role=role,
+        )
+
+        return {"message": "Password updated successfully and emailed to the user."}
+
+    def send_reset_email(self, user_id: int) -> dict:
+        """
+        Generate a cryptographically random temporary password, apply it to the
+        user's account (via bcrypt hash), and email the new credentials to the
+        user's registered email address.
+
+        This is the correct backend for the admin "Send Reset Email" action.
+        It uses the same send_credentials_email() pathway as user registration so
+        the user receives a consistently formatted welcome/reset email.
+
+        Args:
+            user_id: ID of the user whose password should be reset and emailed.
+
+        Returns:
+            dict with "message" key on success, including the target email address.
+
+        Raises:
+            ValueError: If the user_id is not found in the database.
+        """
+        import secrets
+        import string
+
+        # Capture user details first
+        with self._db.session_scope() as session:
+            user = session.query(UserModel).filter_by(id=user_id).first()
+
+            if not user:
+                raise ValueError("User not found")
+
+            # Generate a compliant random password
+            while True:
+                # Ensure at least one of each required type
+                upper = secrets.choice(string.ascii_uppercase)
+                lower = secrets.choice(string.ascii_lowercase)
+                digit = secrets.choice(string.digits)
+                special = secrets.choice("!@#$%^&*")
+                
+                # Fill the rest (8 characters to make total 12)
+                alphabet = string.ascii_letters + string.digits + "!@#$%^&*"
+                rest = "".join(secrets.choice(alphabet) for _ in range(8))
+                
+                # Shuffle the characters
+                chars = list(upper + lower + digit + special + rest)
+                secrets.SystemRandom().shuffle(chars)
+                temp_password = "".join(chars)
+                
+                # Validate against username/email/name logic
+                try:
+                    self.validate_password_strength(temp_password, user.username, user.email, user.full_name)
+                    break # Break out of loop if valid
+                except ValueError:
+                    continue # Generate again if invalid
+
+            # Apply bcrypt hash — temp_password is NEVER stored in plain text
+            user.password_hash = self.hash_password(temp_password)
+
+            # Capture fields needed for the email before the session closes
+            email     = user.email
+            full_name = user.full_name
+            username  = user.username
+            role      = user.role
+
+        # Send the temporary credentials email outside the session block
+        # (email I/O should not hold a DB connection open)
+        self._email_service.send_credentials_email(
+            to_email=email,
+            full_name=full_name,
+            username=username,
+            password=temp_password,   # shown once in email, then disposable
+            role=role,
+        )
+
+        return {
+            "message": f"Temporary password emailed to {email}. "
+                       "The user should change it after their next login."
+        }
+
+    def update_profile(self, user_id: int, full_name: str, email: str) -> dict:
+        """
+        Update the user's Full Name and Email. Username and Role are strictly locked.
+        Creates an audit log of the change.
+        """
+        with self._db.session_scope() as session:
+            user = session.query(UserModel).filter_by(id=user_id).first()
+            if not user:
+                raise ValueError("User not found")
+                
+            old_name = user.full_name
+            old_email = user.email
+            
+            user.full_name = full_name
+            user.email = email
+            
+            audit = AuditLogModel(
+                user_id=user.id,
+                action="Updated Profile",
+                details=f"Name changed from '{old_name}' to '{full_name}'. Email changed from '{old_email}' to '{email}'."
+            )
+            session.add(audit)
+            
+            # Capture details for email
+            final_email = user.email
+            final_name = user.full_name
+            
+        # Send confirmation email
+        try:
+            self._email_service.send_notification(
+                to_email=final_email,
+                subject="Admin Profile Updated",
+                body=f"Hello {final_name},\n\nYour administrative profile information has been successfully updated.\nIf you did not request this change, please contact IT immediately."
+            )
+        except Exception:
+            pass # Non-fatal if email fails
+
+        return {"message": "Profile updated successfully"}
+
+    def change_own_password(
+        self, user_id: int, current_password: str, new_password: str
+    ) -> dict:
+        """
+        Allow a logged-in user to change their own password.
+
+        Security flow:
+          1. Fetch the user's current bcrypt hash from the DB.
+          2. Verify `current_password` matches that hash (bcrypt.checkpw).
+          3. If verified, hash `new_password` and overwrite the stored hash.
+          4. Fire a security-alert email to the admin (metadata only — no passwords).
+
+        Raises:
+          ValueError: If the user is not found or current_password is wrong.
+
+        Args:
+          user_id:          ID of the authenticated user making the request.
+          current_password: Plaintext password the user claims to currently have.
+          new_password:     Desired new plaintext password (min 6 chars enforced by the route).
+
+        Returns:
+          dict with "message" key on success.
+        """
+        from datetime import datetime  # local import to keep top-level imports clean
+
+        with self._db.session_scope() as session:
+            user = session.query(UserModel).filter_by(id=user_id).first()
+
+            if not user:
+                raise ValueError("User not found")
+
+            # Step 1: verify the supplied current password against the stored bcrypt hash
+            if not self.verify_password(current_password, user.password_hash):
+                raise ValueError("Current password is incorrect")
+
+            # Step 2: Validate the new password against strong security rules
+            self.validate_password_strength(new_password, user.username, user.email, user.full_name)
+
+            # Step 3: hash and store the new password — plain text never touches the DB
+            user.password_hash = self.hash_password(new_password)
+            user.last_password_changed_at = datetime.utcnow()
+            
+            # Create Audit Log
+            audit = AuditLogModel(
+                user_id=user.id, 
+                action="Changed Password", 
+                details="User successfully updated their own password."
+            )
+            session.add(audit)
+
+            # Capture audit fields while the session is still open
+            full_name    = user.full_name
+            username     = user.username
+            role         = user.role
+            airport_id   = user.airport_id
+            changed_at   = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+
+        # Step 3: resolve the airport name for the notification email (outside session)
+        airport_name = "All Airports (Admin)"
+        if airport_id is not None:
+            try:
+                with self._db.session_scope() as s2:
+                    from models.models import AirportModel
+                    ap = s2.query(AirportModel).filter_by(id=airport_id).first()
+                    if ap:
+                        airport_name = f"{ap.name} ({ap.code})"
+            except Exception:
+                pass  # non-fatal — email will show 'Unknown' if lookup fails
+
+        # Step 4: notify admin — NO password included, metadata only
+        self._email_service.send_password_change_notification(
+            full_name=full_name,
+            username=username,
+            role=role,
+            airport_name=airport_name,
+            changed_at=changed_at,
+        )
+
+        return {"message": "Password changed successfully"}
 
     def deactivate_user(self, user_id: int) -> dict:
         """

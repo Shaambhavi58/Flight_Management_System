@@ -47,6 +47,8 @@ class UserResponseSchema(BaseModel):
     role: str
     airport_id: Optional[int] = None
     created_at: Optional[datetime] = None
+    last_login_at: Optional[datetime] = None
+    last_password_changed_at: Optional[datetime] = None
     is_active: bool = True
 
     class Config:
@@ -178,5 +180,7 @@ class UserSerializer:
             "role": user_model.role,
             "airport_id": user_model.airport_id,  # None for admin
             "created_at": str(user_model.created_at) if user_model.created_at else None,
+            "last_login_at": str(user_model.last_login_at) if getattr(user_model, "last_login_at", None) else None,
+            "last_password_changed_at": str(user_model.last_password_changed_at) if getattr(user_model, "last_password_changed_at", None) else None,
             "is_active": getattr(user_model, "is_active", True),
         }
