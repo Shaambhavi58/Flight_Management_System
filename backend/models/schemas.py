@@ -1,6 +1,6 @@
 """
 Pydantic schemas for request/response validation and serialization.
-Covers Auth, Users, Airports, Airlines, and Flights.
+Covers Auth, Users, Airports, Airlines, Flights, and Carousel.
 """
 
 from pydantic import BaseModel, Field
@@ -13,33 +13,29 @@ from datetime import datetime
 # ──────────────────────────────────────────────
 
 class LoginSchema(BaseModel):
-    """Schema for login request."""
     username: str = Field(..., example="admin")
     password: str = Field(..., example="admin123")
 
 
 class TokenSchema(BaseModel):
-    """Schema for JWT token response."""
     access_token: str
     token_type: str = "bearer"
     role: str
     full_name: str
     username: str
-    airport_id: Optional[int] = None  # None for admin
+    airport_id: Optional[int] = None
 
 
 class UserCreateSchema(BaseModel):
-    """Schema for registering a new user (admin only)."""
     username: str = Field(..., example="john_staff")
     password: str = Field(..., example="securepass123")
     email: str = Field(..., example="john@example.com")
     full_name: str = Field(..., example="John Doe")
-    role: str = Field(default="viewer", example="staff")  # admin, staff, viewer
-    airport_id: Optional[int] = Field(default=None, example=1)  # Required for staff/viewer
+    role: str = Field(default="viewer", example="staff")
+    airport_id: Optional[int] = Field(default=None, example=1)
 
 
 class UserResponseSchema(BaseModel):
-    """Schema for user response."""
     id: int
     username: str
     email: str
@@ -60,7 +56,6 @@ class UserResponseSchema(BaseModel):
 # ──────────────────────────────────────────────
 
 class AirportResponseSchema(BaseModel):
-    """Schema for airport response."""
     id: int
     name: str
     code: str
@@ -75,7 +70,6 @@ class AirportResponseSchema(BaseModel):
 # ──────────────────────────────────────────────
 
 class FlightCreateSchema(BaseModel):
-    """Schema for creating a new flight (POST request body)."""
     flight_number: str = Field(..., example="6E-201")
     airline_code: str = Field(..., example="6E")
     airport_id: Optional[int] = Field(default=None, example=1)
@@ -86,11 +80,10 @@ class FlightCreateSchema(BaseModel):
     gate_number: str = Field(..., example="G12")
     terminal_number: str = Field(..., example="T1")
     status: str = Field(default="Scheduled")
-    flight_type: str = Field(default="arrival", example="arrival")  # arrival, departure, cargo
+    flight_type: str = Field(default="arrival", example="arrival")
 
 
 class FlightUpdateSchema(BaseModel):
-    """Schema for updating a flight (PUT request body). All fields optional."""
     flight_number: Optional[str] = None
     airline_code: Optional[str] = None
     airport_id: Optional[int] = None
@@ -105,7 +98,6 @@ class FlightUpdateSchema(BaseModel):
 
 
 class FlightResponseSchema(BaseModel):
-    """Schema for flight response (returned by GET endpoints)."""
     id: int
     flight_number: str
     airline_code: str
@@ -120,19 +112,55 @@ class FlightResponseSchema(BaseModel):
     terminal_number: str
     status: str
     flight_type: str
+    carousel_number: Optional[str] = None   # null until flight Arrives
 
     class Config:
         from_attributes = True
 
 
 # ──────────────────────────────────────────────
-#  Serializer Utility Class
+#  Carousel Schemas
+# ──────────────────────────────────────────────
+
+class CarouselUpdateSchema(BaseModel):
+    """
+    Schema for manually overriding a carousel assignment.
+    Used by PUT /flights/{id}/carousel (admin/staff only).
+
+    reason is optional but strongly recommended — it gets logged
+    in carousel_change_log and published to RabbitMQ so the BHS
+    can attach context to the CAROUSEL_CHANGED event.
+    """
+    carousel_number: str = Field(..., example="C5")
+    reason: Optional[str] = Field(
+        default=None,
+        example="Mechanical fault on C3 — rerouting to C5"
+    )
+
+
+class CarouselLogResponseSchema(BaseModel):
+    """Schema for a single carousel change log entry."""
+    id: int
+    flight_id: int
+    flight_number: str
+    old_carousel: Optional[str] = None
+    new_carousel: str
+    changed_by: str
+    changed_at: datetime
+    reason: Optional[str] = None
+    event_type: str
+
+    class Config:
+        from_attributes = True
+
+
+# ──────────────────────────────────────────────
+#  Serializer Utility Classes
 # ──────────────────────────────────────────────
 
 class FlightSerializer:
     """
     Utility class to convert between ORM models, domain objects, and API schemas.
-    Follows OOP principles as required.
     """
 
     @staticmethod
@@ -153,16 +181,15 @@ class FlightSerializer:
             "terminal_number": flight_model.terminal_number,
             "status": flight_model.status,
             "flight_type": flight_model.flight_type or "arrival",
+            "carousel_number": flight_model.carousel_number,  # None if not yet Arrived
         }
 
     @staticmethod
     def schema_to_dict(schema: FlightCreateSchema) -> dict:
-        """Convert a Pydantic create schema to a plain dict."""
         return schema.model_dump()
 
     @staticmethod
     def update_schema_to_dict(schema: FlightUpdateSchema) -> dict:
-        """Convert a Pydantic update schema to a dict, excluding unset fields."""
         return schema.model_dump(exclude_unset=True)
 
 
@@ -171,14 +198,13 @@ class UserSerializer:
 
     @staticmethod
     def orm_to_response(user_model) -> dict:
-        """Convert a UserModel ORM instance to a response dictionary."""
         return {
             "id": user_model.id,
             "username": user_model.username,
             "email": user_model.email,
             "full_name": user_model.full_name,
             "role": user_model.role,
-            "airport_id": user_model.airport_id,  # None for admin
+            "airport_id": user_model.airport_id,
             "created_at": str(user_model.created_at) if user_model.created_at else None,
             "last_login_at": str(user_model.last_login_at) if getattr(user_model, "last_login_at", None) else None,
             "last_password_changed_at": str(user_model.last_password_changed_at) if getattr(user_model, "last_password_changed_at", None) else None,

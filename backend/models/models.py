@@ -1,8 +1,9 @@
 """
 ORM Models and OOP Domain Classes for the Flight Management System.
 
-ORM models (UserModel, AirportModel, AirlineModel, FlightModel) map to database tables.
-Domain classes (User, Airport, Airline, Flight) encapsulate business data with OOP principles.
+ORM models (UserModel, AirportModel, AirlineModel, FlightModel, CarouselChangeLog)
+map to database tables.
+Domain classes encapsulate business data with OOP principles.
 """
 
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text, UniqueConstraint, Boolean
@@ -101,8 +102,18 @@ class FlightModel(Base):
     status = Column(String(30), nullable=False, default="Scheduled")
     flight_type = Column(String(20), nullable=False, default="arrival")  # arrival, departure, cargo
 
+    # ── Carousel Assignment ──────────────────────────────────────────────────
+    # Null until flight status becomes "Arrived".
+    # Auto-assigned by assign_carousel() in service.py based on terminal grouping.
+    # Can be manually overridden by admin/staff via PUT /flights/{id}/carousel.
+    # Every change is logged in carousel_change_log for audit.
+    carousel_number = Column(String(10), nullable=True)   # e.g. "C3", null until Arrived
+
     airline = relationship("AirlineModel", back_populates="flights")
     airport = relationship("AirportModel", back_populates="flights")
+
+    # One flight can have many carousel change log entries
+    carousel_logs = relationship("CarouselChangeLog", back_populates="flight", cascade="all, delete-orphan")
 
     __table_args__ = (
         UniqueConstraint(
@@ -112,7 +123,40 @@ class FlightModel(Base):
     )
 
     def __repr__(self):
-        return f"<FlightModel(id={self.id}, flight='{self.flight_number}', status='{self.status}')>"
+        return f"<FlightModel(id={self.id}, flight='{self.flight_number}', status='{self.status}', carousel='{self.carousel_number}')>"
+
+
+class CarouselChangeLog(Base):
+    """
+    ORM model for the 'carousel_change_log' table.
+
+    Every carousel assignment or change is recorded here — including:
+      - Auto-assignment when a flight arrives (changed_by = 'system')
+      - Manual override by admin/staff (changed_by = username)
+
+    This gives a full audit trail: who changed which carousel, when, and why.
+    The BHS (Beumer Baggage Handling System) would consume CAROUSEL_CHANGED
+    RabbitMQ events to re-route conveyor belts in real time.
+    """
+    __tablename__ = "carousel_change_log"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    flight_id = Column(Integer, ForeignKey("flights.id"), nullable=False)
+    flight_number = Column(String(20), nullable=False)          # denormalized for easy log reads
+    old_carousel = Column(String(10), nullable=True)            # null on first assignment
+    new_carousel = Column(String(10), nullable=False)
+    changed_by = Column(String(50), nullable=False)             # username or "system"
+    changed_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    reason = Column(String(200), nullable=True)                 # e.g. "Mechanical fault on C3"
+    event_type = Column(String(30), nullable=False, default="CAROUSEL_ASSIGNED")
+    # CAROUSEL_ASSIGNED = first assignment on arrival
+    # CAROUSEL_CHANGED  = manual override after initial assignment
+
+    flight = relationship("FlightModel", back_populates="carousel_logs")
+
+    def __repr__(self):
+        return (f"<CarouselChangeLog(flight='{self.flight_number}', "
+                f"{self.old_carousel}→{self.new_carousel}, by='{self.changed_by}')>")
 
 
 # ──────────────────────────────────────────────
@@ -134,24 +178,15 @@ class User:
         self._airport_id = airport_id  # None for admin
 
     @property
-    def id(self):
-        return self._id
-
+    def id(self): return self._id
     @property
-    def username(self):
-        return self._username
-
+    def username(self): return self._username
     @property
-    def email(self):
-        return self._email
-
+    def email(self): return self._email
     @property
-    def full_name(self):
-        return self._full_name
-
+    def full_name(self): return self._full_name
     @property
-    def role(self):
-        return self._role
+    def role(self): return self._role
 
     @role.setter
     def role(self, value: str):
@@ -161,8 +196,7 @@ class User:
         self._role = value
 
     @property
-    def airport_id(self):
-        return self._airport_id
+    def airport_id(self): return self._airport_id
 
     def __str__(self):
         return f"{self._full_name} ({self._username}) - {self._role}"
@@ -181,20 +215,13 @@ class Airport:
         self._city = city
 
     @property
-    def id(self):
-        return self._id
-
+    def id(self): return self._id
     @property
-    def name(self):
-        return self._name
-
+    def name(self): return self._name
     @property
-    def code(self):
-        return self._code
-
+    def code(self): return self._code
     @property
-    def city(self):
-        return self._city
+    def city(self): return self._city
 
     def __str__(self):
         return f"{self._name} ({self._code}) - {self._city}"
@@ -212,16 +239,11 @@ class Airline:
         self._code = code
 
     @property
-    def id(self):
-        return self._id
-
+    def id(self): return self._id
     @property
-    def name(self):
-        return self._name
-
+    def name(self): return self._name
     @property
-    def code(self):
-        return self._code
+    def code(self): return self._code
 
     def __str__(self):
         return f"{self._name} ({self._code})"
@@ -248,6 +270,7 @@ class Flight:
         id: int = None,
         airline_name: str = None,
         airport_code: str = None,
+        carousel_number: str = None,
     ):
         self._id = id
         self._flight_number = flight_number
@@ -262,55 +285,35 @@ class Flight:
         self._terminal_number = terminal_number
         self._status = status
         self._flight_type = flight_type
-
-    # --- Properties ---
-    @property
-    def id(self):
-        return self._id
+        self._carousel_number = carousel_number
 
     @property
-    def flight_number(self):
-        return self._flight_number
+    def id(self): return self._id
+    @property
+    def flight_number(self): return self._flight_number
+    @property
+    def airline_code(self): return self._airline_code
+    @property
+    def airline_name(self): return self._airline_name
+    @property
+    def airport_code(self): return self._airport_code
+    @property
+    def origin(self): return self._origin
+    @property
+    def destination(self): return self._destination
+    @property
+    def departure_time(self): return self._departure_time
+    @property
+    def arrival_time(self): return self._arrival_time
+    @property
+    def gate_number(self): return self._gate_number
+    @property
+    def terminal_number(self): return self._terminal_number
+    @property
+    def carousel_number(self): return self._carousel_number
 
     @property
-    def airline_code(self):
-        return self._airline_code
-
-    @property
-    def airline_name(self):
-        return self._airline_name
-
-    @property
-    def airport_code(self):
-        return self._airport_code
-
-    @property
-    def origin(self):
-        return self._origin
-
-    @property
-    def destination(self):
-        return self._destination
-
-    @property
-    def departure_time(self):
-        return self._departure_time
-
-    @property
-    def arrival_time(self):
-        return self._arrival_time
-
-    @property
-    def gate_number(self):
-        return self._gate_number
-
-    @property
-    def terminal_number(self):
-        return self._terminal_number
-
-    @property
-    def status(self):
-        return self._status
+    def status(self): return self._status
 
     @status.setter
     def status(self, value: str):
@@ -320,8 +323,7 @@ class Flight:
         self._status = value
 
     @property
-    def flight_type(self):
-        return self._flight_type
+    def flight_type(self): return self._flight_type
 
     @flight_type.setter
     def flight_type(self, value: str):
@@ -331,7 +333,6 @@ class Flight:
         self._flight_type = value
 
     def to_dict(self) -> dict:
-        """Serialize the flight to a dictionary."""
         return {
             "id": self._id,
             "flight_number": self._flight_number,
@@ -346,14 +347,16 @@ class Flight:
             "terminal_number": self._terminal_number,
             "status": self._status,
             "flight_type": self._flight_type,
+            "carousel_number": self._carousel_number,
         }
 
     def __str__(self):
         return (
             f"Flight {self._flight_number} | {self._origin} -> {self._destination} | "
             f"Dep: {self._departure_time} | Gate: {self._gate_number} | "
-            f"Terminal: {self._terminal_number} | Status: {self._status}"
+            f"Terminal: {self._terminal_number} | Status: {self._status} | "
+            f"Carousel: {self._carousel_number or 'Not assigned'}"
         )
 
     def __repr__(self):
-        return f"Flight(flight_number='{self._flight_number}', status='{self._status}')"
+        return f"Flight(flight_number='{self._flight_number}', status='{self._status}', carousel='{self._carousel_number}')"

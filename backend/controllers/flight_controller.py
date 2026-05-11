@@ -1,217 +1,195 @@
 """
 controllers/flight_controller.py
 ==================================
-FastAPI router for flight CRUD operations with RBAC enforcement.
+FastAPI router for flight CRUD + carousel management with RBAC enforcement.
 
-Access rules (enforced at BOTH controller and service layer for defence-in-depth):
-  GET  /flights                    → all authenticated users (auto-scoped for staff/viewer)
-  GET  /airports/{id}/flights      → all authenticated users (scoped for staff/viewer)
-  GET  /flights/{id}               → all authenticated users (scoped for staff/viewer)
-  POST /flights                    → admin and staff only (staff airport auto-assigned)
-  PUT  /flights/{id}               → admin only
-  DELETE /flights/{id}             → admin only
-  DELETE /flights/clear-all        → admin only
+New endpoints:
+  PUT  /flights/{id}/carousel        → admin and staff (change carousel assignment)
+  GET  /flights/{id}/carousel-log    → all authenticated users (flight-specific log)
+  GET  /flights/carousel-log         → all authenticated users (recent BHS events)
 """
 
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
-from services.service import FlightService                      # flight business logic
-from models.schemas import FlightCreateSchema, FlightUpdateSchema, FlightSerializer  # validation & serialization
-from controllers.auth_controller import get_current_user, require_admin, require_staff_or_admin  # RBAC deps
-from utils.flight_create_publisher import publish_flight_create  # async RabbitMQ publish helper
+from services.service import FlightService
+from models.schemas import (
+    FlightCreateSchema, FlightUpdateSchema, FlightSerializer,
+    CarouselUpdateSchema,
+)
+from controllers.auth_controller import get_current_user, require_admin, require_staff_or_admin
+from utils.flight_create_publisher import publish_flight_create
 
-# No prefix — flight routes are at root level (e.g. /flights, /airports/{id}/flights)
 router = APIRouter(tags=["Flights"])
-
-# Shared service instance for all route handlers in this module
 flight_service = FlightService()
 
 
+# ── Airport-scoped flights ────────────────────────────────────────────────────
+
 @router.get("/airports/{airport_id}/flights")
-def get_airport_flights(
-    airport_id: int,
-    user: dict = Depends(get_current_user)  # any authenticated user may call this
+def get_airport_flights(airport_id: int, user: dict = Depends(get_current_user)):
+    return flight_service.get_all_flights(current_user=user, airport_id=airport_id)
+
+
+# ── BHS Carousel Log (all recent events) ─────────────────────────────────────
+# IMPORTANT: This route MUST be declared BEFORE /flights/{flight_id} to prevent
+# FastAPI from interpreting "carousel-log" as a flight_id integer.
+
+@router.get("/flights/carousel-log")
+def get_carousel_log(
+    limit: int = 20,
+    user: dict = Depends(get_current_user),
 ):
     """
-    Retrieve all flights for a specific airport.
-    - Admin: sees all flights for the requested airport_id
-    - Staff/Viewer: the airport_id parameter is ignored — service always returns
-      flights for their own assigned airport (enforced in FlightService)
+    Return the most recent carousel assignment/change events across all flights.
+    Used by the frontend BHS log panel to show a live event feed.
+    Accessible to all authenticated users.
     """
-    # Service handles RBAC scoping internally — pass the full user context
-    return flight_service.get_all_flights(
-        current_user=user,
-        airport_id=airport_id  # may be overridden in service for staff/viewer
-    )
+    return flight_service.get_carousel_log(limit=limit)
 
+
+# ── All flights ───────────────────────────────────────────────────────────────
 
 @router.get("/flights")
 def get_all_flights(
-    time_of_day: str = None,   # optional filter: "morning", "afternoon", "evening"
-    status: str = None,        # optional filter: "Scheduled", "Departed", etc.
-    airport_id: int = None,    # optional filter: only used if user is admin
+    time_of_day: str = None,
+    status: str = None,
+    airport_id: int = None,
     user: dict = Depends(get_current_user)
 ):
-    """
-    Retrieve flights with optional filters.
-    - Admin: can filter by any airport_id, time_of_day, or status
-    - Staff/Viewer: airport_id is always overridden with their own airport from JWT
-    """
     return flight_service.get_all_flights(
         current_user=user,
-        airport_id=airport_id,      # admin-only; ignored for staff/viewer
-        time_of_day=time_of_day,    # hour-based filter applied after DB query
-        status=status,              # case-insensitive status match
+        airport_id=airport_id,
+        time_of_day=time_of_day,
+        status=status,
     )
 
 
+# ── Single flight ─────────────────────────────────────────────────────────────
+
 @router.get("/flights/{flight_id}")
 def get_flight(flight_id: int, user: dict = Depends(get_current_user)):
-    """
-    Retrieve a single flight by its database ID.
-    Staff and Viewer can only access flights belonging to their airport.
-    Returns 404 if the flight does not exist or is not accessible.
-    """
-    # Service returns None for missing flights, raises 403 for wrong-airport access
     result = flight_service.get_flight_by_id(flight_id, current_user=user)
-
     if result is None:
         raise HTTPException(status_code=404, detail="Flight not found")
-
     return result
 
 
+# ── Create flight ─────────────────────────────────────────────────────────────
+
 @router.post("/flights", status_code=202)
-def create_flight(
-    flight: FlightCreateSchema,
-    user: dict = Depends(require_staff_or_admin),  # viewers get 403 automatically
-):
-    """
-    Queue a new flight creation request via RabbitMQ.
-    Returns 202 Accepted immediately — the flight is created asynchronously by worker.py.
-
-    - Admin: must provide airport_id in request body
-    - Staff: airport_id is silently overridden with their own assigned airport
-    - Viewer: blocked by require_staff_or_admin dependency (HTTP 403)
-    """
-    role            = user["role"]         # "admin" or "staff" at this point
-    user_airport_id = user.get("airport_id")  # the airport this staff member belongs to
-
-    # Convert the Pydantic schema to a plain dict for publishing
-    data = FlightSerializer.schema_to_dict(flight)
+def create_flight(flight: FlightCreateSchema, user: dict = Depends(require_staff_or_admin)):
+    role            = user["role"]
+    user_airport_id = user.get("airport_id")
+    data            = FlightSerializer.schema_to_dict(flight)
 
     if role == "staff":
-        # Ignore whatever airport_id was in the request body —
-        # staff must always create flights for their own airport only
         data["airport_id"] = user_airport_id
-
     elif role == "admin":
-        # Admin must explicitly provide airport_id — no default exists
         if not data.get("airport_id"):
-            raise HTTPException(
-                status_code=400,
-                detail="airport_id is required when creating a flight as admin"
-            )
+            raise HTTPException(status_code=400, detail="airport_id is required when creating a flight as admin")
 
-    # Attach audit metadata so the worker can log who triggered this creation
-    data["_created_by_user_id"] = user.get("id")    # ID of the user making the request
-    data["_created_by_role"]    = role               # role for audit trail
+    data["_created_by_user_id"] = user.get("id")
+    data["_created_by_role"]    = role
 
     try:
-        # Publish the flight dict as a JSON message to the RabbitMQ queue
         publish_flight_create(data)
     except RuntimeError as e:
-        # RabbitMQ is down — return a clear 503 so the client knows to retry
-        raise HTTPException(
-            status_code=503,
-            detail=f"Flight queued failed — {e}. Start worker.py to process queued flights."
-        )
+        raise HTTPException(status_code=503, detail=f"Flight queued failed — {e}. Start worker.py to process queued flights.")
 
-    # Return 202 Accepted — the flight will appear in the board once worker.py processes it
     return {
-        "message": "Flight creation queued successfully",
-        "flight_number": data.get("flight_number"),  # echo back for client confirmation
-        "airport_id": data.get("airport_id"),          # resolved airport (after staff override)
-        "queued_by": user.get("username"),             # who triggered this request
-        "note": "Flight will appear in the board once worker.py processes the queue."
+        "message":       "Flight creation queued successfully",
+        "flight_number": data.get("flight_number"),
+        "airport_id":    data.get("airport_id"),
+        "queued_by":     user.get("username"),
+        "note":          "Flight will appear in the board once worker.py processes the queue."
     }
 
+
+# ── Update flight ─────────────────────────────────────────────────────────────
 
 @router.put("/flights/{flight_id}")
 def update_flight(
     flight_id: int,
     flight: FlightUpdateSchema,
-    user: dict = Depends(require_admin),   # only admin can modify flight data
+    user: dict = Depends(require_admin),
 ):
-    """
-    Update an existing flight's fields (admin only).
-    All fields in FlightUpdateSchema are optional — only provided fields are changed.
-    Returns 404 if flight does not exist.
-    """
-    # Convert update schema to dict, excluding fields not provided in the request
-    data = FlightSerializer.update_schema_to_dict(flight)
-
-    # Service performs the DB update and returns the refreshed flight
+    data   = FlightSerializer.update_schema_to_dict(flight)
     result = flight_service.update_flight(flight_id, data, current_user=user)
-
     if result is None:
         raise HTTPException(status_code=404, detail="Flight not found")
-
     return result
 
+
+# ── Update carousel ───────────────────────────────────────────────────────────
+
+@router.put("/flights/{flight_id}/carousel")
+def update_carousel(
+    flight_id: int,
+    payload: CarouselUpdateSchema,
+    user: dict = Depends(require_staff_or_admin),
+):
+    """
+    Manually override the carousel assignment for an Arrived flight.
+
+    Why staff can also do this (not just admin):
+      In airport operations, ground staff are the ones who physically observe
+      belt faults and need to reassign immediately — waiting for an admin
+      to log in would cause baggage delays.
+
+    The change is:
+      1. Saved to DB (carousel_number on FlightModel)
+      2. Logged in carousel_change_log (who, when, old→new, reason)
+      3. Published to RabbitMQ bhs_queue as CAROUSEL_CHANGED event
+         so Beumer's BHS can re-route the conveyor in real time.
+    """
+    return flight_service.update_carousel(
+        flight_id=flight_id,
+        new_carousel=payload.carousel_number,
+        reason=payload.reason,
+        current_user=user,
+    )
+
+
+# ── Carousel log for a specific flight ───────────────────────────────────────
+
+@router.get("/flights/{flight_id}/carousel-log")
+def get_flight_carousel_log(
+    flight_id: int,
+    user: dict = Depends(get_current_user),
+):
+    """Return the full carousel change history for a specific flight."""
+    return flight_service.get_carousel_log_for_flight(flight_id)
+
+
+# ── Sync live ─────────────────────────────────────────────────────────────────
 
 @router.post("/flights/sync-live")
 def sync_live_flights(
     background_tasks: BackgroundTasks,
-    user: dict = Depends(require_admin),   # admin only — triggers mass publish
+    user: dict = Depends(require_admin),
 ):
-    """
-    Trigger a full live-flight sync via RabbitMQ (admin only).
-
-    Internally instantiates FlightDataOrchestrator from flight_publisher.py and
-    calls run_once() as a FastAPI BackgroundTask.  The HTTP response is returned
-    immediately; flights appear on the board within seconds once worker.py
-    consumes the RabbitMQ messages.
-
-    This endpoint replaces the old port-8001 publisher server — the frontend
-    Sync Live button now calls POST /flights/sync-live on port 8000 only.
-    """
-    from flight_publisher import FlightDataOrchestrator  # lazy import — avoids circular deps
-    orchestrator  = FlightDataOrchestrator()
-    triggered_by  = user.get("username", "admin")          # pass username for structured logs
+    from flight_publisher import FlightDataOrchestrator
+    orchestrator = FlightDataOrchestrator()
+    triggered_by = user.get("username", "admin")
     background_tasks.add_task(orchestrator.run_once, triggered_by)
     return {
-        "message": "Generating today's full flight schedule for all 5 airports",
-        "date":    str(__import__("datetime").datetime.now().date()),
-        "note":    "Flights appear on board within seconds via RabbitMQ",
+        "message":      "Generating today's full flight schedule for all 5 airports",
+        "date":         str(__import__("datetime").datetime.now().date()),
+        "note":         "Flights appear on board within seconds via RabbitMQ",
         "triggered_by": triggered_by,
     }
 
 
+# ── Clear all flights ─────────────────────────────────────────────────────────
+
 @router.delete("/flights/clear-all")
 def clear_all_flights(user: dict = Depends(require_admin)):
-    """
-    Delete ALL flights from the database (admin only).
-    Used by flight_publisher before generating a fresh daily schedule.
-    IMPORTANT: This route must be defined BEFORE /flights/{flight_id} to prevent
-    FastAPI from matching "clear-all" as a flight_id integer.
-    """
-    count = flight_service.clear_all_flights()  # returns number of deleted rows
+    count = flight_service.clear_all_flights()
     return {"message": f"Cleared {count} flights"}
 
 
 @router.delete("/flights/{flight_id}")
-def delete_flight(
-    flight_id: int,
-    user: dict = Depends(require_admin),   # only admin can delete individual flights
-):
-    """
-    Delete a single flight by its database ID (admin only).
-    Returns 404 if the flight does not exist.
-    """
+def delete_flight(flight_id: int, user: dict = Depends(require_admin)):
     deleted = flight_service.delete_flight(flight_id, current_user=user)
-
-    # Service returns False when no row matched the given flight_id
     if not deleted:
         raise HTTPException(status_code=404, detail="Flight not found")
-
     return {"message": f"Flight {flight_id} deleted successfully"}
