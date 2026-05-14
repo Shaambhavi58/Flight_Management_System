@@ -25,8 +25,8 @@
 
             <!-- User profile pill — clicking opens a dropdown with account actions -->
             <div class="nav-user-wrap" id="nav-user-wrap">
-                <div class="nav-user" id="nav-user-pill" onclick="toggleUserPillMenu(event)"
-                     title="Account options" style="cursor:pointer;user-select:none">
+                <div class="nav-user" id="nav-user-pill" onclick="toggleUserPillMenu(event)" title="Account options"
+                    style="cursor:pointer;user-select:none">
                     <span id="nav-fullname"></span>
                     <span class="role-badge" id="nav-role-badge"></span>
                     <span class="nav-pill-caret" id="nav-pill-caret">&#9662;</span>
@@ -34,13 +34,12 @@
                 <!-- Dropdown menu (shown only when open) -->
                 <div class="nav-user-menu" id="nav-user-menu">
                     <!-- Change Password — shown for staff and viewer only -->
-                    <div class="nav-user-menu-item hidden" id="nav-changepw-item"
-                         onclick="openChangePwModal()">
+                    <div class="nav-user-menu-item hidden" id="nav-changepw-item" onclick="openChangePwModal()">
                         Change Password
                     </div>
                     <!-- Admin sees their role indicator instead -->
-                    <div class="nav-user-menu-item" id="nav-admin-info"
-                         style="display:none" onclick="showPage('admin-profile')">
+                    <div class="nav-user-menu-item" id="nav-admin-info" style="display:none"
+                        onclick="showPage('admin-profile')">
                         Admin Account
                     </div>
                 </div>
@@ -420,6 +419,7 @@
                                 <th>Arrival</th>
                                 <th>Gate</th>
                                 <th>Terminal</th>
+                                <th>Carousel</th>
                                 <th>Status</th>
                                 <th id="actions-th" class="cell-actions">Actions</th>
                             </tr>
@@ -472,7 +472,8 @@
                     </div>
                     <div class="form-group">
                         <label>Username</label>
-                        <input type="text" id="ue-username" placeholder="username" disabled style="background:#f8f9fc;color:#718096;">
+                        <input type="text" id="ue-username" placeholder="username" disabled
+                            style="background:#f8f9fc;color:#718096;">
                     </div>
                     <div class="form-group">
                         <label>Role</label>
@@ -484,7 +485,8 @@
                     </div>
                     <div class="form-group">
                         <label>Current Airport</label>
-                        <input type="text" id="ue-current-airport" placeholder="—" disabled style="background:#f8f9fc;color:#718096;">
+                        <input type="text" id="ue-current-airport" placeholder="—" disabled
+                            style="background:#f8f9fc;color:#718096;">
                     </div>
                     <div id="ue-status-badge-wrap" style="margin-bottom:16px">
                         <span id="ue-status-badge" class="ue-status-badge"></span>
@@ -529,7 +531,8 @@
                         <h2>Change Assigned Airport</h2>
                     </div>
                     <div id="ue-msg-airport" class="msg-box"></div>
-                    <p class="ue-hint">Reassign this user to a different airport. Admins are not scoped to any airport.</p>
+                    <p class="ue-hint">Reassign this user to a different airport. Admins are not scoped to any airport.
+                    </p>
                     <div class="form-group">
                         <label>Select Airport</label>
                         <select id="ue-airport-select">
@@ -552,7 +555,8 @@
                     <div class="ue-action-row">
                         <div>
                             <strong id="ue-deactivate-label">Deactivate User</strong>
-                            <p class="ue-hint" style="margin:4px 0 0">Revokes login access without deleting the account.</p>
+                            <p class="ue-hint" style="margin:4px 0 0">Revokes login access without deleting the account.
+                            </p>
                         </div>
                         <button class="btn-ue-deactivate" id="ue-deactivate-btn" onclick="toggleUserDeactivate()">
                             Deactivate
@@ -564,7 +568,8 @@
                     <div class="ue-action-row">
                         <div>
                             <strong style="color:var(--danger)">Delete User</strong>
-                            <p class="ue-hint" style="margin:4px 0 0">Permanently removes the account. Cannot be undone.</p>
+                            <p class="ue-hint" style="margin:4px 0 0">Permanently removes the account. Cannot be undone.
+                            </p>
                         </div>
                         <button class="btn-ue-delete" onclick="deleteUserFromEdit()">Delete</button>
                     </div>
@@ -591,19 +596,22 @@
             <div class="ue-row">
                 <!-- Admin Info Card -->
                 <div class="ue-card">
-                    <div class="ue-card-header" style="display:flex; justify-content:space-between; align-items:center;">
+                    <div class="ue-card-header"
+                        style="display:flex; justify-content:space-between; align-items:center;">
                         <h2>Admin Information</h2>
-                        <button class="btn-ue-save" id="admin-edit-btn" onclick="toggleAdminEditMode(true)" 
-                                style="width:auto; padding:6px 12px; font-size:12px; margin:0;">Edit Profile</button>
+                        <button class="btn-ue-save" id="admin-edit-btn" onclick="toggleAdminEditMode(true)"
+                            style="width:auto; padding:6px 12px; font-size:12px; margin:0;">Edit Profile</button>
                     </div>
                     <div id="admin-msg-profile" class="msg-box"></div>
                     <div class="form-group">
                         <label>Full Name</label>
-                        <input type="text" id="admin-fullname" disabled style="background:#f8f9fc;color:#718096;font-weight:500">
+                        <input type="text" id="admin-fullname" disabled
+                            style="background:#f8f9fc;color:#718096;font-weight:500">
                     </div>
                     <div class="form-group">
                         <label>Username</label>
-                        <input type="text" id="admin-username" disabled style="background:#f8f9fc;color:#718096;font-family:var(--mono)">
+                        <input type="text" id="admin-username" disabled
+                            style="background:#f8f9fc;color:#718096;font-family:var(--mono)">
                     </div>
                     <div class="form-group">
                         <label>Email Address</label>
@@ -611,28 +619,32 @@
                     </div>
                     <div class="form-group">
                         <label>Role</label>
-                        <input type="text" value="System Administrator" disabled style="background:#f8f9fc;color:#718096;font-weight:600">
+                        <input type="text" value="System Administrator" disabled
+                            style="background:#f8f9fc;color:#718096;font-weight:600">
                     </div>
-                    
+
                     <hr style="border:0;border-top:1px solid #edf2f7;margin:16px 0;">
-                    
+
                     <div class="form-group">
                         <label>Account Created Date</label>
-                        <input type="text" id="admin-created-at" disabled style="background:#f8f9fc;color:#718096;font-size:13px">
+                        <input type="text" id="admin-created-at" disabled
+                            style="background:#f8f9fc;color:#718096;font-size:13px">
                     </div>
                     <div class="form-group">
                         <label>Last Login Time</label>
-                        <input type="text" id="admin-last-login" disabled style="background:#f8f9fc;color:#718096;font-size:13px">
+                        <input type="text" id="admin-last-login" disabled
+                            style="background:#f8f9fc;color:#718096;font-size:13px">
                     </div>
                     <div class="form-group">
                         <label>Last Password Changed</label>
-                        <input type="text" id="admin-last-password-change" disabled style="background:#f8f9fc;color:#718096;font-size:13px">
+                        <input type="text" id="admin-last-password-change" disabled
+                            style="background:#f8f9fc;color:#718096;font-size:13px">
                     </div>
-                    
+
                     <div id="admin-profile-actions" style="display:none;gap:10px;margin-top:16px;">
                         <button class="btn-ue-save" onclick="saveAdminProfile()" style="margin:0;">Save Changes</button>
-                        <button class="btn-ue-save" onclick="toggleAdminEditMode(false)" 
-                                style="background:#edf2f7;color:#4a5568;border:1px solid #cbd5e0;margin:0;">Cancel</button>
+                        <button class="btn-ue-save" onclick="toggleAdminEditMode(false)"
+                            style="background:#edf2f7;color:#4a5568;border:1px solid #cbd5e0;margin:0;">Cancel</button>
                     </div>
                 </div>
 
@@ -655,9 +667,11 @@
                         <input type="password" id="admin-confirm-password" placeholder="Repeat new password">
                     </div>
                     <p style="font-size:12px;color:var(--text3);margin-bottom:16px;">
-                        Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character.
+                        Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one
+                        number, and one special character.
                     </p>
-                    <button class="btn-ue-save" id="btn-admin-pw" onclick="changeAdminPassword()">Update Password</button>
+                    <button class="btn-ue-save" id="btn-admin-pw" onclick="changeAdminPassword()">Update
+                        Password</button>
                 </div>
             </div>
         </div>
@@ -669,8 +683,7 @@
      Validates current password server-side before updating.
 ════════════════════════════════════════════════════════════ -->
     <div id="modal-changepw" class="cpw-overlay" onclick="closeCpwModalOnBackdrop(event)">
-        <div class="cpw-modal" role="dialog" aria-modal="true"
-             aria-labelledby="cpw-title" id="cpw-modal-box">
+        <div class="cpw-modal" role="dialog" aria-modal="true" aria-labelledby="cpw-title" id="cpw-modal-box">
 
             <!-- Modal header -->
             <div class="cpw-header">
@@ -690,22 +703,18 @@
             <div class="cpw-body">
                 <div class="form-group">
                     <label>Current Password</label>
-                    <input type="password" id="cpw-current"
-                           placeholder="Enter your current password"
-                           onkeydown="if(event.key==='Enter')submitChangePw()">
+                    <input type="password" id="cpw-current" placeholder="Enter your current password"
+                        onkeydown="if(event.key==='Enter')submitChangePw()">
                 </div>
                 <div class="form-group">
                     <label>New Password</label>
-                    <input type="password" id="cpw-new"
-                           placeholder="At least 6 characters"
-                           oninput="updatePwStrength(this.value)"
-                           onkeydown="if(event.key==='Enter')submitChangePw()">
+                    <input type="password" id="cpw-new" placeholder="At least 6 characters"
+                        oninput="updatePwStrength(this.value)" onkeydown="if(event.key==='Enter')submitChangePw()">
                 </div>
                 <div class="form-group">
                     <label>Confirm New Password</label>
-                    <input type="password" id="cpw-confirm"
-                           placeholder="Repeat new password"
-                           onkeydown="if(event.key==='Enter')submitChangePw()">
+                    <input type="password" id="cpw-confirm" placeholder="Repeat new password"
+                        onkeydown="if(event.key==='Enter')submitChangePw()">
                 </div>
 
                 <!-- Password strength meter (shown once user starts typing) -->
@@ -723,6 +732,83 @@
                 <button class="cpw-btn-save" id="cpw-submit-btn" onclick="submitChangePw()">
                     Update Password
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="edit-modal" class="cpw-overlay" onclick="if(event.target.id==='edit-modal')closeEditModal()">
+        <div class="cpw-modal">
+            <div class="cpw-header">
+                <div class="cpw-header-left">
+                    <div>
+                        <h2>Edit Flight</h2>
+                        <p>Update status, gate, and carousel.</p>
+                    </div>
+                </div>
+                <button class="cpw-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <div class="cpw-body" id="edit-modal-body"></div>
+            <div class="cpw-footer">
+                <button class="cpw-btn-cancel" onclick="closeEditModal()">Cancel</button>
+                <button class="cpw-btn-save" id="edit-modal-save">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BHS Message Log Panel (In Analytics) -->
+    <div class="page" id="page-analytics">
+        <div class="page-header">
+            <h1>Analytics & BHS Monitoring</h1>
+            <p>Real-time Baggage Handling System status and flight statistics.</p>
+        </div>
+
+        <div class="bhs-layout">
+            <div class="bhs-main">
+                <!-- Existing Analytics Content would be here or wrapped -->
+                <!-- I'll add the BHS log as a new section -->
+                <div class="bhs-panel">
+                    <div class="panel-header">
+                        <h3>BHS Message Log</h3>
+                        <span class="live-indicator"><span class="dot"></span> Live Feed</span>
+                    </div>
+                    <div class="bhs-table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Flight</th>
+                                    <th>Carousel</th>
+                                    <th>Event Status</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bhs-log-body">
+                                <!-- Populated by script.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rest of analytics content (Charts etc) -->
+        <div class="analytics-grid">
+            <div class="analytics-card">
+                <h3>Flight Status Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+            <div class="analytics-card">
+                <h3>Flights per Airline</h3>
+                <div class="chart-container">
+                    <canvas id="airlineChart"></canvas>
+                </div>
+            </div>
+            <div class="analytics-card">
+                <h3>Airport Comparison</h3>
+                <div class="chart-container">
+                    <canvas id="airportChart"></canvas>
+                </div>
             </div>
         </div>
     </div>

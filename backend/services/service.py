@@ -352,7 +352,7 @@ class FlightService:
         with self._db.session_scope() as session:
             return self._repository.delete(session, flight_id)
 
-    def clear_all_flights(self, airport_id: int = None) -> int:
+    def clear_all_flights(self, airport_id: int = None) -> dict:
         with self._db.session_scope() as session:
             return self._repository.delete_all(session, airport_id=airport_id)
 

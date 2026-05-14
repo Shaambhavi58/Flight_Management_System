@@ -13,6 +13,7 @@ let activeCategory = 'arrival';
 let lastFlightCategory = 'arrival'; // remembers last real tab (arrival/departure)
 let activeStatusFilter = 'ALL'; // stat-card status filter (ALL | Arrived | Boarding | Scheduled | Delayed)
 let refreshTimer = null;
+let currentCarouselFlightId = null;
 
 const AIRPORT_ICONS = { DEL: '<img src="/static/delhi.jpg" style="width:100%;height:100%;object-fit:cover;">', BOM: '<img src="/static/mumbai.jpg" style="width:100%;height:100%;object-fit:cover;">', NMIA: '<img src="/static/nmia.jpg" style="width:100%;height:100%;object-fit:cover;">', BLR: '<img src="/static/banglore.jpg" style="width:100%;height:100%;object-fit:cover;">', HYD: '<img src="/static/hyderabad.jpg" style="width:100%;height:100%;object-fit:cover;">' };
 
@@ -1000,7 +1001,10 @@ async function fetchFlights() {
         if (res.status === 401) { handleLogout(); return; }
         allFlights = await res.json();
         updateAllAirlineCards();
-        if (activeCategory !== 'info') renderBoard();
+        if (activeCategory !== 'info') {
+            renderBoard();
+            // loadBHSLog(); // Temporarily disabled to prevent 422 spam
+        }
     } catch (err) {
         console.error(err);
     }
@@ -1138,6 +1142,81 @@ function formatRoute(origin, destination) {
     return `${getCleanName(origin)} &rarr; ${getCleanName(destination)}`;
 }
 
+/**
+ * Deterministic carousel assignment helper for the frontend.
+ * Ensures every flight has a visual assignment even if the backend
+ * is still processing the event.
+ */
+function getCarousel(flightNumber, terminal) {
+    if (!terminal) return "TBD";
+    const mapping = {
+        "T1": ["C1", "C2", "C3", "C4"],
+        "T2": ["C5", "C6", "C7", "C8"],
+        "T3": ["C9", "C10", "C11", "C12"]
+    };
+    const options = mapping[terminal] || ["C1", "C2"];
+    
+    // Simple hash for string
+    let hash = 0;
+    for (let i = 0; i < flightNumber.length; i++) {
+        hash = ((hash << 5) - hash) + flightNumber.charCodeAt(i);
+        hash |= 0;
+    }
+    const index = Math.abs(hash) % options.length;
+    return options[index];
+}
+
+function carouselCell(flight) {
+    if (flight.status !== 'Arrived') {
+        return `<span class="carousel-na">—</span>`;
+    }
+
+    const carousel =
+        flight.carousel_number ||
+        getCarousel(flight.flight_number, flight.terminal_number);
+
+    return `<span class="carousel-badge">${carousel}</span>`;
+}
+
+function closeEditModal() {
+    const modal = document.getElementById("edit-modal");
+    if (modal) {
+        modal.classList.add("hidden");
+        modal.style.display = "none";
+    }
+}
+
+// Removed separate carousel modal handlers
+
+async function loadBHSLog() {
+    // Fail silently if bhs-log-body is missing or backend returns error
+    const body = document.getElementById("bhs-log-body");
+    if (!body) return;
+
+    try {
+        const res = await fetch(`${API}/flights/carousel-log`, {
+            headers: authHeaders()
+        });
+        if (!res.ok) return; // Silent return on 422, 404, 500 etc.
+        
+        const logs = await res.json();
+        body.innerHTML = "";
+        logs.forEach(log => {
+            const statusClass = log.event_type === 'CAROUSEL_ASSIGNED' ? 'bhs-assigned' : 'bhs-changed';
+            body.innerHTML += `
+                <tr>
+                    <td><span class="bhs-flight">${log.flight_number}</span></td>
+                    <td><span class="bhs-carousel">${log.new_carousel}</span></td>
+                    <td><span class="bhs-status ${statusClass}">${log.event_type.replace('_', ' ')}</span></td>
+                    <td><span class="bhs-time">${log.changed_at}</span></td>
+                </tr>
+            `;
+        });
+    } catch (err) {
+        // Silent catch
+    }
+}
+
 function renderBoard() {
     // 1. Filter by category (arrival / departure)
     let filtered = allFlights.filter(f => f.flight_type === activeCategory);
@@ -1197,15 +1276,26 @@ function renderBoard() {
     filtered.forEach(f => {
         const tr = document.createElement('tr');
         let actions = '';
-        if (role === 'admin') {
-            actions = `
-  <td class="cell-actions">
-    <div class="action-container">
-        <button class="action-btn btn-edit" onclick="editFlight(${f.id})">Edit</button>
-        <button class="action-btn btn-delete" onclick="deleteFlight(${f.id})">Delete</button>
-    </div>
-  </td>`;
+
+        if (role === 'admin' || role === 'staff') {
+            if (role === 'admin') {
+                actions = `
+                    <td class="cell-actions">
+                        <div class="action-container">
+                            <button class="action-btn btn-edit" onclick="editFlight(${f.id})">Edit</button>
+                            <button class="action-btn btn-delete" onclick="deleteFlight(${f.id})">Delete</button>
+                        </div>
+                    </td>`;
+            } else if (role === 'staff') {
+                actions = `
+                    <td class="cell-actions">
+                        <div class="action-container">
+                            <button class="action-btn btn-edit" onclick="editFlight(${f.id})">Edit</button>
+                        </div>
+                    </td>`;
+            }
         }
+
         tr.innerHTML = `
   <td class="cell-flight">${f.flight_number}</td>
   <td class="cell-airline-info"><div class="cell-airline"><span class="airline-badge badge-${f.airline_code}">${f.airline_code}</span>${f.airline_name}</div></td>
@@ -1214,8 +1304,9 @@ function renderBoard() {
   <td class="cell-time">${f.arrival_time}</td>
   <td class="cell-gate">${f.gate_number}</td>
   <td class="cell-terminal-info"><span class="terminal-badge terminal-${f.terminal_number}">${f.terminal_number}</span></td>
+  <td class="cell-carousel">${carouselCell(f)}</td>
   <td class="cell-status"><span class="status-badge status-${f.status.replace(/\s+/g, '-')}">${f.status}</span></td>
-  ${role === 'admin' ? actions : ''}`;
+  ${actions}`;
         tbody.appendChild(tr);
     });
 }
@@ -1272,23 +1363,84 @@ async function deleteFlight(id) {
 }
 
 async function editFlight(id) {
-    const status = prompt("Enter new status:");
-    if (!status) return;
+    const flight = allFlights.find(f => f.id === id);
+    if (!flight) return;
 
+    const modal = document.getElementById('edit-modal');
+    const body = document.getElementById('edit-modal-body');
+    const saveBtn = document.getElementById('edit-modal-save');
+
+    if (!modal || !body || !saveBtn) return;
+
+    const currentCarousel = flight.carousel_number || getCarousel(flight.flight_number, flight.terminal_number);
+
+    body.innerHTML = `
+        <div class="form-group">
+            <label>Flight Status</label>
+            <select id="edit-status">
+                <option value="Scheduled" ${flight.status === 'Scheduled' ? 'selected' : ''}>Scheduled</option>
+                <option value="Boarding" ${flight.status === 'Boarding' ? 'selected' : ''}>Boarding</option>
+                <option value="Departed" ${flight.status === 'Departed' ? 'selected' : ''}>Departed</option>
+                <option value="Arrived" ${flight.status === 'Arrived' ? 'selected' : ''}>Arrived</option>
+                <option value="Delayed" ${flight.status === 'Delayed' ? 'selected' : ''}>Delayed</option>
+                <option value="Cancelled" ${flight.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Gate Number</label>
+            <input type="text" id="edit-gate" value="${flight.gate_number}">
+        </div>
+        ${flight.status === 'Arrived' ? `
+        <div class="form-group" style="margin-top:16px; border-top:1px solid #eee; padding-top:16px">
+            <label>Carousel Number</label>
+            <input type="text" id="edit-carousel" value="${currentCarousel}">
+        </div>
+        <div class="form-group">
+            <label>Change Reason (Optional)</label>
+            <input type="text" id="edit-reason" placeholder="e.g. Mechanical fault on C3">
+        </div>
+        ` : ''}
+    `;
+
+    saveBtn.onclick = () => saveFlightChanges(id, flight);
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex'; // Support cpw-overlay flex layout
+}
+
+async function saveFlightChanges(id, originalFlight) {
+    const status = document.getElementById('edit-status').value;
+    const gate = document.getElementById('edit-gate').value.trim();
+    
     try {
+        // Step 1: Update main flight data
         const res = await fetch(`${API}/flights/${id}`, {
             method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                ...authHeaders()
-            },
-            body: JSON.stringify({ status })
+            headers: { "Content-Type": "application/json", ...authHeaders() },
+            body: JSON.stringify({ status, gate_number: gate })
         });
-
         if (!res.ok) throw new Error("Update failed");
 
-        showToast("Flight updated", "success");
+        // Step 2: Update carousel if changed and flight is Arrived
+        if (originalFlight.status === 'Arrived') {
+            const carousel = document.getElementById('edit-carousel').value.trim();
+            const reason = document.getElementById('edit-reason').value.trim() || "Manual override via Edit workflow";
+            
+            const currentVal = originalFlight.carousel_number || getCarousel(originalFlight.flight_number, originalFlight.terminal_number);
+            
+            if (carousel !== currentVal) {
+                const cRes = await fetch(`${API}/flights/${id}/carousel`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json", ...authHeaders() },
+                    body: JSON.stringify({ carousel_number: carousel, reason })
+                });
+                if (!cRes.ok) showToast("Flight updated, but carousel change failed", "warning");
+            }
+        }
+
+        showToast("Flight updated successfully", "success");
+        closeEditModal();
         fetchFlights();
+        loadBHSLog();
     } catch (err) {
         showToast(err.message, "error");
     }

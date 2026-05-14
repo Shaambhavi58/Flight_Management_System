@@ -12,9 +12,10 @@ New endpoints:
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from services.service import FlightService
 from models.schemas import (
-    FlightCreateSchema, FlightUpdateSchema, FlightSerializer,
+    FlightCreateSchema, FlightUpdateSchema, FlightResponseSchema, FlightSerializer,
     CarouselUpdateSchema,
 )
+from typing import List
 from controllers.auth_controller import get_current_user, require_admin, require_staff_or_admin
 from utils.flight_create_publisher import publish_flight_create
 
@@ -24,7 +25,7 @@ flight_service = FlightService()
 
 # ── Airport-scoped flights ────────────────────────────────────────────────────
 
-@router.get("/airports/{airport_id}/flights")
+@router.get("/airports/{airport_id}/flights", response_model=List[FlightResponseSchema])
 def get_airport_flights(airport_id: int, user: dict = Depends(get_current_user)):
     return flight_service.get_all_flights(current_user=user, airport_id=airport_id)
 
@@ -48,7 +49,7 @@ def get_carousel_log(
 
 # ── All flights ───────────────────────────────────────────────────────────────
 
-@router.get("/flights")
+@router.get("/flights", response_model=List[FlightResponseSchema])
 def get_all_flights(
     time_of_day: str = None,
     status: str = None,
@@ -65,7 +66,7 @@ def get_all_flights(
 
 # ── Single flight ─────────────────────────────────────────────────────────────
 
-@router.get("/flights/{flight_id}")
+@router.get("/flights/{flight_id}", response_model=FlightResponseSchema)
 def get_flight(flight_id: int, user: dict = Depends(get_current_user)):
     result = flight_service.get_flight_by_id(flight_id, current_user=user)
     if result is None:
@@ -183,8 +184,8 @@ def sync_live_flights(
 
 @router.delete("/flights/clear-all")
 def clear_all_flights(user: dict = Depends(require_admin)):
-    count = flight_service.clear_all_flights()
-    return {"message": f"Cleared {count} flights"}
+    counts = flight_service.clear_all_flights()
+    return {"message": f"Cleared {counts['flights']} flights and {counts['logs']} carousel logs"}
 
 
 @router.delete("/flights/{flight_id}")

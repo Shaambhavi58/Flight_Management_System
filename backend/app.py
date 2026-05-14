@@ -90,12 +90,40 @@ def start_rabbitmq_consumer():
         print("[App] The app will still work — flights can be added via the API.")
 
 
+def verify_carousel_schema(db: DatabaseManager):
+    """
+    Diagnostic check: Verify carousel_number exists in flights table 
+    and carousel_change_log table exists.
+    Raises RuntimeError if integration is incomplete.
+    """
+    from sqlalchemy import inspect
+    inspector = inspect(db.engine)
+    
+    # 1. Check for table existence
+    tables = inspector.get_table_names()
+    if "carousel_change_log" not in tables:
+        print("[CRITICAL] Missing table: carousel_change_log")
+        raise RuntimeError("Database migration incomplete: carousel_change_log table is missing.")
+        
+    # 2. Check for column existence in flights
+    columns = [c["name"] for c in inspector.get_columns("flights")]
+    if "carousel_number" not in columns:
+        print("[CRITICAL] Missing column in 'flights': carousel_number")
+        raise RuntimeError("Database migration incomplete: 'carousel_number' column is missing from 'flights' table.")
+
+    print("[App] Carousel/BHS integration verified: Schema is healthy.")
+
+
 # ── Lifespan ─────────────────────────────────────────────────────
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application startup and shutdown lifecycle."""
     db = DatabaseManager()
     db.create_tables()          # Creates tables only if they don't exist (no data loss)
+    
+    # Audit: Ensure carousel integration migrated correctly
+    verify_carousel_schema(db)
+    
     seed_airlines(db)
     seed_airports(db)
     seed_admin(db)
@@ -214,14 +242,6 @@ if os.path.isdir(frontend_dir):
     @app.get("/register-page")
     def serve_register():
         return FileResponse(os.path.join(frontend_dir, "index.html"))
-# ── CLEAR ALL FLIGHTS (USED BY RABBITMQ PUBLISHER) ───────────────
-
-@app.delete("/flights/clear-all", tags=["Flights"])
-def clear_all_flights(admin: dict = Depends(require_admin)):
-    """
-    Clears all flights from database.
-    Used by flight_publisher before generating new schedule.
-    """
-    count = flight_service.clear_all_flights()
-    print(f"[API] Cleared {count} flights before new publish.")
-    return {"message": f"Cleared {count} flights"}
+# ══════════════════════════════════════════════════════════════════
+#  END OF FILE
+# ══════════════════════════════════════════════════════════════════

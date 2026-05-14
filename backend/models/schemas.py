@@ -112,8 +112,8 @@ class FlightResponseSchema(BaseModel):
     terminal_number: str
     status: str
     flight_type: str
-    carousel_number: Optional[str] = None   # null until flight Arrives
-
+    carousel_number: Optional[str] = None
+    
     class Config:
         from_attributes = True
 
@@ -181,7 +181,7 @@ class FlightSerializer:
             "terminal_number": flight_model.terminal_number,
             "status": flight_model.status,
             "flight_type": flight_model.flight_type or "arrival",
-            "carousel_number": flight_model.carousel_number,  # None if not yet Arrived
+            "carousel_number": getattr(flight_model, "carousel_number", None),
         }
 
     @staticmethod

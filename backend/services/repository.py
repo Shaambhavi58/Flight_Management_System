@@ -6,7 +6,7 @@ No business logic, no HTTP concerns, no role checks.
 """
 
 from sqlalchemy.orm import Session, joinedload
-from models.models import FlightModel, AirlineModel, AirportModel, UserModel, CarouselChangeLog
+from models.models import FlightModel as Flight, AirlineModel, AirportModel, UserModel, CarouselChangeLog
 from typing import List, Optional
 
 
@@ -20,7 +20,7 @@ class FlightRepository:
 
     # ── CREATE ────────────────────────────────────────────────────────────────
 
-    def create(self, session: Session, flight_data: dict) -> FlightModel:
+    def create(self, session: Session, flight_data: dict) -> Flight:
         clean_data = {
             k: v for k, v in flight_data.items()
             if not k.startswith("_") and k not in ("batch_id", "batch_name")
@@ -35,11 +35,11 @@ class FlightRepository:
                 print(f"[Repository] Unknown airline code: {airline_code}, skipping.")
                 return None
 
-        existing = session.query(FlightModel).filter(
-            FlightModel.flight_number  == clean_data.get("flight_number"),
-            FlightModel.departure_time == clean_data.get("departure_time"),
-            FlightModel.airport_id     == clean_data.get("airport_id"),
-            FlightModel.flight_type    == clean_data.get("flight_type", "arrival"),
+        existing = session.query(Flight).filter(
+            Flight.flight_number  == clean_data.get("flight_number"),
+            Flight.departure_time == clean_data.get("departure_time"),
+            Flight.airport_id     == clean_data.get("airport_id"),
+            Flight.flight_type    == clean_data.get("flight_type", "arrival"),
         ).first()
 
         if existing:
@@ -49,33 +49,33 @@ class FlightRepository:
                   f"type={clean_data.get('flight_type')}")
             return existing
 
-        flight = FlightModel(**clean_data)
+        flight = Flight(**clean_data)
         session.add(flight)
         session.flush()
         return flight
 
     # ── READ ALL ──────────────────────────────────────────────────────────────
 
-    def get_all(self, session: Session, airport_id: int = None) -> List[FlightModel]:
+    def get_all(self, session: Session, airport_id: int = None) -> List[Flight]:
         query = (
-            session.query(FlightModel)
+            session.query(Flight)
             .options(
-                joinedload(FlightModel.airline),
-                joinedload(FlightModel.airport)
+                joinedload(Flight.airline),
+                joinedload(Flight.airport)
             )
         )
         if airport_id:
-            query = query.filter(FlightModel.airport_id == airport_id)
+            query = query.filter(Flight.airport_id == airport_id)
         return query.all()
 
     # ── READ ONE ──────────────────────────────────────────────────────────────
 
-    def get_by_id(self, session: Session, flight_id: int) -> Optional[FlightModel]:
+    def get_by_id(self, session: Session, flight_id: int) -> Optional[Flight]:
         return (
-            session.query(FlightModel)
+            session.query(Flight)
             .options(
-                joinedload(FlightModel.airline),
-                joinedload(FlightModel.airport)
+                joinedload(Flight.airline),
+                joinedload(Flight.airport)
             )
             .filter_by(id=flight_id)
             .first()
@@ -83,8 +83,8 @@ class FlightRepository:
 
     # ── UPDATE ────────────────────────────────────────────────────────────────
 
-    def update(self, session: Session, flight_id: int, update_data: dict) -> Optional[FlightModel]:
-        flight = session.query(FlightModel).filter_by(id=flight_id).first()
+    def update(self, session: Session, flight_id: int, update_data: dict) -> Optional[Flight]:
+        flight = session.query(Flight).filter_by(id=flight_id).first()
         if not flight:
             return None
 
@@ -101,8 +101,8 @@ class FlightRepository:
         session.flush()
 
         return (
-            session.query(FlightModel)
-            .options(joinedload(FlightModel.airline), joinedload(FlightModel.airport))
+            session.query(Flight)
+            .options(joinedload(Flight.airline), joinedload(Flight.airport))
             .filter_by(id=flight_id)
             .first()
         )
@@ -110,29 +110,47 @@ class FlightRepository:
     # ── DELETE ────────────────────────────────────────────────────────────────
 
     def delete(self, session: Session, flight_id: int) -> bool:
-        flight = session.query(FlightModel).filter_by(id=flight_id).first()
+        flight = session.query(Flight).filter_by(id=flight_id).first()
         if not flight:
             return False
+        
+        # 1. Delete dependent carousel logs first
+        session.query(CarouselChangeLog).filter_by(flight_id=flight_id).delete()
+        
+        # 2. Delete the flight
         session.delete(flight)
         session.flush()
         return True
 
-    def delete_all(self, session: Session, airport_id: int = None) -> int:
-        query = session.query(FlightModel)
-        if airport_id:
-            query = query.filter(FlightModel.airport_id == airport_id)
-        count = query.delete()
+    def delete_all(self, session: Session, airport_id: int = None) -> dict:
+        """
+        Clears all flights and their carousel logs.
+        Used by the publisher before a new daily sync.
+        """
+        if airport_id is None:
+            # 1. Delete all carousel logs first (global)
+            log_count = session.query(CarouselChangeLog).delete()
+            # 2. Delete all flights (global)
+            flight_count = session.query(Flight).delete()
+        else:
+            # 1. Delete filtered carousel logs first
+            log_count = session.query(CarouselChangeLog).filter(
+                CarouselChangeLog.flight_id.in_(
+                    session.query(Flight.id).filter(Flight.airport_id == airport_id)
+                )
+            ).delete(synchronize_session=False)
+
+            # 2. Delete filtered flights
+            flight_count = session.query(Flight).filter(
+                Flight.airport_id == airport_id
+            ).delete(synchronize_session=False)
+
         session.flush()
-        return count
+        return {"flights": flight_count, "logs": log_count}
 
     def clear_today_flights(self, session: Session, airport_id: int = None) -> int:
-        query = session.query(FlightModel)
-        if airport_id:
-            query = query.filter(FlightModel.airport_id == airport_id)
-        count = query.delete()
-        session.flush()
-        print(f"[Repository] Cleared {count} flights before daily reset.")
-        return count
+        """Alias for delete_all — used during batch resets."""
+        return self.delete_all(session, airport_id=airport_id)
 
 
 class CarouselRepository:
