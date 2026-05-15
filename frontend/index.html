@@ -19,7 +19,7 @@
             <img src="/static/logo_dark_bg.png" alt="Beumer Group">
         </div>
         <div class="nav-right">
-            <span class="nav-link hidden" id="nav-analytics-link" onclick="showPage('analytics')">Analytics</span>
+            <span class="nav-link hidden" id="nav-analytics-link" onclick="showPage('analytics')">Analytics <span id="alerts-count-badge" class="badge"></span></span>
             <span class="nav-link active-link" onclick="showPage('airports')">Airports</span>
             <span class="nav-link hidden" id="nav-register-link" onclick="showPage('register')">Register User</span>
 
@@ -165,7 +165,7 @@
                         <span class="card-icon">🚨</span> Live Operational Alerts
                         <span class="alerts-count-badge" id="alerts-count-badge"></span>
                     </h3>
-                    <div id="alerts-container" class="alerts-scroll"></div>
+                    <div id="operational-alerts-list" class="alerts-scroll"></div>
                 </div>
                 <div class="analytics-card">
                     <h3 class="card-section-title">
@@ -808,6 +808,15 @@
                 <h3>Airport Comparison</h3>
                 <div class="chart-container">
                     <canvas id="airportChart"></canvas>
+                </div>
+            </div>
+            <div class="analytics-card" id="operational-alerts-card">
+                <div class="panel-header">
+                    <h3>Live Operational Alerts</h3>
+                    <span class="live-indicator"><span class="dot"></span> Active</span>
+                </div>
+                <div class="alerts-container" id="alerts-container">
+                    <div class="empty-alert">No active operational alerts</div>
                 </div>
             </div>
         </div>

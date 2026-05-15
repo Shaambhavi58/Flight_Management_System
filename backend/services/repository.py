@@ -43,10 +43,11 @@ class FlightRepository:
         ).first()
 
         if existing:
-            print(f"[Repository] Duplicate skipped: {clean_data.get('flight_number')} "
-                  f"@ airport_id={clean_data.get('airport_id')} "
-                  f"dep={clean_data.get('departure_time')} "
-                  f"type={clean_data.get('flight_type')}")
+            # Update status and delay info even if flight exists (for real-time sync)
+            existing.status = clean_data.get("status", existing.status)
+            existing.delay_minutes = clean_data.get("delay_minutes", existing.delay_minutes)
+            existing.delay_reason = clean_data.get("delay_reason", existing.delay_reason)
+            session.flush()
             return existing
 
         flight = Flight(**clean_data)

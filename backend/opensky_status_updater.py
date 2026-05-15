@@ -184,10 +184,12 @@ class FlightStatusUpdater:
         )
 
     @staticmethod
-    def _resolve_status(on_ground: bool | None) -> str:
+    def _resolve_status(on_ground: bool | None) -> str | None:
         if on_ground is True:
             return "Arrived"
-        return "Departed" if on_ground is False else "Scheduled"
+        if on_ground is False:
+            return "Departed"
+        return None
 
     def update(self, aircraft: list[dict]) -> int:
         if not aircraft:
@@ -212,10 +214,15 @@ class FlightStatusUpdater:
                         continue
 
                     new_status = self._resolve_status(ac["on_ground"])
+                    if not new_status:
+                        continue
 
                     for flight in flights:
                         old_status = flight.status
                         flight.status = new_status
+                        if new_status != "Delayed":
+                            flight.delay_minutes = 0
+                            flight.delay_reason = None
 
                         # ── Auto-assign carousel when flight transitions to Arrived ──
                         # This is the BHS integration trigger point.
@@ -246,7 +253,7 @@ class FlightStatusUpdater:
                                 "changed_by":    "opensky-updater",
                             })
 
-                            print(f"[Updater] ✈ {fn} Arrived → Carousel {carousel} assigned")
+                            print(f"[Updater]  {fn} Arrived -> Carousel {carousel} assigned")
 
                         if self._has_telemetry:
                             if ac["latitude"]  is not None: flight.latitude  = ac["latitude"]

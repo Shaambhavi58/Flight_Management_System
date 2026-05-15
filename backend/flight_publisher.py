@@ -229,7 +229,7 @@ FLIGHT_PREFIXES = {
 class AviationStackFetcher:
     """
     Fetches real flight data from AviationStack API.
-    - Converts UTC → IST
+    - Converts UTC -> IST
     - Strict airport filter (arrivals land at target, departures leave from target)
     - Skips blank/short flight numbers
     """
@@ -295,6 +295,8 @@ class AviationStackFetcher:
                 arr_time = arr_dt.strftime("%H:%M")
                 origin      = self._clean_route_part(dep.get("airport", ""), dep_iata)
                 destination = self._clean_route_part(arr.get("airport", ""), arr_iata)
+                st, dm, dr = generator._get_status_data(dep_time, arr_time, flight_iata)
+                term = generator._get_terminal(self.AIRLINE_CODE_MAP[airline_iata], origin)
                 results.append({
                     "flight_number":  flight_iata,
                     "airline_code":   self.AIRLINE_CODE_MAP[airline_iata],
@@ -302,8 +304,12 @@ class AviationStackFetcher:
                     "destination":    destination,
                     "departure_time": dep_time,
                     "arrival_time":   arr_time,
+                    "gate_number":    generator._get_gate(flight_iata, term),
+                    "terminal_number": term,
                     "flight_type":    flight_type,
-                    "status":         generator._get_status(dep_time, arr_time, flight_iata),
+                    "status":         st,
+                    "delay_minutes":  dm,
+                    "delay_reason":   dr,
                     "batch_name":     generator._get_batch_name(dep_time),
                     "_from_live":     True,
                 })
@@ -326,14 +332,14 @@ class DailyScheduleGenerator:
     Total: 96 arrivals + 96 departures = 192 flights per airport.
 
     Status logic (accurate, never flips on refresh):
-      1. Already arrived?       → "Arrived"
-      2. Already departed?      → "Departed"
+      1. Already arrived?       -> "Arrived"
+      2. Already departed?      -> "Departed"
       3. Future flight?
-         a. Seeded 3% chance    → "Cancelled"  (stable all day)
+         a. Seeded 3% chance    -> "Cancelled"  (stable all day)
          b. Within 45 mins:
-            - Seeded 15% chance → "Delayed"    (stable all day)
-            - Otherwise         → "Boarding"
-         c. Beyond 45 mins      → "Scheduled"
+            - Seeded 15% chance -> "Delayed"    (stable all day)
+            - Otherwise         -> "Boarding"
+         c. Beyond 45 mins      -> "Scheduled"
 
     Overnight fix:
       Early morning flights (00:00–05:59) are treated as TONIGHT
@@ -355,7 +361,7 @@ class DailyScheduleGenerator:
         seed      = abs(hash(f"{flight_number}{self._today}"))
         return f"G{(seed % (high - low + 1)) + low}"
 
-    def _get_status(self, dep_time: str, arr_time: str, flight_number: str = "") -> str:
+    def _get_status_data(self, dep_time: str, arr_time: str, flight_number: str = "") -> tuple:
         """
         Accurate time-based status with stable seeded cancellation and delays.
 
@@ -386,39 +392,51 @@ class DailyScheduleGenerator:
                 arr_dt += timedelta(days=1)
 
         except Exception:
-            return "Scheduled"
+            return "Scheduled", 0, None
 
+        import random
         diff_dep = (dep_dt - now).total_seconds() / 60  # minutes until departure
 
-        # ── Step 1: Past flights ──────────────────────────────────────────
-        # These have already happened — no cancellation possible
-        if now > arr_dt:
-            return "Arrived"
-        if now >= dep_dt:
-            return "Departed"
-
-        # ── Step 2: Future flights — cancellation check ───────────────────
-        # 3% of upcoming flights are cancelled, seeded by flight+date
-        # so the same flight stays cancelled all day (won't flip on refresh)
+        # ── Step 1: Cancelled Check (3% chance) ─────────────────────────────
         if flight_number:
             cancel_seed = abs(hash(f"{flight_number}{self._today}cancel"))
             if cancel_seed % 100 < 3:
-                return "Cancelled"
+                return "Cancelled", 0, None
 
-        # ── Step 3: Boarding window (within 45 mins of departure) ─────────
-        if diff_dep <= 5:
-            return "Boarding"
+        # ── Step 2: Delay Check (15% chance) ──────────────────────────────
+        dm, dr = 0, None
+        if flight_number:
+            delay_seed = abs(hash(f"{flight_number}{self._today}delay"))
+            if delay_seed % 100 < 15:
+                # Random data for demo richness
+                dm = random.choice([15, 25, 35, 45, 60, 75, 90])
+                dr = random.choice([
+                    "Weather", "Technical", "ATC", "Crew", 
+                    "Security", "Late Arrival", "Operational"
+                ])
+                
+                actual_dep = dep_dt + timedelta(minutes=dm)
+                actual_arr = arr_dt + timedelta(minutes=dm)
+                
+                # If we are within 4 hours of scheduled departure but haven't reached actual delayed departure
+                if now < actual_dep and diff_dep <= 240:
+                    return "Delayed", dm, dr
+                
+                # If past delayed departure, check if still in flight
+                if actual_dep <= now < actual_arr:
+                    return "Departed", 0, None
+                if now >= actual_arr:
+                    return "Arrived", 0, None
 
+        # ── Step 3: Normal Flow (Non-delayed / Non-cancelled) ─────────────
+        if now > arr_dt:
+            return "Arrived", dm, dr
+        if now >= dep_dt:
+            return "Departed", dm, dr
         if diff_dep <= 45:
-            # 15% of boarding-window flights are delayed, seeded for stability
-            if flight_number:
-                delay_seed = abs(hash(f"{flight_number}{self._today}delay"))
-                if delay_seed % 100 < 15:
-                    return "Delayed"
-            return "Boarding"
+            return "Boarding", dm, dr
 
-        # ── Step 4: Everything else is scheduled ──────────────────────────
-        return "Scheduled"
+        return "Scheduled", dm, dr
 
     def _get_batch_name(self, dep_time: str) -> str:
         try:
@@ -474,6 +492,8 @@ class DailyScheduleGenerator:
             arr_time = (dep_dt + timedelta(minutes=duration)).strftime("%H:%M")
             fn       = self._make_flight_number(airline_code, slot_idx, "dep")
             terminal = self._get_terminal(airline_code, origin)
+            
+            st, dm, dr = self._get_status_data(slot_time, arr_time, fn)
 
             flights.append({
                 "flight_number":   fn,
@@ -485,7 +505,9 @@ class DailyScheduleGenerator:
                 "arrival_time":    arr_time,
                 "gate_number":     self._get_gate(fn, terminal),
                 "terminal_number": terminal,
-                "status":          self._get_status(slot_time, arr_time, fn),
+                "status":          st,
+                "delay_minutes":   dm,
+                "delay_reason":    dr,
                 "batch_name":      self._get_batch_name(slot_time),
                 "flight_type":     "departure",
             })
@@ -499,6 +521,8 @@ class DailyScheduleGenerator:
             dep_time = (arr_dt - timedelta(minutes=duration)).strftime("%H:%M")
             fn       = self._make_flight_number(airline_code, slot_idx, "arr")
             terminal = self._get_terminal(airline_code, destination)
+            
+            st_arr, dm_arr, dr_arr = self._get_status_data(dep_time, slot_time, fn)
 
             flights.append({
                 "flight_number":   fn,
@@ -510,12 +534,14 @@ class DailyScheduleGenerator:
                 "arrival_time":    slot_time,
                 "gate_number":     self._get_gate(fn, terminal),
                 "terminal_number": terminal,
-                "status":          self._get_status(dep_time, slot_time, fn),
+                "status":          st_arr,
+                "delay_minutes":   dm_arr,
+                "delay_reason":    dr_arr,
                 "batch_name":      self._get_batch_name(dep_time),
                 "flight_type":     "arrival",
             })
 
-        print(f"[Generator] {airport_iata} → {len(flights)} flights "
+        print(f"[Generator] {airport_iata} -> {len(flights)} flights "
               f"({len(slots)} arrivals + {len(slots)} departures, all slots covered)")
         return flights
 
@@ -632,7 +658,7 @@ class FlightDataOrchestrator:
         self._last_run_date = today.date()
 
         for iata, count in airport_summary.items():
-            print(f"[Sync Live] {iata} → {count} flights")
+            print(f"[Sync Live] {iata} -> {count} flights")
         print(f"[Sync Live] Total published: {published_count} flights across {len(AIRPORTS)} airports")
         print(f"[Sync Live] Completed in {elapsed_ms}ms")
         print(f"{'='*60}\n")

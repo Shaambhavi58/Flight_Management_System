@@ -169,15 +169,17 @@ def _send_batch_email(batch_id: str, flights: list):
     for i, f in enumerate(displayed, 1):
         status_color = STATUS_COLORS.get(f.get("status", ""), "#333")
         row_bg = "#f9f9f9" if i % 2 == 0 else "white"
+        carousel = f.get('carousel_number') if f.get('status') == 'Arrived' else None
+        carousel_text = carousel if carousel else "—"
+        gate = f.get('gate_number', '—')
+        terminal = f.get('terminal_number', '—')
+
         rows_html += f"""
         <tr style="background:{row_bg};">
             <td style="padding:10px 14px; border-bottom:1px solid #eee;">{i}</td>
             <td style="padding:10px 14px; border-bottom:1px solid #eee; font-weight:600;
                        font-family:monospace; color:#0f3460;">
                 {f.get('flight_number', '—')}
-            </td>
-            <td style="padding:10px 14px; border-bottom:1px solid #eee;">
-                {f.get('airline_name', f.get('airline_code', '—'))}
             </td>
             <td style="padding:10px 14px; border-bottom:1px solid #eee; color:#444;">
                 {f.get('origin', '—')} → {f.get('destination', '—')}
@@ -188,6 +190,11 @@ def _send_batch_email(batch_id: str, flights: list):
                     {f.get('status', '—')}
                 </span>
             </td>
+            <td style="padding:10px 14px; border-bottom:1px solid #eee; text-align:center;">{gate}</td>
+            <td style="padding:10px 14px; border-bottom:1px solid #eee; text-align:center;">{terminal}</td>
+            <td style="padding:10px 14px; border-bottom:1px solid #eee; text-align:center; font-weight:600; color:#00a0d2;">
+                {carousel_text}
+            </td>
         </tr>
         """
 
@@ -197,15 +204,17 @@ def _send_batch_email(batch_id: str, flights: list):
         for i, f in enumerate(extra, MAX_ROWS + 1):
             status_color = STATUS_COLORS.get(f.get("status", ""), "#333")
             row_bg = "#f9f9f9" if i % 2 == 0 else "white"
+            carousel = f.get('carousel_number') if f.get('status') == 'Arrived' else None
+            carousel_text = carousel if carousel else "—"
+            gate = f.get('gate_number', '—')
+            terminal = f.get('terminal_number', '—')
+
             extra_rows_html += f"""
             <tr style="background:{row_bg};">
                 <td style="padding:10px 14px; border-bottom:1px solid #eee;">{i}</td>
                 <td style="padding:10px 14px; border-bottom:1px solid #eee; font-weight:600;
                            font-family:monospace; color:#0f3460;">
                     {f.get('flight_number', '—')}
-                </td>
-                <td style="padding:10px 14px; border-bottom:1px solid #eee;">
-                    {f.get('airline_name', f.get('airline_code', '—'))}
                 </td>
                 <td style="padding:10px 14px; border-bottom:1px solid #eee; color:#444;">
                     {f.get('origin', '—')} → {f.get('destination', '—')}
@@ -216,13 +225,18 @@ def _send_batch_email(batch_id: str, flights: list):
                         {f.get('status', '—')}
                     </span>
                 </td>
+                <td style="padding:10px 14px; border-bottom:1px solid #eee; text-align:center;">{gate}</td>
+                <td style="padding:10px 14px; border-bottom:1px solid #eee; text-align:center;">{terminal}</td>
+                <td style="padding:10px 14px; border-bottom:1px solid #eee; text-align:center; font-weight:600; color:#00a0d2;">
+                    {carousel_text}
+                </td>
             </tr>
             """
         overflow_html = f"""
         <details style="margin-top:12px;">
             <summary style="cursor:pointer; color:#00a0d2; font-size:14px;
                             font-weight:600; padding:8px 0; list-style:none;">
-                ▶ Show +{remaining} more flights
+                View all affected flights →
             </summary>
             <table style="width:100%; border-collapse:collapse; font-size:14px; margin-top:8px;">
                 <tbody>{extra_rows_html}</tbody>
@@ -264,10 +278,12 @@ def _send_batch_email(batch_id: str, flights: list):
                 <thead>
                     <tr style="background:#1a2b49; color:white;">
                         <th style="padding:10px 14px; text-align:left;">#</th>
-                        <th style="padding:10px 14px; text-align:left;">Flight No.</th>
-                        <th style="padding:10px 14px; text-align:left;">Airline</th>
+                        <th style="padding:10px 14px; text-align:left;">Flight</th>
                         <th style="padding:10px 14px; text-align:left;">Route</th>
                         <th style="padding:10px 14px; text-align:center;">Status</th>
+                        <th style="padding:10px 14px; text-align:center;">Gate</th>
+                        <th style="padding:10px 14px; text-align:center;">Terminal</th>
+                        <th style="padding:10px 14px; text-align:center;">Carousel</th>
                     </tr>
                 </thead>
                 <tbody>{rows_html}</tbody>

@@ -112,6 +112,27 @@ def verify_carousel_schema(db: DatabaseManager):
         raise RuntimeError("Database migration incomplete: 'carousel_number' column is missing from 'flights' table.")
 
     print("[App] Carousel/BHS integration verified: Schema is healthy.")
+    
+def verify_delay_schema(db: DatabaseManager):
+    """
+    Diagnostic check: Ensure delay tracking columns exist.
+    If missing (e.g. after update), adds them via ALTER TABLE.
+    """
+    from sqlalchemy import inspect, text
+    inspector = inspect(db.engine)
+    columns = [c["name"] for c in inspector.get_columns("flights")]
+    
+    with db.engine.connect() as conn:
+        if "delay_minutes" not in columns:
+            print("[Migration] Adding 'delay_minutes' column to 'flights' table...")
+            # For SQLite/MySQL, use ALTER TABLE
+            conn.execute(text("ALTER TABLE flights ADD COLUMN delay_minutes INTEGER DEFAULT 0 NOT NULL"))
+            conn.commit()
+        if "delay_reason" not in columns:
+            print("[Migration] Adding 'delay_reason' column to 'flights' table...")
+            conn.execute(text("ALTER TABLE flights ADD COLUMN delay_reason VARCHAR(50)"))
+            conn.commit()
+    print("[App] Delay tracking schema verified: healthy.")
 
 
 # ── Lifespan ─────────────────────────────────────────────────────
@@ -123,6 +144,7 @@ async def lifespan(app: FastAPI):
     
     # Audit: Ensure carousel integration migrated correctly
     verify_carousel_schema(db)
+    verify_delay_schema(db)
     
     seed_airlines(db)
     seed_airports(db)

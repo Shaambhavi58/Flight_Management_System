@@ -1007,13 +1007,144 @@ body {
 }
 
 .status-Delayed {
+    background: #fffbeb;
+    color: #d97706
+}
+
+.delay-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.delay-minor {
     background: #fef3c7;
-    color: #92400e
+    color: #92400e;
+    border: 1.5px solid #fcd34d;
+}
+
+.delay-moderate {
+    background: #ffedd5;
+    color: #9a3412;
+    border: 1.5px solid #fdba74;
+}
+
+.delay-severe {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1.5px solid #fecaca;
 }
 
 .status-In-Air {
-    background: #ecfeff;
-    color: #0891b2
+    background: #ecfdf5;
+    color: #059669
+}
+
+/* ── Operational Alerts ── */
+#operational-alerts-list {
+    max-height: 420px;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+#operational-alerts-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+#operational-alerts-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#operational-alerts-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+#operational-alerts-list::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.ops-alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  animation: fadeIn 0.3s ease;
+}
+
+.ops-alert-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.ops-alert-content {
+  flex: 1;
+}
+
+.ops-alert-title {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.ops-alert-subtitle {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 1px;
+}
+
+/* Color Coding */
+.ops-alert-weather { background: #fffbeb; border-color: #fde68a; }
+.ops-alert-weather .ops-alert-icon { background: #fef3c7; }
+
+.ops-alert-technical { background: #fff7ed; border-color: #fed7aa; }
+.ops-alert-technical .ops-alert-icon { background: #ffedd5; }
+
+.ops-alert-atc { background: #eff6ff; border-color: #bfdbfe; }
+.ops-alert-atc .ops-alert-icon { background: #dbeafe; }
+
+.ops-alert-crew { background: #faf5ff; border-color: #e9d5ff; }
+.ops-alert-crew .ops-alert-icon { background: #f3e8ff; }
+
+.ops-alert-security { background: #fef2f2; border-color: #fecaca; }
+.ops-alert-security .ops-alert-icon { background: #fee2e2; }
+
+.ops-alert-late { background: #ecfeff; border-color: #a5f3fc; }
+.ops-alert-late .ops-alert-icon { background: #cffafe; }
+
+.ops-alert-other { background: #f8fafc; border-color: #e2e8f0; }
+.ops-alert-other .ops-alert-icon { background: #f1f5f9; }
+
+.ops-alert-boarding { background: #f0fdf4; border-color: #bbf7d0; }
+.ops-alert-boarding .ops-alert-icon { background: #d1fae5; }
+
+.ops-alert-cancelled { background: #fff1f2; border-color: #fecdd3; }
+.ops-alert-cancelled .ops-alert-icon { background: #ffe4e6; }
+
+.ops-alert-arrived { background: #f0f9ff; border-color: #bae6fd; }
+.ops-alert-arrived .ops-alert-icon { background: #e0f2fe; }
+
+.empty-alerts, .empty-alert {
+    text-align: center;
+    color: var(--text3);
+    padding: 40px 20px;
+    font-size: 14px;
 }
 
 .status-Cancelled {
@@ -2500,4 +2631,17 @@ body {
     border-color: #10b981;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+/* ── Alerts Badge ── */
+.badge {
+    background: var(--danger);
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 5px;
+    vertical-align: middle;
+    display: none;
+    font-weight: 700;
 }

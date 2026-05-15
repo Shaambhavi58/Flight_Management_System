@@ -81,6 +81,8 @@ class FlightCreateSchema(BaseModel):
     terminal_number: str = Field(..., example="T1")
     status: str = Field(default="Scheduled")
     flight_type: str = Field(default="arrival", example="arrival")
+    delay_minutes: int = Field(default=0)
+    delay_reason: Optional[str] = Field(default=None)
 
 
 class FlightUpdateSchema(BaseModel):
@@ -95,6 +97,8 @@ class FlightUpdateSchema(BaseModel):
     terminal_number: Optional[str] = None
     status: Optional[str] = None
     flight_type: Optional[str] = None
+    delay_minutes: Optional[int] = None
+    delay_reason: Optional[str] = None
 
 
 class FlightResponseSchema(BaseModel):
@@ -113,6 +117,8 @@ class FlightResponseSchema(BaseModel):
     status: str
     flight_type: str
     carousel_number: Optional[str] = None
+    delay_minutes: int = 0
+    delay_reason: Optional[str] = None
     
     class Config:
         from_attributes = True
@@ -182,6 +188,8 @@ class FlightSerializer:
             "status": flight_model.status,
             "flight_type": flight_model.flight_type or "arrival",
             "carousel_number": getattr(flight_model, "carousel_number", None),
+            "delay_minutes": getattr(flight_model, "delay_minutes", 0),
+            "delay_reason": getattr(flight_model, "delay_reason", None),
         }
 
     @staticmethod

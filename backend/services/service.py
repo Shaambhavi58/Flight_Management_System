@@ -123,6 +123,13 @@ class FlightService:
                 raise HTTPException(status_code=400, detail="airport_id is required for admin flight creation")
 
         with self._db.session_scope() as session:
+            # ── Auto-assign carousel on creation if status is Arrived ────────
+            if flight_data.get("status") == "Arrived" and not flight_data.get("carousel_number"):
+                fn = flight_data.get("flight_number")
+                tn = flight_data.get("terminal_number", "T1")
+                # We use the standalone assign_carousel utility
+                flight_data["carousel_number"] = assign_carousel(fn, tn)
+
             flight = self._repository.create(session, flight_data)
             flight = self._repository.get_by_id(session, flight.id)
             return self._serializer.orm_to_response(flight)
@@ -185,6 +192,23 @@ class FlightService:
             raise HTTPException(status_code=403, detail="Only admins can update flights")
 
         with self._db.session_scope() as session:
+            # ── Delay Logic ──────────────────────────────────────────────────
+            status = update_data.get("status")
+            if status:
+                if status == "Delayed":
+                    delay_mins = update_data.get("delay_minutes", 0)
+                    if delay_mins < 0:
+                        raise HTTPException(status_code=400, detail="delay_minutes must be >= 0")
+                    
+                    allowed_reasons = ["Weather", "Technical", "ATC", "Crew", "Security", "Late Arrival", "Operational", "Other"]
+                    reason = update_data.get("delay_reason")
+                    if reason and reason not in allowed_reasons:
+                        raise HTTPException(status_code=400, detail=f"Invalid delay_reason. Must be one of {allowed_reasons}")
+                else:
+                    # Clear delay fields if status is NOT Delayed
+                    update_data["delay_minutes"] = 0
+                    update_data["delay_reason"] = None
+
             # ── Auto-assign carousel when status changes to Arrived ───────────
             # This is the core BHS integration trigger:
             # FMS detects Arrived → assigns carousel → publishes to RabbitMQ

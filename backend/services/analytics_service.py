@@ -149,28 +149,35 @@ class AnalyticsService:
 
     def get_live_alerts(self):
         """
-        Return the 10 most recent operational alerts (Delayed or Boarding flights).
-        Used to populate the live-alerts feed on the dashboard sidebar.
-
-        JOIN with AirportModel so we can display the airport code in each alert message.
-        ORDER BY id DESC gives us the newest flights first (most recently inserted).
+        Return the 10 most recent operational alerts for the dashboard feed.
+        Includes: Delayed, Cancelled, Boarding, and Arrived (if carousel assigned).
         """
         with self.db.session_scope() as session:
-            # Fetch flights with Delayed or Boarding status, newest 10 only
+            # Fetch flights with statuses that warrant an alert
+            # Arrived flights only show up if they have an assigned carousel
             alerts = session.query(FlightModel, AirportModel).join(AirportModel).filter(
-                FlightModel.status.in_(["Delayed", "Boarding"])
+                (FlightModel.status.in_(["Delayed", "Boarding", "Cancelled"])) |
+                ((FlightModel.status == "Arrived") & (FlightModel.carousel_number.is_not(None)) & (FlightModel.carousel_number != ""))
             ).order_by(FlightModel.id.desc()).limit(10).all()
 
             alert_list = []
             for flight, airport in alerts:
                 if flight.status == "Delayed":
-                    # Warning alert — gate is delayed
-                    msg = f"⚠ {airport.code} Gate {flight.gate_number} delayed ({flight.flight_number})"
-                    alert_type = "warning"
+                    mins = getattr(flight, "delay_minutes", 0) or 0
+                    reason = getattr(flight, "delay_reason", "Operational")
+                    msg = f"{flight.flight_number} delayed by {mins} min due to {reason}"
+                    alert_type = "delayed"
+                elif flight.status == "Cancelled":
+                    msg = f"{flight.flight_number} has been cancelled"
+                    alert_type = "cancelled"
+                elif flight.status == "Boarding":
+                    msg = f"{flight.flight_number} boarding at Gate {flight.gate_number}"
+                    alert_type = "boarding"
+                elif flight.status == "Arrived":
+                    msg = f"{flight.flight_number} arrived — baggage at {flight.carousel_number}"
+                    alert_type = "arrived"
                 else:
-                    # Info alert — boarding in progress
-                    msg = f"🛫 {airport.code} boarding traffic ({flight.flight_number})"
-                    alert_type = "info"
+                    continue
 
                 alert_list.append({"message": msg, "type": alert_type})
 

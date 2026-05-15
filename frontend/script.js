@@ -1305,10 +1305,14 @@ function renderBoard() {
   <td class="cell-gate">${f.gate_number}</td>
   <td class="cell-terminal-info"><span class="terminal-badge terminal-${f.terminal_number}">${f.terminal_number}</span></td>
   <td class="cell-carousel">${carouselCell(f)}</td>
-  <td class="cell-status"><span class="status-badge status-${f.status.replace(/\s+/g, '-')}">${f.status}</span></td>
+  <td class="cell-status">${renderStatusCell(f)}</td>
   ${actions}`;
         tbody.appendChild(tr);
     });
+}
+
+function renderStatusCell(f) {
+    return `<span class="status-badge status-${f.status.replace(/\s+/g, '-')}">${f.status}</span>`;
 }
 
 function toggleForm() {
@@ -1386,6 +1390,27 @@ async function editFlight(id) {
                 <option value="Cancelled" ${flight.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
             </select>
         </div>
+
+        <div id="delay-fields" class="${flight.status === 'Delayed' ? '' : 'hidden'}" style="margin-top:16px; border-top:1px solid #eee; padding-top:16px">
+            <div class="form-group">
+                <label>Delay Minutes</label>
+                <input type="number" id="edit-delay-minutes" value="${flight.delay_minutes || 0}" min="0">
+            </div>
+            <div class="form-group">
+                <label>Delay Reason</label>
+                <select id="edit-delay-reason">
+                    <option value="Weather" ${flight.delay_reason === 'Weather' ? 'selected' : ''}>Weather</option>
+                    <option value="Technical" ${flight.delay_reason === 'Technical' ? 'selected' : ''}>Technical</option>
+                    <option value="ATC" ${flight.delay_reason === 'ATC' ? 'selected' : ''}>ATC</option>
+                    <option value="Crew" ${flight.delay_reason === 'Crew' ? 'selected' : ''}>Crew</option>
+                    <option value="Security" ${flight.delay_reason === 'Security' ? 'selected' : ''}>Security</option>
+                    <option value="Late Arrival" ${flight.delay_reason === 'Late Arrival' ? 'selected' : ''}>Late Arrival</option>
+                    <option value="Operational" ${flight.delay_reason === 'Operational' ? 'selected' : ''}>Operational</option>
+                    <option value="Other" ${flight.delay_reason === 'Other' ? 'selected' : ''}>Other</option>
+                </select>
+            </div>
+        </div>
+
         <div class="form-group">
             <label>Gate Number</label>
             <input type="text" id="edit-gate" value="${flight.gate_number}">
@@ -1403,6 +1428,20 @@ async function editFlight(id) {
     `;
 
     saveBtn.onclick = () => saveFlightChanges(id, flight);
+    
+    // Add change listener for status to toggle delay fields
+    const statusSelect = document.getElementById('edit-status');
+    if (statusSelect) {
+        statusSelect.onchange = () => {
+            const delayFields = document.getElementById('delay-fields');
+            if (statusSelect.value === 'Delayed') {
+                delayFields.classList.remove('hidden');
+            } else {
+                delayFields.classList.add('hidden');
+            }
+        };
+    }
+
     modal.classList.remove('hidden');
     modal.style.display = 'flex'; // Support cpw-overlay flex layout
 }
@@ -1411,12 +1450,22 @@ async function saveFlightChanges(id, originalFlight) {
     const status = document.getElementById('edit-status').value;
     const gate = document.getElementById('edit-gate').value.trim();
     
+    const payload = { status, gate_number: gate };
+    if (status === 'Delayed') {
+        payload.delay_minutes = parseInt(document.getElementById('edit-delay-minutes').value) || 0;
+        payload.delay_reason = document.getElementById('edit-delay-reason').value;
+    } else {
+        // Clear delay info if flight is no longer delayed
+        payload.delay_minutes = 0;
+        payload.delay_reason = null;
+    }
+
     try {
         // Step 1: Update main flight data
         const res = await fetch(`${API}/flights/${id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json", ...authHeaders() },
-            body: JSON.stringify({ status, gate_number: gate })
+            body: JSON.stringify(payload)
         });
         if (!res.ok) throw new Error("Update failed");
 
@@ -1601,7 +1650,16 @@ async function loadAnalytics() {
 
         // Render each dashboard section with its data slice
         renderKPIs(data.kpis);                        // top headline cards
-        renderAlerts(data.live_alerts);               // live alert feed
+        // Use the existing flight data to generate alerts dynamically
+        if (typeof allFlights !== 'undefined' && allFlights.length > 0) {
+            renderOperationalAlerts(allFlights);
+        } else {
+            // Fallback: fetch flights if they haven't been loaded yet
+            fetch(`${API}/flights`, { headers: authHeaders() })
+                .then(r => r.json())
+                .then(f => renderOperationalAlerts(f))
+                .catch(e => console.error("Alerts fallback failed", e));
+        }
         renderEmailBatches(data.batch_emails);        // batch email monitor
 
         // Only render Chart.js charts if the library is loaded on the page
@@ -1647,30 +1705,100 @@ function renderKPIs(kpis) {
     `).join('');
 }
 
-function renderAlerts(alerts) {
-    const container = document.getElementById('alerts-container');
-    const badge     = document.getElementById('alerts-count-badge');
+function renderOperationalAlerts(flights) {
+    const container = document.getElementById("operational-alerts-list");
+    const badge = document.getElementById("alerts-count-badge");
     if (!container) return;
 
-    // Show a "no alerts" message when everything is operating normally
-    if (!alerts || alerts.length === 0) {
-        container.innerHTML = '<p style="color:var(--text3);font-size:13px;padding:12px 0">✅ No active alerts — all operations nominal.</p>';
-        if (badge) { badge.textContent = ''; badge.classList.remove('visible'); }
-        return;
-    }
+    const flightData = Array.isArray(flights) ? flights : [];
+    
+    const delayedAlerts = [];
+    const cancelledAlerts = [];
+    const boardingAlerts = [];
+    const arrivedAlerts = [];
+    const seen = new Set();
+    
+    // Mapping of delay reasons to styles/icons
+    const reasonConfig = {
+        "Weather":      { icon: "🌦️", class: "ops-alert-weather" },
+        "Technical":    { icon: "🔧", class: "ops-alert-technical" },
+        "ATC":          { icon: "🗼", class: "ops-alert-atc" },
+        "Crew":         { icon: "👨‍✈️", class: "ops-alert-crew" },
+        "Security":     { icon: "🚨", class: "ops-alert-security" },
+        "Late Arrival": { icon: "⏰", class: "ops-alert-late" },
+        "Operational":  { icon: "⚠️", class: "ops-alert-other" },
+        "Other":        { icon: "⚠️", class: "ops-alert-other" }
+    };
 
-    // Update the alert count badge in the sidebar/header
-    if (badge) {
-        badge.textContent = alerts.length;   // show number of active alerts
-        badge.classList.add('visible');       // make badge visible
-    }
+    flightData.forEach(f => {
+        const key = `${f.flight_number}:${f.status}`;
+        if (seen.has(key)) return;
 
-    // Render each alert with its CSS class for color coding (warning=orange, info=blue)
-    container.innerHTML = alerts.map(a => `
-        <div class="live-alert-item alert-${a.type}">
-            ${a.message}
+        if (f.status === "Delayed") {
+            seen.add(key);
+            const reason = f.delay_reason || "Other";
+            const config = reasonConfig[reason] || reasonConfig["Other"];
+            const mins = f.delay_minutes;
+            const timeStr = (mins && mins > 0) ? `${mins} min` : "Time not specified";
+            
+            delayedAlerts.push({
+                type: config.class,
+                icon: config.icon,
+                title: `${f.flight_number} Delayed`,
+                subtitle: `${timeStr} • ${reason} • Gate ${f.gate_number || '—'}`
+            });
+        } else if (f.status === "Cancelled") {
+            seen.add(key);
+            cancelledAlerts.push({
+                type: "ops-alert-cancelled",
+                icon: "❌",
+                title: `${f.flight_number} Cancelled`,
+                subtitle: `Operational disruption • Gate ${f.gate_number || '—'}`
+            });
+        } else if (f.status === "Boarding") {
+            seen.add(key);
+            boardingAlerts.push({
+                type: "ops-alert-boarding",
+                icon: "🛫",
+                title: `${f.flight_number} Boarding`,
+                subtitle: `Gate ${f.gate_number} • Final call`
+            });
+        } else if (f.status === "Arrived" && f.carousel_number) {
+            seen.add(key);
+            arrivedAlerts.push({
+                type: "ops-alert-arrived",
+                icon: "✅",
+                title: `${f.flight_number} Arrived`,
+                subtitle: `Baggage at Carousel ${f.carousel_number}`
+            });
+        }
+    });
+
+    // Create a balanced mix (All delays + Limited others)
+    const displayAlerts = [
+        ...delayedAlerts,
+        ...boardingAlerts.slice(0, 3),
+        ...cancelledAlerts.slice(0, 3),
+        ...arrivedAlerts.slice(0, 2)
+    ];
+
+    const html = displayAlerts.map(a => `
+        <div class="ops-alert ${a.type}">
+            <div class="ops-alert-icon">${a.icon}</div>
+            <div class="ops-alert-content">
+                <div class="ops-alert-title">${a.title}</div>
+                <div class="ops-alert-subtitle">${a.subtitle}</div>
+            </div>
         </div>
-    `).join('');
+    `).join("");
+
+    const total = delayedAlerts.length + cancelledAlerts.length + boardingAlerts.length + arrivedAlerts.length;
+    container.innerHTML = html || '<div class="empty-alert">No active operational alerts</div>';
+
+    if (badge) {
+        badge.textContent = total || "";
+        badge.style.display = total > 0 ? 'inline-block' : 'none';
+    }
 }
 
 function renderEmailBatches(batches) {

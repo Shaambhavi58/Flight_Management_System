@@ -108,6 +108,12 @@ class FlightModel(Base):
     # Can be manually overridden by admin/staff via PUT /flights/{id}/carousel.
     # Every change is logged in carousel_change_log for audit.
     carousel_number = Column(String(10), nullable=True)   # e.g. "C3", null until Arrived
+    
+    # ── Delay Tracking ───────────────────────────────────────────────────────
+    # Operational reality: flights are often delayed. We track minutes and reason.
+    # Severity is calculated on frontend based on minutes.
+    delay_minutes = Column(Integer, default=0, nullable=False)
+    delay_reason = Column(String(50), nullable=True)  # Weather, Technical, ATC, Crew, Security, Late Arrival, Operational, Other
 
     airline = relationship("AirlineModel", back_populates="flights")
     airport = relationship("AirportModel", back_populates="flights")
@@ -271,6 +277,8 @@ class Flight:
         airline_name: str = None,
         airport_code: str = None,
         carousel_number: str = None,
+        delay_minutes: int = 0,
+        delay_reason: str = None,
     ):
         self._id = id
         self._flight_number = flight_number
@@ -286,6 +294,8 @@ class Flight:
         self._status = status
         self._flight_type = flight_type
         self._carousel_number = carousel_number
+        self._delay_minutes = delay_minutes
+        self._delay_reason = delay_reason
 
     @property
     def id(self): return self._id
@@ -311,6 +321,10 @@ class Flight:
     def terminal_number(self): return self._terminal_number
     @property
     def carousel_number(self): return self._carousel_number
+    @property
+    def delay_minutes(self): return self._delay_minutes
+    @property
+    def delay_reason(self): return self._delay_reason
 
     @property
     def status(self): return self._status
@@ -348,6 +362,8 @@ class Flight:
             "status": self._status,
             "flight_type": self._flight_type,
             "carousel_number": self._carousel_number,
+            "delay_minutes": self._delay_minutes,
+            "delay_reason": self._delay_reason,
         }
 
     def __str__(self):
