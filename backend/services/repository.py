@@ -43,8 +43,24 @@ class FlightRepository:
         ).first()
 
         if existing:
+            # Check for status change
+            old_status = existing.status
+            new_status = clean_data.get("status", existing.status)
+            
+            if new_status and new_status != old_status:
+                from services.repository import FlightStatusHistoryRepository
+                status_repo = FlightStatusHistoryRepository()
+                status_repo.log_status_change(
+                    session=session,
+                    flight=existing,
+                    old_status=old_status,
+                    new_status=new_status,
+                    changed_by="system",
+                    reason="Auto status update"
+                )
+            
             # Update status and delay info even if flight exists (for real-time sync)
-            existing.status = clean_data.get("status", existing.status)
+            existing.status = new_status
             existing.delay_minutes = clean_data.get("delay_minutes", existing.delay_minutes)
             existing.delay_reason = clean_data.get("delay_reason", existing.delay_reason)
             session.flush()
@@ -111,14 +127,18 @@ class FlightRepository:
     # ── DELETE ────────────────────────────────────────────────────────────────
 
     def delete(self, session: Session, flight_id: int) -> bool:
+        from models.models import FlightStatusHistory
         flight = session.query(Flight).filter_by(id=flight_id).first()
         if not flight:
             return False
         
-        # 1. Delete dependent carousel logs first
+        # 1. Delete dependent status history first
+        session.query(FlightStatusHistory).filter_by(flight_id=flight_id).delete()
+        
+        # 2. Delete dependent carousel logs
         session.query(CarouselChangeLog).filter_by(flight_id=flight_id).delete()
         
-        # 2. Delete the flight
+        # 3. Delete the flight
         session.delete(flight)
         session.flush()
         return True
@@ -128,20 +148,25 @@ class FlightRepository:
         Clears all flights and their carousel logs.
         Used by the publisher before a new daily sync.
         """
+        from models.models import FlightStatusHistory
         if airport_id is None:
-            # 1. Delete all carousel logs first (global)
+            # 1. Delete all status history first (global)
+            session.query(FlightStatusHistory).delete(synchronize_session=False)
+            # 2. Delete all carousel logs (global)
             log_count = session.query(CarouselChangeLog).delete()
-            # 2. Delete all flights (global)
+            # 3. Delete all flights (global)
             flight_count = session.query(Flight).delete()
         else:
-            # 1. Delete filtered carousel logs first
-            log_count = session.query(CarouselChangeLog).filter(
-                CarouselChangeLog.flight_id.in_(
-                    session.query(Flight.id).filter(Flight.airport_id == airport_id)
-                )
+            flight_ids_q = session.query(Flight.id).filter(Flight.airport_id == airport_id)
+            # 1. Delete filtered status history
+            session.query(FlightStatusHistory).filter(
+                FlightStatusHistory.flight_id.in_(flight_ids_q)
             ).delete(synchronize_session=False)
-
-            # 2. Delete filtered flights
+            # 2. Delete filtered carousel logs
+            log_count = session.query(CarouselChangeLog).filter(
+                CarouselChangeLog.flight_id.in_(flight_ids_q)
+            ).delete(synchronize_session=False)
+            # 3. Delete filtered flights
             flight_count = session.query(Flight).filter(
                 Flight.airport_id == airport_id
             ).delete(synchronize_session=False)
@@ -211,6 +236,32 @@ class CarouselRepository:
             session.query(CarouselChangeLog)
             .order_by(CarouselChangeLog.changed_at.desc())
             .limit(limit)
+            .all()
+        )
+
+class FlightStatusHistoryRepository:
+    def log_status_change(self, session: Session, flight: Flight, old_status: str, new_status: str, changed_by: str, reason: str = None):
+        from models.models import FlightStatusHistory
+        from datetime import datetime
+        history = FlightStatusHistory(
+            flight_id=flight.id,
+            flight_number=flight.flight_number,
+            old_status=old_status,
+            new_status=new_status,
+            changed_by=changed_by,
+            changed_at=datetime.utcnow(),
+            reason=reason
+        )
+        session.add(history)
+        session.flush()
+        return history
+
+    def get_by_flight(self, session: Session, flight_id: int):
+        from models.models import FlightStatusHistory
+        return (
+            session.query(FlightStatusHistory)
+            .filter_by(flight_id=flight_id)
+            .order_by(FlightStatusHistory.changed_at.asc())
             .all()
         )
 

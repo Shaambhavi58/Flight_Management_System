@@ -151,11 +151,6 @@ def _send_batch_email(batch_id: str, flights: list):
     }
     time_range = time_ranges.get(batch_id, "")
 
-    MAX_ROWS  = 30
-    displayed = flights[:MAX_ROWS]
-    remaining = total - MAX_ROWS
-    extra     = flights[MAX_ROWS:]
-
     STATUS_COLORS = {
         "Scheduled": "#2196F3",
         "Boarding":  "#FF9800",
@@ -166,7 +161,7 @@ def _send_batch_email(batch_id: str, flights: list):
     }
 
     rows_html = ""
-    for i, f in enumerate(displayed, 1):
+    for i, f in enumerate(flights, 1):
         status_color = STATUS_COLORS.get(f.get("status", ""), "#333")
         row_bg = "#f9f9f9" if i % 2 == 0 else "white"
         carousel = f.get('carousel_number') if f.get('status') == 'Arrived' else None
@@ -198,52 +193,6 @@ def _send_batch_email(batch_id: str, flights: list):
         </tr>
         """
 
-    overflow_html = ""
-    if remaining > 0:
-        extra_rows_html = ""
-        for i, f in enumerate(extra, MAX_ROWS + 1):
-            status_color = STATUS_COLORS.get(f.get("status", ""), "#333")
-            row_bg = "#f9f9f9" if i % 2 == 0 else "white"
-            carousel = f.get('carousel_number') if f.get('status') == 'Arrived' else None
-            carousel_text = carousel if carousel else "—"
-            gate = f.get('gate_number', '—')
-            terminal = f.get('terminal_number', '—')
-
-            extra_rows_html += f"""
-            <tr style="background:{row_bg};">
-                <td style="padding:10px 14px; border-bottom:1px solid #eee;">{i}</td>
-                <td style="padding:10px 14px; border-bottom:1px solid #eee; font-weight:600;
-                           font-family:monospace; color:#0f3460;">
-                    {f.get('flight_number', '—')}
-                </td>
-                <td style="padding:10px 14px; border-bottom:1px solid #eee; color:#444;">
-                    {f.get('origin', '—')} → {f.get('destination', '—')}
-                </td>
-                <td style="padding:10px 14px; border-bottom:1px solid #eee; text-align:center;">
-                    <span style="background:{status_color}; color:white; padding:3px 10px;
-                                 border-radius:12px; font-size:12px; font-weight:600;">
-                        {f.get('status', '—')}
-                    </span>
-                </td>
-                <td style="padding:10px 14px; border-bottom:1px solid #eee; text-align:center;">{gate}</td>
-                <td style="padding:10px 14px; border-bottom:1px solid #eee; text-align:center;">{terminal}</td>
-                <td style="padding:10px 14px; border-bottom:1px solid #eee; text-align:center; font-weight:600; color:#00a0d2;">
-                    {carousel_text}
-                </td>
-            </tr>
-            """
-        overflow_html = f"""
-        <details style="margin-top:12px;">
-            <summary style="cursor:pointer; color:#00a0d2; font-size:14px;
-                            font-weight:600; padding:8px 0; list-style:none;">
-                View all affected flights →
-            </summary>
-            <table style="width:100%; border-collapse:collapse; font-size:14px; margin-top:8px;">
-                <tbody>{extra_rows_html}</tbody>
-            </table>
-        </details>
-        """
-
     html_body = f"""
     <html>
     <body style="font-family: Arial, sans-serif; background: #f5f5f5; padding: 30px;">
@@ -269,10 +218,6 @@ def _send_batch_email(batch_id: str, flights: list):
                     <td style="padding:4px 12px 4px 0;"><strong>Total flights</strong></td>
                     <td>{total}</td>
                 </tr>
-                <tr>
-                    <td style="padding:4px 12px 4px 0;"><strong>Showing</strong></td>
-                    <td>Top {min(total, MAX_ROWS)} flights</td>
-                </tr>
             </table>
             <table style="width:100%; border-collapse:collapse; font-size:14px;">
                 <thead>
@@ -288,7 +233,6 @@ def _send_batch_email(batch_id: str, flights: list):
                 </thead>
                 <tbody>{rows_html}</tbody>
             </table>
-            {overflow_html}
             <hr style="border:none; border-top:1px solid #e0e0e0; margin:24px 0 16px;">
             <p style="color:#999; font-size:12px; text-align:center;">
                 Beumer Group — Flight Management System &copy; 2026
@@ -366,7 +310,7 @@ class BatchEmailScheduler:
                 "afternoon": "12:00 PM–05:59 PM",
                 "evening":   "06:00 PM–11:59 PM",
             }.get(batch_id, "")
-            print(f"[Scheduler]   {batch_id.capitalize():10s} ({window}) → email at {h:02d}:{m:02d}")
+            print(f"[Scheduler]   {batch_id.capitalize():10s} ({window}) -> email at {h:02d}:{m:02d}")
 
         # ── Startup delay: don't check until flights are loaded ────────────────
         if SCHEDULER_STARTUP_DELAY > 0:
@@ -451,9 +395,35 @@ class FlightWorker:
                 "airport_id": None,
             }
 
-            result = self._service.create_flight(flight_data, current_user=system_user)
-            print(f"[Worker] Saved flight ID={result['id']}  "
-                  f"number={result['flight_number']}  airport={result['airport_id']}")
+            from services.service import ensure_delay_fields
+            flight_data = ensure_delay_fields(flight_data)
+            
+            # ── Upsert Logic: Prevent Duplicates ──────────────────────────
+            # Before creating, check if this flight already exists at this airport.
+            # If it does, we update the existing record instead of inserting a new row.
+            from core.database import DatabaseManager
+            from models.models import FlightModel
+            
+            db = DatabaseManager()
+            existing_id = None
+            with db.session_scope() as session:
+                existing = session.query(FlightModel).filter(
+                    FlightModel.flight_number == flight_data["flight_number"],
+                    FlightModel.airport_id == flight_data["airport_id"]
+                ).first()
+                if existing:
+                    existing_id = existing.id
+
+            if existing_id:
+                # Update existing row
+                result = self._service.update_flight(existing_id, flight_data, current_user=system_user)
+                print(f"[Worker] Updated existing flight ID={existing_id}  "
+                      f"number={flight_number}  airport={airport_id}")
+            else:
+                # Create new row
+                result = self._service.create_flight(flight_data, current_user=system_user)
+                print(f"[Worker] Saved new flight ID={result['id']}  "
+                      f"number={result['flight_number']}  airport={result['airport_id']}")
 
             if batch_id in ("morning", "afternoon", "evening"):
                 self._batch_store.record(batch_id, {

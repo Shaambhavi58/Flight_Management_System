@@ -19,7 +19,7 @@
             <img src="/static/logo_dark_bg.png" alt="Beumer Group">
         </div>
         <div class="nav-right">
-            <span class="nav-link hidden" id="nav-analytics-link" onclick="showPage('analytics')">Analytics <span id="alerts-count-badge" class="badge"></span></span>
+            <span class="nav-link hidden" id="nav-analytics-link" onclick="showPage('analytics')">Analytics</span>
             <span class="nav-link active-link" onclick="showPage('airports')">Airports</span>
             <span class="nav-link hidden" id="nav-register-link" onclick="showPage('register')">Register User</span>
 
@@ -156,6 +156,50 @@
                         <canvas id="airportChart"></canvas>
                     </div>
                 </div>
+                <div class="analytics-card">
+                    <h3 class="card-section-title">
+                        <span class="card-icon">💡</span> Alert Reason Distribution
+                    </h3>
+                    <div class="chart-wrapper">
+                        <canvas id="alertReasonChart"></canvas>
+                    </div>
+                </div>
+                <div class="analytics-card">
+                    <h3 class="card-section-title">
+                        <span class="card-icon">⏱️</span> Top Delayed Flights
+                    </h3>
+                    <div id="top-delayed-flights-list" class="alerts-scroll" style="height:260px; overflow-y:auto; padding-top:8px;"></div>
+                </div>
+                <div class="analytics-card">
+                    <h3 class="card-section-title">
+                        <span class="card-icon">⚠️</span> Delay Severity Summary
+                    </h3>
+                    <div id="delay-severity-summary" style="height:260px; display:flex; flex-direction:column; justify-content:center; gap:16px;"></div>
+                </div>
+                <div class="analytics-card">
+                    <h3 class="card-section-title">
+                        <span class="card-icon">🏛️</span> Flights per Terminal
+                    </h3>
+                    <div class="chart-wrapper">
+                        <canvas id="terminalChart"></canvas>
+                    </div>
+                </div>
+                <div class="analytics-card">
+                    <h3 class="card-section-title">
+                        <span class="card-icon">🚧</span> Gate Infrastructure Status
+                    </h3>
+                    <div id="gate-infrastructure-summary" style="height:260px; display:flex; flex-direction:column; justify-content:center; gap:20px; padding: 10px;">
+                        <!-- injected dynamically by script.js -->
+                    </div>
+                </div>
+                <div class="analytics-card">
+                    <h3 class="card-section-title">
+                        <span class="card-icon">📈</span> Peak Traffic Analysis
+                    </h3>
+                    <div class="chart-wrapper">
+                        <canvas id="trafficChart"></canvas>
+                    </div>
+                </div>
             </div>
 
             <!-- Alerts + Email row -->
@@ -173,6 +217,39 @@
                     </h3>
                     <p class="card-hint">worker.py must be running for emails to send</p>
                     <div id="email-batches-container"></div>
+                    
+                    <!-- System Integration Status Section -->
+                    <div class="email-system-status" style="margin-top:20px; border-top:1px dashed var(--gray2); padding-top:16px; display:flex; flex-direction:column; gap:12px;">
+                        <h4 style="font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin:0 0 4px 0;">
+                            System Integration Status
+                        </h4>
+                        <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; color:var(--text2);">
+                            <span style="display:flex; align-items:center; gap:6px;">
+                                <span style="width:8px; height:8px; background:#10b981; border-radius:50%; box-shadow:0 0 8px #10b981; display:inline-block;"></span>
+                                SMTP Gateway
+                            </span>
+                            <span style="color:#10b981; font-weight:700;">CONNECTED</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; color:var(--text2);">
+                            <span style="display:flex; align-items:center; gap:6px;">
+                                <span style="width:8px; height:8px; background:#10b981; border-radius:50%; box-shadow:0 0 8px #10b981; display:inline-block;"></span>
+                                RabbitMQ Broker
+                            </span>
+                            <span style="color:#10b981; font-weight:700;">ONLINE</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; color:var(--text2);">
+                            <span style="display:flex; align-items:center; gap:6px;">
+                                <span style="width:8px; height:8px; background:#3b82f6; border-radius:50%; box-shadow:0 0 8px #3b82f6; display:inline-block;"></span>
+                                Background Worker
+                            </span>
+                            <span style="color:#3b82f6; font-weight:700;">IDLE</span>
+                        </div>
+                        <div style="margin-top:8px;">
+                            <button id="trigger-test-email-btn" onclick="triggerTestEmailBatch()" style="width:100%; padding:10px; background:linear-gradient(135deg, var(--cyan) 0%, var(--teal) 100%); color:#fff; border:none; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 4px 12px rgba(13, 148, 136, 0.2); transition:transform 0.1s, box-shadow 0.1s; display:flex; align-items:center; justify-content:center; gap:6px;">
+                                📧 Trigger Manual Batch Sync
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

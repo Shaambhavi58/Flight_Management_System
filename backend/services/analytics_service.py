@@ -13,7 +13,7 @@ Used by: controllers/analytics_controller.py → GET /analytics/dashboard
 
 from sqlalchemy import func
 from core.database import DatabaseManager
-from models.models import FlightModel, AirportModel, AirlineModel
+from models.models import FlightModel, AirportModel, AirlineModel, GateModel
 from datetime import datetime
 
 class AnalyticsService:
@@ -43,22 +43,52 @@ class AnalyticsService:
             # Delayed flights — subset of active that have not yet departed on time
             delayed = session.query(func.count(FlightModel.id)).filter(
                 FlightModel.status == "Delayed"
-            ).scalar()
+            ).scalar() or 0
 
             # Boarding flights — at gate, about to depart
             boarding = session.query(func.count(FlightModel.id)).filter(
                 FlightModel.status == "Boarding"
-            ).scalar()
+            ).scalar() or 0
 
             # Arrived flights — have landed at destination
             arrived = session.query(func.count(FlightModel.id)).filter(
                 FlightModel.status == "Arrived"
-            ).scalar()
+            ).scalar() or 0
+
+            # Cancelled flights
+            cancelled = session.query(func.count(FlightModel.id)).filter(
+                FlightModel.status == "Cancelled"
+            ).scalar() or 0
 
             # Distinct airlines that have at least one flight in the DB
             active_airlines = session.query(
                 func.count(func.distinct(FlightModel.airline_id))
+            ).scalar() or 0
+
+            # On-Time Percentage Calculation: (Total - Delayed - Cancelled) / Total * 100
+            on_time_count = total - delayed - cancelled
+            on_time_percentage = round((on_time_count / total * 100.0), 1) if total > 0 else 100.0
+
+            # Average Delay Duration: AVG(delay_minutes) across Delayed flights
+            avg_delay = session.query(func.avg(FlightModel.delay_minutes)).filter(
+                FlightModel.status == "Delayed"
             ).scalar()
+            avg_delay_duration = round(float(avg_delay), 1) if avg_delay is not None else 0.0
+
+            # Scheduled flights count
+            scheduled = session.query(func.count(FlightModel.id)).filter(
+                FlightModel.status == "Scheduled"
+            ).scalar() or 0
+
+            # Active carousels in use today
+            active_carousels = session.query(func.count(func.distinct(FlightModel.carousel_number))).filter(
+                FlightModel.status == "Arrived",
+                FlightModel.carousel_number.is_not(None),
+                FlightModel.carousel_number != ""
+            ).scalar() or 0
+
+            # Active airports registered
+            active_airports = session.query(func.count(AirportModel.id)).scalar() or 0
 
             return {
                 "total_flights":   total,
@@ -67,6 +97,12 @@ class AnalyticsService:
                 "boarding_flights": boarding,
                 "arrived_flights": arrived,
                 "active_airlines": active_airlines,
+                "on_time_percentage": on_time_percentage,
+                "avg_delay_duration": avg_delay_duration,
+                "scheduled_flights": scheduled,
+                "cancelled_flights": cancelled,
+                "active_carousels": active_carousels,
+                "active_airports": active_airports,
             }
 
     def get_status_distribution(self):
@@ -272,3 +308,81 @@ class AnalyticsService:
                     "status":  evening_status,
                 },
             ]
+
+    def get_flights_per_terminal(self):
+        """
+        Return the flight counts grouped by terminal (T1, T2, T3, etc.).
+        Used to render the terminal distribution chart in the analytics dashboard.
+        """
+        with self.db.session_scope() as session:
+            result = session.query(
+                FlightModel.terminal_number,
+                func.count(FlightModel.id)
+            ).group_by(FlightModel.terminal_number).all()
+
+            return [
+                {"terminal": term if term else "Unknown", "count": count}
+                for term, count in result
+            ]
+
+    def get_gate_status_distribution(self):
+        """
+        Return the counts of physical gates by status (Available, Occupied, Maintenance).
+        Used to display a gorgeous progress card of gate infrastructure health.
+        """
+        with self.db.session_scope() as session:
+            result = session.query(
+                GateModel.status,
+                func.count(GateModel.id)
+            ).group_by(GateModel.status).all()
+
+            dist = {status: count for status, count in result}
+            total = sum(dist.values())
+
+            return {
+                "total": total,
+                "available": dist.get("Available", 0),
+                "occupied": dist.get("Occupied", 0),
+                "maintenance": dist.get("Maintenance", 0)
+            }
+
+    def get_hourly_traffic(self):
+        """
+        Return the hourly flight departure volume.
+        Groups flights into 4-hour blocks for a clean visual bar chart.
+        """
+        with self.db.session_scope() as session:
+            flights = session.query(FlightModel.departure_time).all()
+            
+            buckets = {
+                "00:00 - 04:00": 0,
+                "04:00 - 08:00": 0,
+                "08:00 - 12:00": 0,
+                "12:00 - 16:00": 0,
+                "16:00 - 20:00": 0,
+                "20:00 - 24:00": 0
+            }
+
+            for (dep_time,) in flights:
+                if not dep_time:
+                    continue
+                try:
+                    hour = int(dep_time.split(":")[0])
+                    if 0 <= hour < 4:
+                        buckets["00:00 - 04:00"] += 1
+                    elif 4 <= hour < 8:
+                        buckets["04:00 - 08:00"] += 1
+                    elif 8 <= hour < 12:
+                        buckets["08:00 - 12:00"] += 1
+                    elif 12 <= hour < 16:
+                        buckets["12:00 - 16:00"] += 1
+                    elif 16 <= hour < 20:
+                        buckets["16:00 - 20:00"] += 1
+                    else:
+                        buckets["20:00 - 24:00"] += 1
+                except Exception:
+                    continue
+
+            return [{"interval": k, "count": v} for k, v in buckets.items()]
+
+

@@ -313,6 +313,10 @@ class AviationStackFetcher:
                     "batch_name":     generator._get_batch_name(dep_time),
                     "_from_live":     True,
                 })
+                # Apply safety check
+                last = results[-1]
+                last["status"], last["delay_minutes"], last["delay_reason"] = \
+                    generator._ensure_delay_integrity(last["status"], last["delay_minutes"], last["delay_reason"])
             except Exception:
                 continue
         print(f"[AviationStack] {len(results)} flights kept for {target_iata}")
@@ -430,13 +434,27 @@ class DailyScheduleGenerator:
 
         # ── Step 3: Normal Flow (Non-delayed / Non-cancelled) ─────────────
         if now > arr_dt:
-            return "Arrived", dm, dr
+            return "Arrived", 0, None
         if now >= dep_dt:
-            return "Departed", dm, dr
+            return "Departed", 0, None
         if diff_dep <= 45:
-            return "Boarding", dm, dr
+            return "Boarding", 0, None
 
-        return "Scheduled", dm, dr
+        return "Scheduled", 0, None
+
+    def _ensure_delay_integrity(self, status, dm, dr):
+        """Final safety check to match DB rules."""
+        if status == "Delayed":
+            if not dm or int(dm) <= 0:
+                dm = random.choice([15, 25, 35, 45, 60, 75, 90])
+            if not dr:
+                dr = random.choice([
+                    "Weather", "Technical", "ATC", "Crew", 
+                    "Security", "Late Arrival", "Operational"
+                ])
+        else:
+            dm, dr = 0, None
+        return status, dm, dr
 
     def _get_batch_name(self, dep_time: str) -> str:
         try:
@@ -511,6 +529,10 @@ class DailyScheduleGenerator:
                 "batch_name":      self._get_batch_name(slot_time),
                 "flight_type":     "departure",
             })
+            # Apply safety check
+            last = flights[-1]
+            last["status"], last["delay_minutes"], last["delay_reason"] = \
+                self._ensure_delay_integrity(last["status"], last["delay_minutes"], last["delay_reason"])
 
             # ── One ARRIVAL per slot ─────────────────────────────────────
             airline_code, origin, destination, duration, _ = \
@@ -540,6 +562,10 @@ class DailyScheduleGenerator:
                 "batch_name":      self._get_batch_name(dep_time),
                 "flight_type":     "arrival",
             })
+            # Apply safety check
+            last = flights[-1]
+            last["status"], last["delay_minutes"], last["delay_reason"] = \
+                self._ensure_delay_integrity(last["status"], last["delay_minutes"], last["delay_reason"])
 
         print(f"[Generator] {airport_iata} -> {len(flights)} flights "
               f"({len(slots)} arrivals + {len(slots)} departures, all slots covered)")

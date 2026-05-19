@@ -15,12 +15,39 @@ from models.schemas import (
     FlightCreateSchema, FlightUpdateSchema, FlightResponseSchema, FlightSerializer,
     CarouselUpdateSchema,
 )
-from typing import List
+from typing import List, Optional
 from controllers.auth_controller import get_current_user, require_admin, require_staff_or_admin
 from utils.flight_create_publisher import publish_flight_create
 
 router = APIRouter(tags=["Flights"])
 flight_service = FlightService()
+
+
+# ── Gate Availability Endpoint ────────────────────────────────────────────────
+
+@router.get("/gates/available")
+def get_available_gates(
+    airport_id: int,
+    terminal: str,
+    start_time: str,
+    end_time: str,
+    flight_id: Optional[int] = None,
+    user: dict = Depends(get_current_user)
+):
+    """
+    Returns all gates for the given airport and terminal that are:
+    - Same airport
+    - Same terminal
+    - Status is NOT 'Maintenance'
+    - Not assigned to another flight in the specified HH:MM time range.
+    """
+    return flight_service.get_available_gates(
+        airport_id=airport_id,
+        terminal=terminal,
+        start_time=start_time,
+        end_time=end_time,
+        flight_id=flight_id
+    )
 
 
 # ── Airport-scoped flights ────────────────────────────────────────────────────
@@ -159,6 +186,34 @@ def get_flight_carousel_log(
 ):
     """Return the full carousel change history for a specific flight."""
     return flight_service.get_carousel_log_for_flight(flight_id)
+
+
+# ── Status history for a specific flight ─────────────────────────────────────
+
+@router.get("/flights/{flight_id}/history")
+def get_flight_status_history(
+    flight_id: int,
+    user: dict = Depends(get_current_user),
+):
+    """Return the full status change history for a specific flight."""
+    return flight_service.get_status_history_for_flight(flight_id)
+
+
+# ── Clear gate change alert ───────────────────────────────────────────────────
+# Must be declared BEFORE /flights/{flight_id} (dynamic int segment) to avoid
+# FastAPI interpreting "clear-gate-alert" as an integer flight_id.
+
+@router.patch("/flights/{flight_id}/clear-gate-alert")
+def clear_gate_alert(
+    flight_id: int,
+    user: dict = Depends(get_current_user),
+):
+    """
+    Acknowledge and clear the gate_changed flag for a flight.
+    Accessible to all authenticated users — it's a non-destructive action.
+    After clearing, the 'Gate Changed' badge disappears from the flight row.
+    """
+    return flight_service.clear_gate_alert(flight_id)
 
 
 # ── Sync live ─────────────────────────────────────────────────────────────────

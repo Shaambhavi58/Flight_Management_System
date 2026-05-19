@@ -224,6 +224,18 @@ class FlightStatusUpdater:
                             flight.delay_minutes = 0
                             flight.delay_reason = None
 
+                        if old_status != new_status:
+                            from services.repository import FlightStatusHistoryRepository
+                            status_repo = FlightStatusHistoryRepository()
+                            status_repo.log_status_change(
+                                session=session,
+                                flight=flight,
+                                old_status=old_status,
+                                new_status=new_status,
+                                changed_by="opensky-updater",
+                                reason="Auto status update from OpenSky"
+                            )
+
                         # ── Auto-assign carousel when flight transitions to Arrived ──
                         # This is the BHS integration trigger point.
                         # Only assign if not already assigned (avoid overwriting manual changes).
@@ -277,13 +289,13 @@ class OpenSkyStatusUpdaterService:
 
     def run_once(self) -> dict:
         ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print(f"\n[Service] ── Cycle start: {ts} ──────────────────────────────")
+        print(f"\n[Service] ----- Cycle start: {ts} ------------------------------")
         aircraft = self._fetcher.fetch()
         if not aircraft:
             print("[Service] No usable aircraft data — skipping DB update.")
             return {"timestamp": ts, "fetched": 0, "updated": 0}
         updated = self._updater.update(aircraft)
-        print(f"[Service] ✅ Updated {updated} flight row(s) from {len(aircraft)} aircraft callsigns.")
+        print(f"[Service] [Success] Updated {updated} flight row(s) from {len(aircraft)} aircraft callsigns.")
         return {"timestamp": ts, "fetched": len(aircraft), "updated": updated}
 
     def run(self):
@@ -298,8 +310,8 @@ class OpenSkyStatusUpdaterService:
                 print("\n[Service] Interrupted by user. Shutting down.")
                 break
             except Exception as e:
-                print(f"[Service] ❌ Unhandled error in cycle: {e}")
-            print(f"[Service] Sleeping {POLL_INTERVAL}s until next cycle…\n")
+                print(f"[Service] [Error] Unhandled error in cycle: {e}")
+            print(f"[Service] Sleeping {POLL_INTERVAL}s until next cycle...\n")
             time.sleep(POLL_INTERVAL)
 
 

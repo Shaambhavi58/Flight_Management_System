@@ -32,3 +32,6 @@ logs/
 dist/
 build/
 *.egg-info/
+
+brain/
+*.db

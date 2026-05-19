@@ -19,7 +19,7 @@ from services.service import FlightService
 
 flight_service = FlightService()
 from core.database import DatabaseManager
-from models.models import AirlineModel, AirportModel, UserModel
+from models.models import AirlineModel, AirportModel, UserModel, FlightStatusHistory, GateModel, GateAssignmentModel
 from services.auth_service import AuthService
 from utils.status_updater import status_update_loop
 
@@ -134,6 +134,96 @@ def verify_delay_schema(db: DatabaseManager):
             conn.commit()
     print("[App] Delay tracking schema verified: healthy.")
 
+def verify_timestamp_schema(db: DatabaseManager):
+    """
+    Diagnostic check: Ensure updated_at column exists in flights table.
+    If missing, adds it via ALTER TABLE.
+    """
+    from sqlalchemy import inspect, text
+    inspector = inspect(db.engine)
+    columns = [c["name"] for c in inspector.get_columns("flights")]
+    
+    with db.engine.connect() as conn:
+        if "updated_at" not in columns:
+            print("[Migration] Adding 'updated_at' column to 'flights' table...")
+            conn.execute(text("ALTER TABLE flights ADD COLUMN updated_at DATETIME"))
+            conn.commit()
+    print("[App] Timestamp schema verified: healthy.")
+
+
+def seed_gates_and_assignments(db: DatabaseManager):
+    """
+    Scans all existing flights, seeds the gates table for any existing unique gates,
+    creates active assignments for them, and inserts extra mock gates for rich selection.
+    """
+    from models.models import FlightModel, GateModel, GateAssignmentModel
+    print("[Seed] Synchronizing and seeding gates & assignments...")
+    with db.session_scope() as session:
+        # 1. Gather all existing flights
+        flights = session.query(FlightModel).all()
+        for f in flights:
+            if not f.gate_number or not f.terminal_number:
+                continue
+            # Check/insert gate
+            gate = session.query(GateModel).filter_by(
+                airport_id=f.airport_id,
+                terminal_number=f.terminal_number,
+                gate_number=f.gate_number
+            ).first()
+            if not gate:
+                gate = GateModel(
+                    airport_id=f.airport_id,
+                    terminal_number=f.terminal_number,
+                    gate_number=f.gate_number,
+                    status="Available"
+                )
+                session.add(gate)
+                session.flush()
+
+            # Check/insert active assignment
+            assignment = session.query(GateAssignmentModel).filter_by(
+                flight_id=f.id,
+                gate_id=gate.id,
+                assignment_status="Active"
+            ).first()
+            if not assignment:
+                assignment = GateAssignmentModel(
+                    flight_id=f.id,
+                    gate_id=gate.id,
+                    start_time=f.departure_time,
+                    end_time=f.arrival_time,
+                    assignment_status="Active"
+                )
+                session.add(assignment)
+
+        # 2. Add some extra gates to each airport/terminal for options!
+        # Airports: 1 to 5, Terminals: T1, T2, T3
+        for airport_id in range(1, 6):
+            for term in ["T1", "T2", "T3"]:
+                # Let's seed 15 gates per terminal (G1 to G15)
+                for g_num in range(1, 16):
+                    gate_str = f"G{g_num}"
+                    # Skip if already exists
+                    existing = session.query(GateModel).filter_by(
+                        airport_id=airport_id,
+                        terminal_number=term,
+                        gate_number=gate_str
+                    ).first()
+                    if not existing:
+                        # Make G13 a "Maintenance" gate for realistic constraint demo!
+                        status = "Maintenance" if g_num == 13 else "Available"
+                        gate = GateModel(
+                            airport_id=airport_id,
+                            terminal_number=term,
+                            gate_number=gate_str,
+                            status=status
+                        )
+                        session.add(gate)
+
+        session.commit()
+    print("[Seed] Gates and assignments seeding complete.")
+
+
 
 # ── Lifespan ─────────────────────────────────────────────────────
 @asynccontextmanager
@@ -145,10 +235,21 @@ async def lifespan(app: FastAPI):
     # Audit: Ensure carousel integration migrated correctly
     verify_carousel_schema(db)
     verify_delay_schema(db)
+    verify_timestamp_schema(db)
+
+    # Verify flight_status_history table exists (auto-created by create_tables above)
+    from sqlalchemy import inspect as sa_inspect
+    inspector = sa_inspect(db.engine)
+    if "flight_status_history" in inspector.get_table_names():
+        print("[App] Flight status history table: ✅ present")
+    else:
+        print("[App] Flight status history table: ⚠  not found — was it imported?")
+
     
     seed_airlines(db)
     seed_airports(db)
     seed_admin(db)
+    seed_gates_and_assignments(db)
 
     print(f"[App] Database ready — existing flights preserved.")
 

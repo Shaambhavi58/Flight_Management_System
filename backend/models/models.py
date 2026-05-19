@@ -113,19 +113,27 @@ class FlightModel(Base):
     # Operational reality: flights are often delayed. We track minutes and reason.
     # Severity is calculated on frontend based on minutes.
     delay_minutes = Column(Integer, default=0, nullable=False)
-    delay_reason = Column(String(50), nullable=True)  # Weather, Technical, ATC, Crew, Security, Late Arrival, Operational, Other
+    delay_reason = Column(String(50), nullable=True)  # Weather, Technical, ATC, Crew, Security, Late Arrival, Operational
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # ── Gate Change Tracking ─────────────────────────────────────────────────
+    # Set when an admin/staff edits the gate_number on an existing flight.
+    # gate_changed flag drives the "Gate Changed" badge on the flight board.
+    # Cleared via PATCH /flights/{id}/clear-gate-alert.
+    gate_changed    = Column(Boolean, default=False, nullable=False)
+    previous_gate   = Column(String(10), nullable=True)   # the gate before the change
+    gate_changed_at = Column(DateTime, nullable=True)     # when the gate was last changed
+
 
     airline = relationship("AirlineModel", back_populates="flights")
     airport = relationship("AirportModel", back_populates="flights")
 
     # One flight can have many carousel change log entries
     carousel_logs = relationship("CarouselChangeLog", back_populates="flight", cascade="all, delete-orphan")
+    status_history = relationship("FlightStatusHistory", back_populates="flight", cascade="all, delete-orphan")
 
     __table_args__ = (
-        UniqueConstraint(
-            "flight_number", "departure_time", "airport_id", "flight_type",
-            name="unique_flight_constraint"
-        ),
+        UniqueConstraint("flight_number", "airport_id", name="uq_flight_airport"),
     )
 
     def __repr__(self):
@@ -163,6 +171,53 @@ class CarouselChangeLog(Base):
     def __repr__(self):
         return (f"<CarouselChangeLog(flight='{self.flight_number}', "
                 f"{self.old_carousel}→{self.new_carousel}, by='{self.changed_by}')>")
+
+class FlightStatusHistory(Base):
+    __tablename__ = "flight_status_history"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    flight_id = Column(Integer, ForeignKey("flights.id"), nullable=False)
+    flight_number = Column(String(20), nullable=False)
+    old_status = Column(String(30), nullable=True)
+    new_status = Column(String(30), nullable=False)
+    changed_by = Column(String(50), nullable=False)
+    changed_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    reason = Column(String(200), nullable=True)
+
+    flight = relationship("FlightModel", back_populates="status_history")
+
+
+class GateModel(Base):
+    __tablename__ = "gates"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    airport_id = Column(Integer, ForeignKey("airports.id"), nullable=False)
+    terminal_number = Column(String(5), nullable=False)
+    gate_number = Column(String(10), nullable=False)
+    status = Column(String(20), nullable=False, default="Available") # Available / Occupied / Maintenance
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    airport = relationship("AirportModel")
+
+    __table_args__ = (
+        UniqueConstraint("airport_id", "terminal_number", "gate_number", name="uq_gate_airport_terminal"),
+    )
+
+
+class GateAssignmentModel(Base):
+    __tablename__ = "gate_assignments"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    flight_id = Column(Integer, ForeignKey("flights.id"), nullable=False)
+    gate_id = Column(Integer, ForeignKey("gates.id"), nullable=False)
+    start_time = Column(String(10), nullable=False) # "HH:MM"
+    end_time = Column(String(10), nullable=False)   # "HH:MM"
+    assignment_status = Column(String(20), nullable=False, default="Active") # Active / Completed / Cancelled
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+
+    flight = relationship("FlightModel")
+    gate = relationship("GateModel")
 
 
 # ──────────────────────────────────────────────

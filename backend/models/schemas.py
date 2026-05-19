@@ -119,6 +119,10 @@ class FlightResponseSchema(BaseModel):
     carousel_number: Optional[str] = None
     delay_minutes: int = 0
     delay_reason: Optional[str] = None
+    updated_at: Optional[str] = None
+    gate_changed: bool = False
+    previous_gate: Optional[str] = None
+    gate_changed_at: Optional[str] = None
     
     class Config:
         from_attributes = True
@@ -190,6 +194,10 @@ class FlightSerializer:
             "carousel_number": getattr(flight_model, "carousel_number", None),
             "delay_minutes": getattr(flight_model, "delay_minutes", 0),
             "delay_reason": getattr(flight_model, "delay_reason", None),
+            "updated_at": getattr(flight_model, "updated_at").isoformat() if getattr(flight_model, "updated_at", None) else None,
+            "gate_changed": getattr(flight_model, "gate_changed", False) or False,
+            "previous_gate": getattr(flight_model, "previous_gate", None),
+            "gate_changed_at": getattr(flight_model, "gate_changed_at").isoformat() if getattr(flight_model, "gate_changed_at", None) else None,
         }
 
     @staticmethod

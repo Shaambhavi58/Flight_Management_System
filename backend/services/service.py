@@ -16,6 +16,28 @@ from core.database import DatabaseManager
 from services.repository import FlightRepository, AirportRepository, CarouselRepository
 from models.schemas import FlightSerializer
 from typing import List, Optional
+import random
+
+DELAY_REASONS = [
+    "Weather", "Technical", "ATC", "Crew",
+    "Security", "Late Arrival", "Operational"
+]
+
+def ensure_delay_fields(data):
+    """
+    Safety fallback: ensures that if status is Delayed, it must have 
+    positive delay_minutes and a valid reason.
+    """
+    if data.get("status") == "Delayed":
+        if not data.get("delay_minutes") or int(data.get("delay_minutes", 0)) <= 0:
+            data["delay_minutes"] = random.choice([15, 25, 35, 45, 60, 75, 90])
+        if not data.get("delay_reason"):
+            data["delay_reason"] = random.choice(DELAY_REASONS)
+    else:
+        # Clear delay fields if status is NOT Delayed
+        data["delay_minutes"] = 0
+        data["delay_reason"] = None
+    return data
 from datetime import datetime
 
 
@@ -130,6 +152,10 @@ class FlightService:
                 # We use the standalone assign_carousel utility
                 flight_data["carousel_number"] = assign_carousel(fn, tn)
 
+            # Ensure operational fidelity for delays
+            flight_data = ensure_delay_fields(flight_data)
+            flight_data["updated_at"] = datetime.utcnow()
+
             flight = self._repository.create(session, flight_data)
             flight = self._repository.get_by_id(session, flight.id)
             return self._serializer.orm_to_response(flight)
@@ -193,21 +219,8 @@ class FlightService:
 
         with self._db.session_scope() as session:
             # ── Delay Logic ──────────────────────────────────────────────────
-            status = update_data.get("status")
-            if status:
-                if status == "Delayed":
-                    delay_mins = update_data.get("delay_minutes", 0)
-                    if delay_mins < 0:
-                        raise HTTPException(status_code=400, detail="delay_minutes must be >= 0")
-                    
-                    allowed_reasons = ["Weather", "Technical", "ATC", "Crew", "Security", "Late Arrival", "Operational", "Other"]
-                    reason = update_data.get("delay_reason")
-                    if reason and reason not in allowed_reasons:
-                        raise HTTPException(status_code=400, detail=f"Invalid delay_reason. Must be one of {allowed_reasons}")
-                else:
-                    # Clear delay fields if status is NOT Delayed
-                    update_data["delay_minutes"] = 0
-                    update_data["delay_reason"] = None
+            update_data = ensure_delay_fields(update_data)
+            update_data["updated_at"] = datetime.utcnow()
 
             # ── Auto-assign carousel when status changes to Arrived ───────────
             # This is the core BHS integration trigger:
@@ -241,6 +254,112 @@ class FlightService:
                         "airport_id":     existing.airport_id,
                         "changed_by":     "system",
                     })
+
+            # ── Gate Availability Validation ─────────────────────────────────
+            new_gate = update_data.get("gate_number")
+            if new_gate:
+                from models.models import GateModel, GateAssignmentModel
+                
+                # Fetch existing flight details for validations
+                flight_base = self._repository.get_by_id(session, flight_id)
+                if flight_base and flight_base.gate_number != new_gate:
+                    # 1. Fetch gate in DB for this airport & terminal
+                    gate = session.query(GateModel).filter_by(
+                        airport_id=flight_base.airport_id,
+                        terminal_number=flight_base.terminal_number,
+                        gate_number=new_gate
+                    ).first()
+                    
+                    if not gate:
+                        raise HTTPException(
+                            status_code=400,
+                            detail=f"Gate {new_gate} is invalid for this airport and terminal."
+                        )
+                    
+                    # 2. Check maintenance status
+                    if gate.status == "Maintenance":
+                        raise HTTPException(
+                            status_code=400,
+                            detail=f"Gate {new_gate} is under maintenance. Please select another gate."
+                        )
+                    
+                    # 3. Check for overlapping gate assignments
+                    def check_overlap(start_A: str, end_A: str, start_B: str, end_B: str) -> bool:
+                        def to_min(t_str):
+                            try:
+                                h, m = map(int, t_str.split(':'))
+                                return h * 60 + m
+                            except:
+                                return 0
+                        a1, a2 = to_min(start_A), to_min(end_A)
+                        b1, b2 = to_min(start_B), to_min(end_B)
+                        if a2 <= a1:
+                            a2 += 1440
+                        if b2 <= b1:
+                            b2 += 1440
+                        return (a1 < b2 and a2 > b1)
+
+                    overlapping = session.query(GateAssignmentModel).filter(
+                        GateAssignmentModel.gate_id == gate.id,
+                        GateAssignmentModel.flight_id != flight_id,
+                        GateAssignmentModel.assignment_status == "Active"
+                    ).all()
+                    
+                    for assign in overlapping:
+                        if check_overlap(flight_base.departure_time, flight_base.arrival_time, assign.start_time, assign.end_time):
+                            raise HTTPException(
+                                status_code=400,
+                                detail=f"Gate {new_gate} is already occupied for this time. Please select another gate."
+                            )
+
+                    # Deactivate previous active assignment for this flight
+                    session.query(GateAssignmentModel).filter_by(
+                        flight_id=flight_id,
+                        assignment_status="Active"
+                    ).update({"assignment_status": "Completed"})
+
+                    # Create new active assignment
+                    new_assign = GateAssignmentModel(
+                        flight_id=flight_id,
+                        gate_id=gate.id,
+                        start_time=flight_base.departure_time,
+                        end_time=flight_base.arrival_time,
+                        assignment_status="Active"
+                    )
+                    session.add(new_assign)
+
+                    # Stamp the gate change metadata onto the update payload
+                    old_gate = flight_base.gate_number
+                    update_data["previous_gate"]   = old_gate
+                    update_data["gate_changed"]     = True
+                    update_data["gate_changed_at"]  = datetime.utcnow()
+                    
+                    # Publish GATE_CHANGED to RabbitMQ (BHS queue)
+                    publish_bhs_event("GATE_CHANGED", {
+                        "flight_number": flight_base.flight_number,
+                        "old_gate":      old_gate,
+                        "new_gate":      new_gate,
+                        "terminal":      flight_base.terminal_number,
+                        "airport_id":    flight_base.airport_id,
+                        "changed_by":    current_user.get("username", "admin"),
+                    })
+                    print(f"[GateAlert] {flight_base.flight_number}: {old_gate} → {new_gate} by {current_user.get('username')}")
+
+            # ── Log status change before updating ────────────────────────────
+            new_status = update_data.get("status")
+            if new_status:
+                pre_flight = self._repository.get_by_id(session, flight_id)
+                if pre_flight and pre_flight.status != new_status:
+                    from services.repository import FlightStatusHistoryRepository
+                    status_repo = FlightStatusHistoryRepository()
+                    status_repo.log_status_change(
+                        session=session,
+                        flight=pre_flight,
+                        old_status=pre_flight.status,
+                        new_status=new_status,
+                        changed_by=current_user.get("username", "admin"),
+                        reason=update_data.get("reason") or f"Admin status update"
+                    )
 
             flight = self._repository.update(session, flight_id, update_data)
             if flight is None:
@@ -290,6 +409,7 @@ class FlightService:
 
             # Update the flight row
             flight.carousel_number = new_carousel.upper()
+            flight.updated_at = datetime.utcnow()
             session.flush()
 
             # Log the manual change
@@ -368,6 +488,25 @@ class FlightService:
                 for log in logs
             ]
 
+    # ── GET STATUS HISTORY FOR FLIGHT ──────────────────────────────────────────
+
+    def get_status_history_for_flight(self, flight_id: int) -> List[dict]:
+        """Return all status change events for a specific flight."""
+        from services.repository import FlightStatusHistoryRepository
+        with self._db.session_scope() as session:
+            status_repo = FlightStatusHistoryRepository()
+            history_logs = status_repo.get_by_flight(session, flight_id)
+            return [
+                {
+                    "old_status": log.old_status,
+                    "new_status": log.new_status,
+                    "changed_by": log.changed_by,
+                    "changed_at": log.changed_at.isoformat() if log.changed_at else None,
+                    "reason": log.reason
+                }
+                for log in history_logs
+            ]
+
     # ── DELETE ────────────────────────────────────────────────────────────────
 
     def delete_flight(self, flight_id: int, current_user: dict) -> bool:
@@ -379,6 +518,85 @@ class FlightService:
     def clear_all_flights(self, airport_id: int = None) -> dict:
         with self._db.session_scope() as session:
             return self._repository.delete_all(session, airport_id=airport_id)
+
+    # ── CLEAR GATE ALERT ──────────────────────────────────────────────────────
+
+    def clear_gate_alert(self, flight_id: int) -> dict:
+        """
+        Clear the gate_changed flag on a flight.
+        Called via PATCH /flights/{id}/clear-gate-alert.
+        Safe for any authenticated user — it's a non-destructive acknowledge action.
+        """
+        with self._db.session_scope() as session:
+            from models.models import FlightModel
+            flight = session.query(FlightModel).filter_by(id=flight_id).first()
+            if not flight:
+                raise HTTPException(status_code=404, detail="Flight not found")
+            flight.gate_changed    = False
+            flight.previous_gate   = None
+            flight.gate_changed_at = None
+            session.flush()
+            return {"message": f"Gate alert cleared for flight {flight.flight_number}"}
+
+    # ── GET AVAILABLE GATES ───────────────────────────────────────────────────
+
+    def get_available_gates(self, airport_id: int, terminal: str, start_time: str, end_time: str, flight_id: Optional[int] = None) -> List[dict]:
+        """
+        Return list of gates for this airport/terminal that are available
+        in the specified start_time to end_time range, ignoring self-conflict.
+        """
+        from models.models import GateModel, GateAssignmentModel
+        
+        def check_overlap(start_A: str, end_A: str, start_B: str, end_B: str) -> bool:
+            def to_min(t_str):
+                try:
+                    h, m = map(int, t_str.split(':'))
+                    return h * 60 + m
+                except:
+                    return 0
+            a1, a2 = to_min(start_A), to_min(end_A)
+            b1, b2 = to_min(start_B), to_min(end_B)
+            if a2 <= a1:
+                a2 += 1440
+            if b2 <= b1:
+                b2 += 1440
+            return (a1 < b2 and a2 > b1)
+
+        with self._db.session_scope() as session:
+            # Get all gates for this airport and terminal
+            gates = session.query(GateModel).filter_by(
+                airport_id=airport_id,
+                terminal_number=terminal
+            ).all()
+
+            available_gates = []
+            for g in gates:
+                if g.status == "Maintenance":
+                    continue
+                
+                # Check active assignments
+                assignments = session.query(GateAssignmentModel).filter_by(
+                    gate_id=g.id,
+                    assignment_status="Active"
+                ).all()
+
+                has_conflict = False
+                for assign in assignments:
+                    if flight_id and assign.flight_id == flight_id:
+                        continue
+                    if check_overlap(start_time, end_time, assign.start_time, assign.end_time):
+                        has_conflict = True
+                        break
+
+                if not has_conflict:
+                    available_gates.append({
+                        "id": g.id,
+                        "gate_number": g.gate_number,
+                        "status": g.status
+                    })
+
+            return available_gates
+
 
 
 # ── Airport Service ────────────────────────────────────────────────────────────

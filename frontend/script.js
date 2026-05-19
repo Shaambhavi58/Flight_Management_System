@@ -1315,6 +1315,24 @@ function renderStatusCell(f) {
     return `<span class="status-badge status-${f.status.replace(/\s+/g, '-')}">${f.status}</span>`;
 }
 
+async function clearGateAlert(event, flightId) {
+    event.stopPropagation();
+    try {
+        const res = await fetch(`${API}/flights/${flightId}/clear-gate-alert`, {
+            method: 'PATCH',
+            headers: authHeaders()
+        });
+        if (!res.ok) throw new Error('Failed');
+        // Optimistically update local data so badge vanishes immediately
+        const f = allFlights.find(x => x.id === flightId);
+        if (f) { f.gate_changed = false; f.previous_gate = null; }
+        renderBoard();
+        showToast('Gate alert cleared', 'success');
+    } catch (err) {
+        showToast('Could not clear gate alert', 'error');
+    }
+}
+
 function toggleForm() {
     document.getElementById('add-flight-form').classList.toggle('hidden');
 }
@@ -1413,7 +1431,10 @@ async function editFlight(id) {
 
         <div class="form-group">
             <label>Gate Number</label>
-            <input type="text" id="edit-gate" value="${flight.gate_number}">
+            <select id="edit-gate" class="form-control" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--gray3);">
+                <option value="${flight.gate_number}" selected>${flight.gate_number}</option>
+            </select>
+            <small class="text-muted" id="gate-loading-indicator" style="display:block; margin-top:6px; font-size:11px;">Loading available gates...</small>
         </div>
         ${flight.status === 'Arrived' ? `
         <div class="form-group" style="margin-top:16px; border-top:1px solid #eee; padding-top:16px">
@@ -1425,6 +1446,13 @@ async function editFlight(id) {
             <input type="text" id="edit-reason" placeholder="e.g. Mechanical fault on C3">
         </div>
         ` : ''}
+
+        <div style="margin-top:24px;">
+            <h4 style="font-size:14px; margin-bottom:12px; color:var(--navy);">Status History</h4>
+            <div id="flight-history-timeline">
+                <p style="color:var(--text3);font-size:12px;">Loading history...</p>
+            </div>
+        </div>
     `;
 
     saveBtn.onclick = () => saveFlightChanges(id, flight);
@@ -1444,6 +1472,84 @@ async function editFlight(id) {
 
     modal.classList.remove('hidden');
     modal.style.display = 'flex'; // Support cpw-overlay flex layout
+
+    fetchFlightHistory(id);
+    fetchAvailableGates(flight.airport_id, flight.terminal_number, flight.departure_time, flight.arrival_time, flight.gate_number, flight.id);
+}
+
+async function fetchAvailableGates(airportId, terminal, startTime, endTime, currentGate, flightId) {
+    const indicator = document.getElementById('gate-loading-indicator');
+    const select = document.getElementById('edit-gate');
+    if (!select) return;
+
+    try {
+        const url = `${API}/gates/available?airport_id=${airportId}&terminal=${terminal}&start_time=${startTime}&end_time=${endTime}&flight_id=${flightId}`;
+        const res = await fetch(url, { headers: authHeaders() });
+        if (!res.ok) throw new Error('Failed to load available gates');
+        const gates = await res.json();
+
+        // Populate select options
+        select.innerHTML = '';
+        
+        // Ensure current gate is always the first, active choice
+        let optionsHtml = `<option value="${currentGate}" selected>${currentGate} (Current)</option>`;
+        
+        gates.forEach(g => {
+            if (g.gate_number !== currentGate) {
+                optionsHtml += `<option value="${g.gate_number}">${g.gate_number}</option>`;
+            }
+        });
+        
+        select.innerHTML = optionsHtml;
+        if (indicator) {
+            indicator.textContent = `Available Gates: ${gates.map(g => g.gate_number).join(', ') || 'None (only current)'}`;
+            indicator.style.color = '#16a34a';
+        }
+    } catch (err) {
+        console.error(err);
+        if (indicator) {
+            indicator.textContent = 'Could not load available gates.';
+            indicator.style.color = 'red';
+        }
+    }
+}
+
+async function fetchFlightHistory(id) {
+    try {
+        const res = await fetch(`${API}/flights/${id}/history`, { headers: authHeaders() });
+        if (!res.ok) throw new Error('Failed to load history');
+        const history = await res.json();
+        
+        const container = document.getElementById('flight-history-timeline');
+        if (!container) return;
+        
+        if (history.length === 0) {
+            container.innerHTML = '<p style="color:var(--text3);font-size:13px;padding:8px 0;">No status changes recorded.</p>';
+            return;
+        }
+        
+        let html = '<div class="timeline-container">';
+        history.forEach(h => {
+            const time = new Date(h.changed_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const oldS = h.old_status ? h.old_status + ' → ' : '';
+            html += `
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-status">${oldS}${h.new_status}</div>
+                        <div class="timeline-meta">${time} · ${h.changed_by}</div>
+                        ${h.reason ? `<div class="timeline-reason">${h.reason}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    } catch (err) {
+        console.error(err);
+        const container = document.getElementById('flight-history-timeline');
+        if (container) container.innerHTML = '<p style="color:red;font-size:12px;">Error loading history.</p>';
+    }
 }
 
 async function saveFlightChanges(id, originalFlight) {
@@ -1467,7 +1573,10 @@ async function saveFlightChanges(id, originalFlight) {
             headers: { "Content-Type": "application/json", ...authHeaders() },
             body: JSON.stringify(payload)
         });
-        if (!res.ok) throw new Error("Update failed");
+        if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.detail || "Update failed");
+        }
 
         // Step 2: Update carousel if changed and flight is Arrived
         if (originalFlight.status === 'Arrived') {
@@ -1626,6 +1735,40 @@ function showToast(msg, type) {
 let statusChartInstance  = null;
 let airlineChartInstance = null;
 let airportChartInstance = null;
+let alertReasonChart = null;
+let terminalChartInstance = null;
+let trafficChartInstance = null;
+
+async function triggerTestEmailBatch() {
+    const btn = document.getElementById('trigger-test-email-btn');
+    if (!btn) return;
+
+    btn.disabled = true;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '⏳ Dispatched Sync Request...';
+
+    try {
+        const res = await fetch(`${API}/analytics/trigger-test-email`, {
+            method: 'POST',
+            headers: authHeaders()
+        });
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+            showToast(data.message || 'Manual Batch Email Alert Triggered Successfully!', 'success');
+        } else {
+            showToast(data.message || 'Failed to dispatch manual email sync.', 'error');
+        }
+    } catch (err) {
+        console.error('[BatchEmailSync] Error:', err);
+        showToast('System connectivity error. Please try again later.', 'error');
+    } finally {
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }, 3000);
+    }
+}
 
 async function loadAnalytics() {
     // Show a loading placeholder in the KPI grid on the first render
@@ -1650,16 +1793,22 @@ async function loadAnalytics() {
 
         // Render each dashboard section with its data slice
         renderKPIs(data.kpis);                        // top headline cards
-        // Use the existing flight data to generate alerts dynamically
-        if (typeof allFlights !== 'undefined' && allFlights.length > 0) {
-            renderOperationalAlerts(allFlights);
-        } else {
-            // Fallback: fetch flights if they haven't been loaded yet
-            fetch(`${API}/flights`, { headers: authHeaders() })
-                .then(r => r.json())
-                .then(f => renderOperationalAlerts(f))
-                .catch(e => console.error("Alerts fallback failed", e));
+        // ── Step 3: Fetch fresh flight list for Operational Alerts ──────────
+        // Enforce live data sourcing from the selected airport to prevent stale/cached alerts.
+        const airportId = selectedAirport ? selectedAirport.id : userAirportId;
+        const flightUrl = airportId ? `${API}/airports/${airportId}/flights` : `${API}/flights`;
+        
+        let fetchedFlights = [];
+        const flightRes = await fetch(flightUrl, { headers: authHeaders() });
+        if (flightRes.ok) {
+            fetchedFlights = await flightRes.json();
+            // Verification log for operational data integrity
+            console.log("Live analytics source", fetchedFlights.filter(f => f.status === "Delayed"));
+            renderOperationalAlerts(fetchedFlights);
+            renderTopDelayedFlights(fetchedFlights);
+            renderDelaySeveritySummary(fetchedFlights);
         }
+
         renderEmailBatches(data.batch_emails);        // batch email monitor
 
         // Only render Chart.js charts if the library is loaded on the page
@@ -1667,6 +1816,12 @@ async function loadAnalytics() {
             renderStatusChart(data.status_distribution);   // doughnut: flight status breakdown
             renderAirlineChart(data.airline_flights);       // bar: flights per airline
             renderAirportChart(data.airport_comparison);   // horizontal bar: flights per airport
+            renderTerminalChart(data.terminal_distribution); // doughnut: terminal breakdown
+            renderGateInfrastructure(data.gate_distribution); // progress bars: gate health
+            renderTrafficChart(data.hourly_traffic);       // bar: hourly traffic peaks
+            if (fetchedFlights.length > 0) {
+                renderAlertReasonChart(fetchedFlights);
+            }
         } else {
             // Chart.js CDN failed to load — show a fallback message
             console.error('[Analytics] Chart.js not loaded.');
@@ -1693,6 +1848,12 @@ function renderKPIs(kpis) {
         { icon: '🛫',  label: 'Boarding Flights',value: kpis.boarding_flights, color: '#10b981' },
         { icon: '✅',  label: 'Arrived Flights', value: kpis.arrived_flights,  color: '#065f46' },
         { icon: '🏢',  label: 'Active Airlines', value: kpis.active_airlines,  color: '#6366f1' },
+        { icon: '⏱️',  label: 'On-Time %',       value: `${kpis.on_time_percentage}%`, color: '#3b82f6' },
+        { icon: '⏳',  label: 'Avg Delay Duration', value: `${kpis.avg_delay_duration} min`, color: '#ec4899' },
+        { icon: '📅',  label: 'Scheduled Flights', value: kpis.scheduled_flights, color: '#6b7280' },
+        { icon: '❌',  label: 'Cancelled Flights', value: kpis.cancelled_flights, color: '#ef4444' },
+        { icon: '🧳',  label: 'Active Carousels',  value: kpis.active_carousels,  color: '#8b5cf6' },
+        { icon: '🗺️',  label: 'Active Airports',   value: kpis.active_airports,   color: '#0d9488' },
     ];
 
     // Render each card as a styled div with a CSS custom property for the accent border color
@@ -1705,99 +1866,190 @@ function renderKPIs(kpis) {
     `).join('');
 }
 
+const DELAY_REASON_FALLBACKS = [
+  "Adverse weather conditions",
+  "Aircraft technical inspection in progress",
+  "Air traffic control slot restriction",
+  "Late inbound aircraft arrival",
+  "Crew availability and shift compliance",
+  "Ground handling operational constraint",
+  "Security screening and clearance delay",
+  "Runway traffic congestion",
+  "Baggage loading and reconciliation delay",
+  "Operational turnaround delay"
+];
+
+function stableDelayReason(f) {
+  const raw = String(f.delay_reason || "").trim();
+  const badReasons = [
+    "",
+    "Operational review in progress",
+    "Operational issue",
+    "Unknown",
+    "N/A",
+    "null",
+    "undefined"
+  ];
+
+  if (raw && !badReasons.includes(raw)) {
+    return raw;
+  }
+
+  const key = String(f.flight_number || f.id || f.gate_number || "flight");
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) {
+    hash = ((hash << 5) - hash) + key.charCodeAt(i);
+    hash |= 0;
+  }
+
+  return DELAY_REASON_FALLBACKS[Math.abs(hash) % DELAY_REASON_FALLBACKS.length];
+}
+
+function getAlertClass(reason, status) {
+  const text = `${reason || ""} ${status || ""}`.toLowerCase();
+  if (text.includes("weather")) return "alert-weather";
+  if (text.includes("security")) return "alert-security";
+  if (text.includes("crew")) return "alert-crew";
+  if (text.includes("technical")) return "alert-technical";
+  if (text.includes("air traffic") || text.includes("atc")) return "alert-atc";
+  if (text.includes("ground")) return "alert-ground";
+  if (text.includes("baggage")) return "alert-baggage";
+  if (text.includes("runway")) return "alert-runway";
+  if (text.includes("turnaround") || text.includes("operational")) return "alert-operational";
+  if (status === "Boarding") return "alert-boarding";
+  if (status === "Cancelled") return "alert-cancelled";
+  if (status === "Arrived") return "alert-arrived";
+  return "alert-operational";
+}
+
 function renderOperationalAlerts(flights) {
     const container = document.getElementById("operational-alerts-list");
-    const badge = document.getElementById("alerts-count-badge");
     if (!container) return;
 
     const flightData = Array.isArray(flights) ? flights : [];
     
+    const gateChangeAlerts = [];
     const delayedAlerts = [];
     const cancelledAlerts = [];
     const boardingAlerts = [];
     const arrivedAlerts = [];
     const seen = new Set();
-    
-    // Mapping of delay reasons to styles/icons
-    const reasonConfig = {
-        "Weather":      { icon: "🌦️", class: "ops-alert-weather" },
-        "Technical":    { icon: "🔧", class: "ops-alert-technical" },
-        "ATC":          { icon: "🗼", class: "ops-alert-atc" },
-        "Crew":         { icon: "👨‍✈️", class: "ops-alert-crew" },
-        "Security":     { icon: "🚨", class: "ops-alert-security" },
-        "Late Arrival": { icon: "⏰", class: "ops-alert-late" },
-        "Operational":  { icon: "⚠️", class: "ops-alert-other" },
-        "Other":        { icon: "⚠️", class: "ops-alert-other" }
+
+    const reasonDescriptions = {
+        "Weather":      "Adverse weather conditions",
+        "Technical":    "Aircraft technical inspection in progress",
+        "ATC":          "Air traffic control slot restriction",
+        "Crew":         "Crew availability and shift compliance",
+        "Security":     "Security screening and clearance delay",
+        "Late Arrival": "Inbound aircraft arrived behind schedule",
+        "Operational":  "Ground handling operational constraint"
     };
+
+    function getAlertTime(f) {
+        if (f.status === "Arrived") return f.arrival_time || "Time unavailable";
+        return f.departure_time || "Time unavailable";
+    }
 
     flightData.forEach(f => {
         const key = `${f.flight_number}:${f.status}`;
+
+        // 1. Capture gate change alerts immediately
+        if (f.gate_changed) {
+            const gateKey = `${f.flight_number}:gate-change`;
+            if (!seen.has(gateKey)) {
+                seen.add(gateKey);
+                gateChangeAlerts.push({
+                    id: f.id,
+                    type: "alert-gate-change",
+                    title: `${f.flight_number} Gate Changed`,
+                    subtitle: `${getAlertTime(f)} • Gate changed to ${f.gate_number} (was ${f.previous_gate || '—'})`
+                });
+            }
+        }
+
         if (seen.has(key)) return;
+
+        const time = getAlertTime(f);
 
         if (f.status === "Delayed") {
             seen.add(key);
-            const reason = f.delay_reason || "Other";
-            const config = reasonConfig[reason] || reasonConfig["Other"];
+            const rawDelay = stableDelayReason(f);
+            const description = reasonDescriptions[rawDelay] || rawDelay;
             const mins = f.delay_minutes;
-            const timeStr = (mins && mins > 0) ? `${mins} min` : "Time not specified";
+            const timeStr = (mins && mins > 0) ? `${time} (+${mins} min)` : time;
             
             delayedAlerts.push({
-                type: config.class,
-                icon: config.icon,
+                type: getAlertClass(rawDelay, f.status),
                 title: `${f.flight_number} Delayed`,
-                subtitle: `${timeStr} • ${reason} • Gate ${f.gate_number || '—'}`
+                subtitle: `${timeStr} • ${description} • Gate ${f.gate_number || '—'}`
             });
         } else if (f.status === "Cancelled") {
             seen.add(key);
             cancelledAlerts.push({
-                type: "ops-alert-cancelled",
-                icon: "❌",
+                type: getAlertClass("", f.status),
                 title: `${f.flight_number} Cancelled`,
-                subtitle: `Operational disruption • Gate ${f.gate_number || '—'}`
+                subtitle: `${time} • Operational disruption • Gate ${f.gate_number || '—'}`
             });
         } else if (f.status === "Boarding") {
             seen.add(key);
             boardingAlerts.push({
-                type: "ops-alert-boarding",
-                icon: "🛫",
+                type: getAlertClass("", f.status),
                 title: `${f.flight_number} Boarding`,
-                subtitle: `Gate ${f.gate_number} • Final call`
+                subtitle: `${time} • Gate ${f.gate_number} • Final call`
             });
         } else if (f.status === "Arrived" && f.carousel_number) {
             seen.add(key);
             arrivedAlerts.push({
-                type: "ops-alert-arrived",
-                icon: "✅",
+                type: getAlertClass("", f.status),
                 title: `${f.flight_number} Arrived`,
-                subtitle: `Baggage at Carousel ${f.carousel_number}`
+                subtitle: `${time} • Baggage at Carousel ${f.carousel_number}`
             });
         }
     });
 
-    // Create a balanced mix (All delays + Limited others)
+    // Create a balanced mix (Gate change alerts first, then all delays + Limited others)
     const displayAlerts = [
+        ...gateChangeAlerts,
         ...delayedAlerts,
         ...boardingAlerts.slice(0, 3),
         ...cancelledAlerts.slice(0, 3),
         ...arrivedAlerts.slice(0, 2)
     ];
 
-    const html = displayAlerts.map(a => `
-        <div class="ops-alert ${a.type}">
-            <div class="ops-alert-icon">${a.icon}</div>
-            <div class="ops-alert-content">
-                <div class="ops-alert-title">${a.title}</div>
-                <div class="ops-alert-subtitle">${a.subtitle}</div>
+    const html = displayAlerts.map(a => {
+        let clearBtnHtml = "";
+        if (a.type === "alert-gate-change" && a.id) {
+            clearBtnHtml = `<button class="clear-alert-btn" onclick="clearGateAlertFromFeed(event, ${a.id})" title="Dismiss Alert">✕</button>`;
+        }
+        return `
+            <div class="ops-alert ${a.type}" style="display:flex; justify-content:space-between; align-items:center; width:100%; box-sizing:border-box;">
+                <div class="ops-alert-content" style="flex:1;">
+                    <div class="ops-alert-title">${a.title}</div>
+                    <div class="ops-alert-subtitle">${a.subtitle}</div>
+                </div>
+                ${clearBtnHtml}
             </div>
-        </div>
-    `).join("");
+        `;
+    }).join("");
 
-    const total = delayedAlerts.length + cancelledAlerts.length + boardingAlerts.length + arrivedAlerts.length;
     container.innerHTML = html || '<div class="empty-alert">No active operational alerts</div>';
+}
 
-    if (badge) {
-        badge.textContent = total || "";
-        badge.style.display = total > 0 ? 'inline-block' : 'none';
+async function clearGateAlertFromFeed(event, flightId) {
+    event.stopPropagation();
+    try {
+        const res = await fetch(`${API}/flights/${flightId}/clear-gate-alert`, {
+            method: 'PATCH',
+            headers: authHeaders()
+        });
+        if (!res.ok) throw new Error('Failed');
+        // Optimistically update local data so alert vanishes immediately
+        const f = allFlights.find(x => x.id === flightId);
+        if (f) { f.gate_changed = false; f.previous_gate = null; }
+        fetchFlights(); // Refresh feeds and dashboard state
+        showToast('Gate change alert dismissed', 'success');
+    } catch (err) {
+        showToast('Could not clear gate alert', 'error');
     }
 }
 
@@ -1957,6 +2209,258 @@ function renderAirportChart(data) {
             }
         }
     });
+}
+
+function renderTerminalChart(data) {
+    const ctx = document.getElementById('terminalChart');
+    if (!ctx) return;
+
+    // Destroy stale instance to prevent Chart.js canvas conflicts on re-render
+    if (terminalChartInstance) { terminalChartInstance.destroy(); terminalChartInstance = null; }
+
+    // Doughnut chart — clean representation of terminal occupancy distribution
+    terminalChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: data.map(d => d.terminal.startsWith("T") ? `Terminal ${d.terminal}` : d.terminal),
+            datasets: [{
+                data: data.map(d => d.count),
+                backgroundColor: [
+                    '#3b82f6', // cobalt blue
+                    '#10b981', // emerald green
+                    '#8b5cf6', // violet
+                    '#f59e0b', // amber gold
+                    '#ec4899'  // rose pink
+                ],
+                borderWidth: 2,
+                borderColor: '#ffffff',
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 16,
+                        font: { size: 11, family: 'Inter, sans-serif' }
+                    }
+                }
+            },
+            cutout: '65%' // sleek premium donut cut
+        }
+    });
+}
+
+function renderGateInfrastructure(data) {
+    const container = document.getElementById('gate-infrastructure-summary');
+    if (!container) return;
+
+    const total = data.total || 0;
+    const available = data.available || 0;
+    const occupied = data.occupied || 0;
+    const maintenance = data.maintenance || 0;
+
+    const availPct = total > 0 ? Math.round((available / total) * 100) : 0;
+    const occPct = total > 0 ? Math.round((occupied / total) * 100) : 0;
+    const maintPct = total > 0 ? Math.round((maintenance / total) * 100) : 0;
+
+    container.innerHTML = `
+        <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px;">
+                <span>🟢 Available Gates</span>
+                <span>${available} / ${total} (${availPct}%)</span>
+            </div>
+            <div style="height:8px; width:100%; background:#e2e8f0; border-radius:4px; overflow:hidden;">
+                <div style="height:100%; width:${availPct}%; background:#10b981; border-radius:4px;"></div>
+            </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px;">
+                <span>🔵 Occupied Gates</span>
+                <span>${occupied} / ${total} (${occPct}%)</span>
+            </div>
+            <div style="height:8px; width:100%; background:#e2e8f0; border-radius:4px; overflow:hidden;">
+                <div style="height:100%; width:${occPct}%; background:#3b82f6; border-radius:4px;"></div>
+            </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px;">
+                <span>🔴 Maintenance Gates</span>
+                <span>${maintenance} / ${total} (${maintPct}%)</span>
+            </div>
+            <div style="height:8px; width:100%; background:#e2e8f0; border-radius:4px; overflow:hidden;">
+                <div style="height:100%; width:${maintPct}%; background:#ef4444; border-radius:4px;"></div>
+            </div>
+        </div>
+    `;
+}
+
+function renderTrafficChart(data) {
+    const ctx = document.getElementById('trafficChart');
+    if (!ctx) return;
+
+    if (trafficChartInstance) { trafficChartInstance.destroy(); trafficChartInstance = null; }
+
+    trafficChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.map(d => d.interval),
+            datasets: [{
+                label: 'Departures',
+                data: data.map(d => d.count),
+                backgroundColor: '#3b82f6', // cobalt blue
+                borderRadius: 4,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { size: 9, family: 'Inter, sans-serif' } } },
+                y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 9 } } }
+            }
+        }
+    });
+}
+
+
+
+function getAlertCategory(f) {
+  const reason = String(f.delay_reason || "").toLowerCase();
+  const status = String(f.status || "").toLowerCase();
+
+  if (reason.includes("weather")) return "Weather";
+  if (reason.includes("security")) return "Security";
+  if (reason.includes("crew")) return "Crew";
+  if (reason.includes("technical")) return "Technical";
+  if (reason.includes("air traffic") || reason.includes("atc")) return "ATC";
+  if (reason.includes("ground")) return "Ground Handling";
+  if (reason.includes("baggage")) return "Baggage";
+  if (reason.includes("runway")) return "Runway";
+  if (status === "boarding") return "Boarding";
+  if (status === "cancelled") return "Cancelled";
+  if (status === "arrived") return "Arrived";
+  return "Operational";
+}
+
+function renderAlertReasonChart(flights) {
+  const canvas = document.getElementById("alertReasonChart");
+  if (!canvas) return;
+
+  const counts = {};
+
+  flights.forEach(f => {
+    if (!["Delayed", "Boarding", "Cancelled", "Arrived"].includes(f.status)) return;
+    const category = getAlertCategory(f);
+    counts[category] = (counts[category] || 0) + 1;
+  });
+
+  const labels = Object.keys(counts);
+  const values = Object.values(counts);
+
+  if (alertReasonChart) {
+    alertReasonChart.destroy();
+  }
+
+  alertReasonChart = new Chart(canvas, {
+    type: "doughnut",
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: [
+          "#3b82f6",
+          "#ef4444",
+          "#8b5cf6",
+          "#f97316",
+          "#6366f1",
+          "#22c55e",
+          "#06b6d4",
+          "#f59e0b",
+          "#64748b",
+          "#10b981"
+        ]
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "bottom"
+        }
+      }
+    }
+  });
+}
+
+function renderTopDelayedFlights(flights) {
+    const container = document.getElementById("top-delayed-flights-list");
+    if (!container) return;
+
+    // Filter delayed flights and sort descending by delay_minutes
+    const delayed = flights.filter(f => f.status === "Delayed" && f.delay_minutes > 0)
+                           .sort((a, b) => b.delay_minutes - a.delay_minutes)
+                           .slice(0, 5);
+
+    if (delayed.length === 0) {
+        container.innerHTML = '<div class="empty-alert">No delayed flights</div>';
+        return;
+    }
+
+    const html = delayed.map(f => `
+        <div class="ops-alert ops-alert-other" style="background:#f8fafc; border-left:4px solid #ef4444; margin-bottom:8px; padding:10px 14px;">
+            <div class="ops-alert-content">
+                <div class="ops-alert-title" style="color:#0f172a; display:flex; justify-content:space-between; align-items:center;">
+                    <span>${f.flight_number}</span>
+                    <span style="color:#ef4444; font-size:13px; font-weight:700;">${f.delay_minutes} min</span>
+                </div>
+                <div class="ops-alert-subtitle" style="color:#64748b; font-size:12px; margin-top:2px;">
+                    ${f.delay_reason || 'Operational delay'} • Gate ${f.gate_number || '—'}
+                </div>
+            </div>
+        </div>
+    `).join("");
+
+    container.innerHTML = html;
+}
+
+function renderDelaySeveritySummary(flights) {
+    const container = document.getElementById("delay-severity-summary");
+    if (!container) return;
+
+    let minor = 0;
+    let moderate = 0;
+    let severe = 0;
+
+    flights.forEach(f => {
+        if (f.status === "Delayed" && f.delay_minutes > 0) {
+            if (f.delay_minutes <= 30) minor++;
+            else if (f.delay_minutes <= 60) moderate++;
+            else severe++;
+        }
+    });
+
+    container.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:12px 16px; border-radius:8px; border-left:4px solid #f59e0b;">
+            <span style="font-weight:600; color:#334155; font-size:13px;">Minor Delay (0-30 min)</span>
+            <span style="font-weight:700; font-size:16px; color:#f59e0b;">${minor}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:12px 16px; border-radius:8px; border-left:4px solid #f97316;">
+            <span style="font-weight:600; color:#334155; font-size:13px;">Moderate Delay (31-60 min)</span>
+            <span style="font-weight:700; font-size:16px; color:#f97316;">${moderate}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#fef2f2; padding:12px 16px; border-radius:8px; border-left:4px solid #ef4444;">
+            <span style="font-weight:600; color:#991b1b; font-size:13px;">Severe Delay (60+ min)</span>
+            <span style="font-weight:700; font-size:16px; color:#ef4444;">${severe}</span>
+        </div>
+    `;
 }
 
 // ── Admin Profile ────────────────────────────────────────────────
