@@ -81,6 +81,8 @@ class FlightCreateSchema(BaseModel):
     terminal_number: str = Field(..., example="T1")
     status: str = Field(default="Scheduled")
     flight_type: str = Field(default="arrival", example="arrival")
+    carousel_number: Optional[str] = Field(default=None, example="C3")   # Arrival BHS: baggage claim belt
+    makeup_area: Optional[str] = Field(default=None, example="M2")       # Departure BHS: make-up/sorting zone
     delay_minutes: int = Field(default=0)
     delay_reason: Optional[str] = Field(default=None)
 
@@ -97,6 +99,8 @@ class FlightUpdateSchema(BaseModel):
     terminal_number: Optional[str] = None
     status: Optional[str] = None
     flight_type: Optional[str] = None
+    carousel_number: Optional[str] = None   # Arrival BHS: baggage claim belt (C1, C2, C3...)
+    makeup_area: Optional[str] = None       # Departure BHS: make-up/sorting zone (M1, M2, M3...)
     delay_minutes: Optional[int] = None
     delay_reason: Optional[str] = None
 
@@ -116,7 +120,8 @@ class FlightResponseSchema(BaseModel):
     terminal_number: str
     status: str
     flight_type: str
-    carousel_number: Optional[str] = None
+    carousel_number: Optional[str] = None   # Arrival BHS: baggage claim belt (C1, C2, C3...)
+    makeup_area: Optional[str] = None       # Departure BHS: make-up/sorting zone (M1, M2, M3...)
     delay_minutes: int = 0
     delay_reason: Optional[str] = None
     updated_at: Optional[str] = None
@@ -192,6 +197,7 @@ class FlightSerializer:
             "status": flight_model.status,
             "flight_type": flight_model.flight_type or "arrival",
             "carousel_number": getattr(flight_model, "carousel_number", None),
+            "makeup_area": getattr(flight_model, "makeup_area", None),
             "delay_minutes": getattr(flight_model, "delay_minutes", 0),
             "delay_reason": getattr(flight_model, "delay_reason", None),
             "updated_at": getattr(flight_model, "updated_at").isoformat() if getattr(flight_model, "updated_at", None) else None,

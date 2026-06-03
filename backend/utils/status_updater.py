@@ -17,6 +17,7 @@ import random     # for realistic probabilistic Delayed status simulation
 from datetime import datetime, timedelta
 from core.database import DatabaseManager  # singleton DB engine and session scope
 from models.models import FlightModel      # SQLAlchemy ORM model for the flights table
+from services.alert_service import AlertService
 
 
 class StatusUpdater:
@@ -120,8 +121,18 @@ class StatusUpdater:
                     # Only update rows where the status actually changed
                     # This minimizes dirty writes and DB I/O
                     if new_status != flight.status:
+                        old_status = flight.status
                         flight.status = new_status  # SQLAlchemy detects this as dirty
                         updated += 1                # track how many rows we're changing
+
+                        if new_status in ["Delayed", "Cancelled"]:
+                            AlertService().create_alert(
+                                flight_id=flight.id,
+                                flight_number=flight.flight_number,
+                                alert_type=new_status,
+                                message=f"{flight.flight_number} status changed to {new_status}",
+                                metadata_json={"old_status": old_status, "new_status": new_status}
+                            )
 
             # Log only if something actually changed — avoids noisy logs every 60s
             if updated > 0:

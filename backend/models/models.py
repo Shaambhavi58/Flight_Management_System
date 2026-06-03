@@ -6,7 +6,7 @@ map to database tables.
 Domain classes encapsulate business data with OOP principles.
 """
 
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text, UniqueConstraint, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text, UniqueConstraint, Boolean, JSON
 from sqlalchemy.orm import relationship
 from core.database import Base
 from datetime import datetime
@@ -14,7 +14,7 @@ from datetime import datetime
 
 # ──────────────────────────────────────────────
 #  SQLAlchemy ORM Models (Database Layer)
-# ──────────────────────────────────────────────
+# ──────────────────────────────────────────────de
 
 class UserModel(Base):
     """ORM model for the 'users' table."""
@@ -102,12 +102,21 @@ class FlightModel(Base):
     status = Column(String(30), nullable=False, default="Scheduled")
     flight_type = Column(String(20), nullable=False, default="arrival")  # arrival, departure, cargo
 
-    # ── Carousel Assignment ──────────────────────────────────────────────────
+    # ── Carousel Assignment (Arrival BHS) ───────────────────────────────────
+    # Used for ARRIVAL flights: identifies the baggage claim belt assigned to the flight.
     # Null until flight status becomes "Arrived".
     # Auto-assigned by assign_carousel() in service.py based on terminal grouping.
     # Can be manually overridden by admin/staff via PUT /flights/{id}/carousel.
     # Every change is logged in carousel_change_log for audit.
+    # Examples: "C1", "C2", "C3" — physical carousels in the arrivals hall.
     carousel_number = Column(String(10), nullable=True)   # e.g. "C3", null until Arrived
+
+    # ── Make-up Area Assignment (Departure BHS) ──────────────────────────────
+    # Used for DEPARTURE flights: identifies the Beumer BHS make-up area where
+    # bags are sorted and loaded onto the aircraft before departure.
+    # Null until a BHS operator or admin assigns a zone to the flight.
+    # Examples: "M1", "M2", "M3" — physical make-up zones in the baggage handling area.
+    makeup_area = Column(String(10), nullable=True)       # e.g. "M2", null until assigned
     
     # ── Delay Tracking ───────────────────────────────────────────────────────
     # Operational reality: flights are often delayed. We track minutes and reason.
@@ -137,7 +146,7 @@ class FlightModel(Base):
     )
 
     def __repr__(self):
-        return f"<FlightModel(id={self.id}, flight='{self.flight_number}', status='{self.status}', carousel='{self.carousel_number}')>"
+        return f"<FlightModel(id={self.id}, flight='{self.flight_number}', status='{self.status}', carousel='{self.carousel_number}', makeup_area='{self.makeup_area}')>"
 
 
 class CarouselChangeLog(Base):
@@ -185,6 +194,27 @@ class FlightStatusHistory(Base):
     reason = Column(String(200), nullable=True)
 
     flight = relationship("FlightModel", back_populates="status_history")
+
+class OperationalAlertModel(Base):
+    __tablename__ = "operational_alerts"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    flight_id = Column(Integer, ForeignKey("flights.id"), nullable=True) # nullable for gate-level alerts
+    flight_number = Column(String(20), nullable=True)
+    alert_type = Column(String(50), nullable=False) # Gate Changed, Delayed, Cancelled, Maintenance, Carousel Changed
+    message = Column(Text, nullable=False)
+    status = Column(String(20), nullable=False, default="New") # New, Acknowledged, Resolved, Dismissed
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    acknowledged_at = Column(DateTime, nullable=True)
+    resolved_at = Column(DateTime, nullable=True)
+    dismissed_at = Column(DateTime, nullable=True)
+    handled_by = Column(String(50), nullable=True) # username of who handled it
+    metadata_json = Column(JSON, nullable=True) # Useful for old/new values
+
+    flight = relationship("FlightModel")
+
+    def __repr__(self):
+        return f"<OperationalAlertModel(id={self.id}, type='{self.alert_type}', status='{self.status}')>"
 
 
 class GateModel(Base):
@@ -332,6 +362,7 @@ class Flight:
         airline_name: str = None,
         airport_code: str = None,
         carousel_number: str = None,
+        makeup_area: str = None,
         delay_minutes: int = 0,
         delay_reason: str = None,
     ):
@@ -349,6 +380,7 @@ class Flight:
         self._status = status
         self._flight_type = flight_type
         self._carousel_number = carousel_number
+        self._makeup_area = makeup_area
         self._delay_minutes = delay_minutes
         self._delay_reason = delay_reason
 
@@ -376,6 +408,8 @@ class Flight:
     def terminal_number(self): return self._terminal_number
     @property
     def carousel_number(self): return self._carousel_number
+    @property
+    def makeup_area(self): return self._makeup_area
     @property
     def delay_minutes(self): return self._delay_minutes
     @property
@@ -417,6 +451,7 @@ class Flight:
             "status": self._status,
             "flight_type": self._flight_type,
             "carousel_number": self._carousel_number,
+            "makeup_area": self._makeup_area,
             "delay_minutes": self._delay_minutes,
             "delay_reason": self._delay_reason,
         }
@@ -426,8 +461,9 @@ class Flight:
             f"Flight {self._flight_number} | {self._origin} -> {self._destination} | "
             f"Dep: {self._departure_time} | Gate: {self._gate_number} | "
             f"Terminal: {self._terminal_number} | Status: {self._status} | "
-            f"Carousel: {self._carousel_number or 'Not assigned'}"
+            f"Carousel: {self._carousel_number or 'Not assigned'} | "
+            f"Make-up Area: {self._makeup_area or 'Not assigned'}"
         )
 
     def __repr__(self):
-        return f"Flight(flight_number='{self._flight_number}', status='{self._status}', carousel='{self._carousel_number}')"
+        return f"Flight(flight_number='{self._flight_number}', status='{self._status}', carousel='{self._carousel_number}', makeup_area='{self._makeup_area}')"

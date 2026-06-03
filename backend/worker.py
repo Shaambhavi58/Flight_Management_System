@@ -160,14 +160,36 @@ def _send_batch_email(batch_id: str, flights: list):
         "Cancelled": "#9E9E9E",
     }
 
+    from core.database import DatabaseManager
+    from models.models import FlightModel
+    from services.service import assign_carousel
+
+    db = DatabaseManager()
+    with db.session_scope() as session:
+        for f in flights:
+            flight_number = f.get('flight_number')
+            db_flight = session.query(FlightModel).filter_by(flight_number=flight_number).order_by(FlightModel.id.desc()).first()
+            if db_flight:
+                f['status'] = db_flight.status
+                f['gate_number'] = db_flight.gate_number
+                f['terminal_number'] = db_flight.terminal_number
+                f['carousel_number'] = db_flight.carousel_number
+
+                if f['status'] == 'Arrived' and not f['carousel_number']:
+                    f['carousel_number'] = assign_carousel(db_flight.flight_number, db_flight.terminal_number)
+
     rows_html = ""
     for i, f in enumerate(flights, 1):
         status_color = STATUS_COLORS.get(f.get("status", ""), "#333")
         row_bg = "#f9f9f9" if i % 2 == 0 else "white"
         carousel = f.get('carousel_number') if f.get('status') == 'Arrived' else None
         carousel_text = carousel if carousel else "—"
-        gate = f.get('gate_number', '—')
-        terminal = f.get('terminal_number', '—')
+        gate = f.get('gate_number')
+        gate = gate if gate else "—"
+        terminal = f.get('terminal_number')
+        terminal = terminal if terminal else "—"
+
+        print(f"DEBUG BATCH EMAIL: Flight: {f.get('flight_number')} | Gate: {gate} | Terminal: {terminal} | Carousel: {carousel_text}")
 
         rows_html += f"""
         <tr style="background:{row_bg};">
@@ -433,6 +455,9 @@ class FlightWorker:
                     "origin":        result.get("origin"),
                     "destination":   result.get("destination"),
                     "status":        result.get("status"),
+                    "gate_number":   result.get("gate_number"),
+                    "terminal_number": result.get("terminal_number"),
+                    "carousel_number": result.get("carousel_number"),
                 })
 
             channel.basic_ack(delivery_tag=method.delivery_tag)

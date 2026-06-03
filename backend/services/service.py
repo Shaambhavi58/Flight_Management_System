@@ -15,6 +15,7 @@ from fastapi import HTTPException
 from core.database import DatabaseManager
 from services.repository import FlightRepository, AirportRepository, CarouselRepository
 from models.schemas import FlightSerializer
+from services.alert_service import AlertService
 from typing import List, Optional
 import random
 
@@ -128,6 +129,7 @@ class FlightService:
         self._repository      = FlightRepository()
         self._carousel_repo   = CarouselRepository()
         self._serializer      = FlightSerializer()
+        self._alert_service   = AlertService()
 
     # ── CREATE ────────────────────────────────────────────────────────────────
 
@@ -244,6 +246,14 @@ class FlightService:
                         event_type="CAROUSEL_ASSIGNED",
                     )
 
+                    self._alert_service.create_alert(
+                        flight_id=flight_id,
+                        flight_number=existing.flight_number,
+                        alert_type="Carousel Changed",
+                        message=f"{existing.flight_number} assigned carousel {carousel}",
+                        metadata_json={"new_carousel": carousel}
+                    )
+
                     # Notify BHS via RabbitMQ
                     publish_bhs_event("CAROUSEL_ASSIGNED", {
                         "flight_number":  existing.flight_number,
@@ -334,6 +344,14 @@ class FlightService:
                     update_data["gate_changed"]     = True
                     update_data["gate_changed_at"]  = datetime.utcnow()
                     
+                    self._alert_service.create_alert(
+                        flight_id=flight_id,
+                        flight_number=flight_base.flight_number,
+                        alert_type="Gate Changed",
+                        message=f"{flight_base.flight_number} gate changed to {new_gate}",
+                        metadata_json={"old_gate": old_gate, "new_gate": new_gate}
+                    )
+                    
                     # Publish GATE_CHANGED to RabbitMQ (BHS queue)
                     publish_bhs_event("GATE_CHANGED", {
                         "flight_number": flight_base.flight_number,
@@ -360,6 +378,15 @@ class FlightService:
                         changed_by=current_user.get("username", "admin"),
                         reason=update_data.get("reason") or f"Admin status update"
                     )
+
+                    if new_status in ["Delayed", "Cancelled"]:
+                        self._alert_service.create_alert(
+                            flight_id=flight_id,
+                            flight_number=pre_flight.flight_number,
+                            alert_type=new_status,
+                            message=f"{pre_flight.flight_number} status changed to {new_status}",
+                            metadata_json={"old_status": pre_flight.status, "new_status": new_status, "reason": update_data.get("delay_reason")}
+                        )
 
             flight = self._repository.update(session, flight_id, update_data)
             if flight is None:
@@ -422,6 +449,14 @@ class FlightService:
                 changed_by=current_user.get("username", "unknown"),
                 reason=reason,
                 event_type="CAROUSEL_CHANGED",
+            )
+
+            self._alert_service.create_alert(
+                flight_id=flight_id,
+                flight_number=flight.flight_number,
+                alert_type="Carousel Changed",
+                message=f"{flight.flight_number} carousel changed to {new_carousel.upper()}",
+                metadata_json={"old_carousel": old_carousel, "new_carousel": new_carousel.upper()}
             )
 
             # Publish HIGH PRIORITY event to BHS
@@ -588,7 +623,6 @@ class FlightService:
                         has_conflict = True
                         break
 
-                if not has_conflict:
                     available_gates.append({
                         "id": g.id,
                         "gate_number": g.gate_number,
@@ -596,6 +630,51 @@ class FlightService:
                     })
 
             return available_gates
+
+    # ── UPDATE GATE STATUS ────────────────────────────────────────────────────
+
+    def update_gate_status(self, gate_id: int, status: str, current_user: dict) -> dict:
+        if current_user["role"] not in ["admin", "staff"]:
+            raise HTTPException(status_code=403, detail="Only admins or staff can update gate status")
+
+        with self._db.session_scope() as session:
+            from models.models import GateModel, GateAssignmentModel
+            gate = session.query(GateModel).filter_by(id=gate_id).first()
+            if not gate:
+                raise HTTPException(status_code=404, detail="Gate not found")
+
+            old_status = gate.status
+            gate.status = status
+            session.flush()
+
+            # Trigger maintenance alerts if changed to Maintenance
+            if status == "Maintenance" and old_status != "Maintenance":
+                # 1. Create gate-level alert (flight_id is None)
+                self._alert_service.create_alert(
+                    flight_id=None,
+                    flight_number=None,
+                    alert_type="Maintenance",
+                    message=f"Gate {gate.gate_number} is now under maintenance.",
+                    metadata_json={"gate_number": gate.gate_number, "terminal": gate.terminal_number}
+                )
+
+                # 2. Create flight-level alerts for active assignments
+                active_assignments = session.query(GateAssignmentModel).filter_by(
+                    gate_id=gate.id,
+                    assignment_status="Active"
+                ).all()
+
+                for assign in active_assignments:
+                    if assign.flight:
+                        self._alert_service.create_alert(
+                            flight_id=assign.flight.id,
+                            flight_number=assign.flight.flight_number,
+                            alert_type="Maintenance",
+                            message=f"{assign.flight.flight_number}'s assigned gate {gate.gate_number} is under maintenance.",
+                            metadata_json={"gate_number": gate.gate_number}
+                        )
+
+            return {"message": f"Gate {gate.gate_number} status updated to {status}"}
 
 
 

@@ -1,0 +1,3517 @@
+{
+    "original_count": 1528,
+    "final_count": 943,
+    "removed_count": 585,
+    "removed_flights": [
+        {
+            "kept": "AI9659",
+            "removed": "IX2893",
+            "route": "IXB -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6067",
+            "removed": "VS8407",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6067",
+            "removed": "QF5091",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6067",
+            "removed": "JL9029",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E335",
+            "removed": "KL4741",
+            "route": "TRV -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5228",
+            "removed": "VS8557",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E7214",
+            "removed": "BA8828",
+            "route": "VGA -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6212",
+            "removed": "VS8779",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6212",
+            "removed": "QF8781",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6212",
+            "removed": "JL9213",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5386",
+            "removed": "VS8561",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6282",
+            "removed": "QF8785",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6282",
+            "removed": "JL9215",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6282",
+            "removed": "VS8781",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E464",
+            "removed": "KL4539",
+            "route": "BDQ -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9409",
+            "removed": "IX2744",
+            "route": "VTZ -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2531",
+            "removed": "SQ4849",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2531",
+            "removed": "ET1223",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6681",
+            "removed": "BA8203",
+            "route": "COK -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2899",
+            "removed": "ET1764",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9564",
+            "removed": "IX2051",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E7206",
+            "removed": "BA8827",
+            "route": "VGA -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E884",
+            "removed": "VS8774",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E884",
+            "removed": "TK7806",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E884",
+            "removed": "QF8773",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E884",
+            "removed": "JL9205",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E884",
+            "removed": "BA7999",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9572",
+            "removed": "IX2819",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "QR4776",
+            "removed": "QR1314",
+            "route": "DOH -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6404",
+            "removed": "VS8409",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6404",
+            "removed": "QF5089",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6404",
+            "removed": "JL5296",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2859",
+            "removed": "SQ4869",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E876",
+            "removed": "KL4699",
+            "route": "CCJ -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E876",
+            "removed": "BA7940",
+            "route": "CCJ -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6293",
+            "removed": "VS8238",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6293",
+            "removed": "TK7807",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6293",
+            "removed": "QF8770",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6293",
+            "removed": "JL9082",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5318",
+            "removed": "VS8559",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5318",
+            "removed": "TK7845",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5178",
+            "removed": "VS8556",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5178",
+            "removed": "TK7841",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5178",
+            "removed": "BA7985",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E705",
+            "removed": "VS8773",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E705",
+            "removed": "TK7810",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E705",
+            "removed": "QF8771",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E705",
+            "removed": "JL9206",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9568",
+            "removed": "IX1501",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "VA5618",
+            "removed": "NZ3258",
+            "route": "SIN -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "VA5618",
+            "removed": "SQ518",
+            "route": "SIN -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9574",
+            "removed": "IX2935",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E537",
+            "removed": "VS8398",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E537",
+            "removed": "QF5087",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E537",
+            "removed": "JL9023",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E537",
+            "removed": "BA8292",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E312",
+            "removed": "VS8406",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E312",
+            "removed": "QF5085",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E312",
+            "removed": "JL9783",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E312",
+            "removed": "BA8290",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9929",
+            "removed": "IX2745",
+            "route": "VTZ -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E484",
+            "removed": "VS8397",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E484",
+            "removed": "QF5083",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E484",
+            "removed": "JL9019",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E484",
+            "removed": "BA8291",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E484",
+            "removed": "AF6516",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E203",
+            "removed": "VS8771",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E203",
+            "removed": "TK7809",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E203",
+            "removed": "QF8767",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E203",
+            "removed": "KL3656",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E203",
+            "removed": "JL9201",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E203",
+            "removed": "BA7997",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E203",
+            "removed": "AF6096",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E203",
+            "removed": "AA9188",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9591",
+            "removed": "IX2371",
+            "route": "GAU -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9600",
+            "removed": "IX2404",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E834",
+            "removed": "BA8848",
+            "route": "MAA -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI1793",
+            "removed": "LH5531",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI1793",
+            "removed": "ET1082",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI1793",
+            "removed": "LO4445",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2625",
+            "removed": "LX9872",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2625",
+            "removed": "LH5314",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5044",
+            "removed": "VS8554",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5044",
+            "removed": "KL3662",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5044",
+            "removed": "BA7987",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5044",
+            "removed": "AF3781",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E495",
+            "removed": "BA8849",
+            "route": "MAA -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2873",
+            "removed": "ET1543",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5246",
+            "removed": "VS8558",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6178",
+            "removed": "VS8408",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6178",
+            "removed": "QF5084",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6178",
+            "removed": "JL9610",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6178",
+            "removed": "AF3351",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9570",
+            "removed": "IX2018",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E704",
+            "removed": "VS8775",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E704",
+            "removed": "QF8768",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E704",
+            "removed": "JL9212",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E704",
+            "removed": "AF6092",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E704",
+            "removed": "AA9187",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9979",
+            "removed": "IX2837",
+            "route": "PNQ -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5179",
+            "removed": "VS8553",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5179",
+            "removed": "AF3356",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2577",
+            "removed": "LX9860",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6187",
+            "removed": "VS8612",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AF4338",
+            "removed": "EY352",
+            "route": "AUH -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "D0154",
+            "removed": "BZ154",
+            "route": "MAA -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AA6667",
+            "removed": "BA277",
+            "route": "LHR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "QR4774",
+            "removed": "QR1316",
+            "route": "DOH -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6195",
+            "removed": "VS8562",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E684",
+            "removed": "VS8404",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E684",
+            "removed": "QF5079",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E684",
+            "removed": "JL9776",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "JL7949",
+            "removed": "MH198",
+            "route": "KUL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "OV735",
+            "removed": "WY5225",
+            "route": "MCT -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI8752",
+            "removed": "AC9622",
+            "route": "FRA -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI8752",
+            "removed": "LH752",
+            "route": "FRA -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E882",
+            "removed": "VS8236",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E882",
+            "removed": "QF8775",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E882",
+            "removed": "JL9208",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI1706",
+            "removed": "AC6435",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI1706",
+            "removed": "LH5290",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "EK2246",
+            "removed": "FZ435",
+            "route": "DXB -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "KL3877",
+            "removed": "EY358",
+            "route": "AUH -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E985",
+            "removed": "BA8773",
+            "route": "GOI -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2449",
+            "removed": "ET1084",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6784",
+            "removed": "VS8232",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6784",
+            "removed": "QF5031",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6784",
+            "removed": "JL5297",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "VA5652",
+            "removed": "NZ3252",
+            "route": "SIN -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "VA5652",
+            "removed": "NH5364",
+            "route": "SIN -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "VA5652",
+            "removed": "SQ522",
+            "route": "SIN -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E855",
+            "removed": "VS8405",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E855",
+            "removed": "QF5095",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E855",
+            "removed": "JL9035",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E382",
+            "removed": "VS8772",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E382",
+            "removed": "QF8769",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E382",
+            "removed": "JL9203",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E382",
+            "removed": "BA7998",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E742",
+            "removed": "BA8202",
+            "route": "COK -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2869",
+            "removed": "MK8052",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2869",
+            "removed": "LH5521",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2869",
+            "removed": "ET4401",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5056",
+            "removed": "VS8555",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5056",
+            "removed": "BA7986",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E385",
+            "removed": "BA8836",
+            "route": "VTZ -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E883",
+            "removed": "BA8835",
+            "route": "VTZ -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9897",
+            "removed": "IX1380",
+            "route": "VGA -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9799",
+            "removed": "IX2375",
+            "route": "IXR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E1028",
+            "removed": "QF8760",
+            "route": "SIN -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E638",
+            "removed": "VS8399",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E638",
+            "removed": "QF5093",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E638",
+            "removed": "JL9033",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5326",
+            "removed": "VS8560",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E193",
+            "removed": "BA7920",
+            "route": "MAA -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6177",
+            "removed": "BA8772",
+            "route": "GOI -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6601",
+            "removed": "VS8783",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6601",
+            "removed": "QF8791",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6601",
+            "removed": "JL9216",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E216",
+            "removed": "BA8834",
+            "route": "VTZ -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E7392",
+            "removed": "BA8830",
+            "route": "VGA -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI1708",
+            "removed": "OZ6390",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI1708",
+            "removed": "NH6933",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9566",
+            "removed": "IX1250",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E717",
+            "removed": "VS8777",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E717",
+            "removed": "QF8779",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E717",
+            "removed": "JL9211",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6217",
+            "removed": "VS8780",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6217",
+            "removed": "QF8783",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6217",
+            "removed": "JL9645",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9659",
+            "removed": "IX2893",
+            "route": "IXB -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6212",
+            "removed": "VS8779",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6212",
+            "removed": "QF8781",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6212",
+            "removed": "JL9213",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5228",
+            "removed": "VS8557",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E7214",
+            "removed": "BA8828",
+            "route": "VGA -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6282",
+            "removed": "VS8781",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6282",
+            "removed": "QF8785",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6282",
+            "removed": "JL9215",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6681",
+            "removed": "BA8203",
+            "route": "COK -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6067",
+            "removed": "VS8407",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6067",
+            "removed": "QF5091",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6067",
+            "removed": "JL9029",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9409",
+            "removed": "IX2744",
+            "route": "VTZ -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2899",
+            "removed": "ET1764",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9564",
+            "removed": "IX2051",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E884",
+            "removed": "VS8774",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E884",
+            "removed": "TK7806",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E884",
+            "removed": "QF8773",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E884",
+            "removed": "JL9205",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E884",
+            "removed": "BA7999",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5386",
+            "removed": "VS8561",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2531",
+            "removed": "SQ4849",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2531",
+            "removed": "MK8050",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2531",
+            "removed": "ET1223",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E7206",
+            "removed": "BA8827",
+            "route": "VGA -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6404",
+            "removed": "VS8409",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6404",
+            "removed": "QF5089",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6404",
+            "removed": "JL5296",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2859",
+            "removed": "SQ4869",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E876",
+            "removed": "BA7940",
+            "route": "CCJ -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6293",
+            "removed": "VS8238",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6293",
+            "removed": "TK7807",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6293",
+            "removed": "QF8770",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6293",
+            "removed": "JL9082",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9568",
+            "removed": "IX1501",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5318",
+            "removed": "VS8559",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5318",
+            "removed": "TK7845",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5178",
+            "removed": "VS8556",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5178",
+            "removed": "TK7841",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5178",
+            "removed": "BA7985",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9572",
+            "removed": "IX2819",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E537",
+            "removed": "VS8398",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E537",
+            "removed": "QF5087",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E537",
+            "removed": "JL9023",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E537",
+            "removed": "BA8292",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E705",
+            "removed": "VS8773",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E705",
+            "removed": "TK7810",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E705",
+            "removed": "QF8771",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E705",
+            "removed": "JL9206",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E312",
+            "removed": "AF3775",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E312",
+            "removed": "VS8406",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E312",
+            "removed": "QF5085",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E312",
+            "removed": "JL9783",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E312",
+            "removed": "BA8290",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E203",
+            "removed": "VS8771",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E203",
+            "removed": "TK7809",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E203",
+            "removed": "QF8767",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E203",
+            "removed": "KL3656",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E203",
+            "removed": "JL9201",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E203",
+            "removed": "BA7997",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E203",
+            "removed": "AF6096",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E203",
+            "removed": "AA9188",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9600",
+            "removed": "IX2404",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9591",
+            "removed": "IX2371",
+            "route": "GAU -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E834",
+            "removed": "BA8848",
+            "route": "MAA -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9929",
+            "removed": "IX2745",
+            "route": "VTZ -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9574",
+            "removed": "IX2935",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E484",
+            "removed": "VS8397",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E484",
+            "removed": "QF5083",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E484",
+            "removed": "JL9019",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E484",
+            "removed": "BA8291",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E484",
+            "removed": "AF6516",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9771",
+            "removed": "IX1394",
+            "route": "VGA -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E495",
+            "removed": "BA8849",
+            "route": "MAA -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2625",
+            "removed": "MS9567",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2625",
+            "removed": "LX9872",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2625",
+            "removed": "LH5314",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5044",
+            "removed": "VS8554",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5044",
+            "removed": "KL3662",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5044",
+            "removed": "BA7987",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5044",
+            "removed": "AF3781",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2873",
+            "removed": "ET1543",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5246",
+            "removed": "VS8558",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6178",
+            "removed": "VS8408",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6178",
+            "removed": "QF5084",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6178",
+            "removed": "KL3704",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6178",
+            "removed": "JL9200",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6178",
+            "removed": "AF3351",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI1793",
+            "removed": "LH5531",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI1793",
+            "removed": "ET1082",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI1793",
+            "removed": "LO4445",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9570",
+            "removed": "IX2018",
+            "route": "BLR -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E704",
+            "removed": "VS8775",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E704",
+            "removed": "QF8768",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E704",
+            "removed": "JL9212",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E704",
+            "removed": "AF6092",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E704",
+            "removed": "AA9187",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9979",
+            "removed": "IX2837",
+            "route": "PNQ -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2577",
+            "removed": "LX9860",
+            "route": "DEL -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5179",
+            "removed": "VS8553",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5179",
+            "removed": "AF3356",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6187",
+            "removed": "VS8612",
+            "route": "BOM -> HYD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2880",
+            "removed": "OZ6393",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2880",
+            "removed": "AC6432",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6727",
+            "removed": "BA8218",
+            "route": "HYD -> AMD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6417",
+            "removed": "VS8533",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6417",
+            "removed": "QF5094",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6417",
+            "removed": "JL9615",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E710",
+            "removed": "VS9136",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E710",
+            "removed": "QF8777",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E710",
+            "removed": "JL9628",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E710",
+            "removed": "AA9214",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5259",
+            "removed": "VS9128",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5259",
+            "removed": "AF3327",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2890",
+            "removed": "SQ4870",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E314",
+            "removed": "JL9612",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E314",
+            "removed": "VS9107",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E314",
+            "removed": "QF5092",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6372",
+            "removed": "VS9154",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6372",
+            "removed": "QF8794",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6372",
+            "removed": "JL9636",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6372",
+            "removed": "AA9195",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E668",
+            "removed": "BA8845",
+            "route": "HYD -> MAA",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2447",
+            "removed": "SQ4861",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2447",
+            "removed": "LX9873",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9569",
+            "removed": "IX1345",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6234",
+            "removed": "BA7962",
+            "route": "HYD -> COK",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "QR4777",
+            "removed": "QR1315",
+            "route": "HYD -> DOH",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2541",
+            "removed": "SQ4851",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9658",
+            "removed": "IX2746",
+            "route": "HYD -> IXB",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E711",
+            "removed": "VS9146",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E711",
+            "removed": "QF8780",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E711",
+            "removed": "JL9631",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E504",
+            "removed": "BA8833",
+            "route": "HYD -> VTZ",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6405",
+            "removed": "VS9111",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6405",
+            "removed": "QF5090",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6405",
+            "removed": "JL9620",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9408",
+            "removed": "IX2819",
+            "route": "HYD -> VTZ",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5099",
+            "removed": "VS9118",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E514",
+            "removed": "BA8847",
+            "route": "HYD -> MAA",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6682",
+            "removed": "BA7963",
+            "route": "HYD -> COK",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6031",
+            "removed": "VS9148",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6031",
+            "removed": "QF8784",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6031",
+            "removed": "JL9632",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E409",
+            "removed": "BA8831",
+            "route": "HYD -> VTZ",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5384",
+            "removed": "VS9131",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9575",
+            "removed": "IX2937",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2559",
+            "removed": "NH6934",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9798",
+            "removed": "IX2372",
+            "route": "HYD -> IXR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E376",
+            "removed": "BA7951",
+            "route": "HYD -> CCU",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6202",
+            "removed": "VS9151",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6202",
+            "removed": "QF8786",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6202",
+            "removed": "JL9634",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "VA5619",
+            "removed": "NZ3259",
+            "route": "HYD -> SIN",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "VA5619",
+            "removed": "NH5365",
+            "route": "HYD -> SIN",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "VA5619",
+            "removed": "SQ519",
+            "route": "HYD -> SIN",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E7211",
+            "removed": "BA8826",
+            "route": "HYD -> VGA",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9567",
+            "removed": "IX1407",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E879",
+            "removed": "BA8832",
+            "route": "HYD -> VTZ",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E997",
+            "removed": "BA8217",
+            "route": "HYD -> AMD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "KL3879",
+            "removed": "EY353",
+            "route": "HYD -> AUH",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6719",
+            "removed": "MH5611",
+            "route": "HYD -> PAT",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6719",
+            "removed": "MH5282",
+            "route": "HYD -> PAT",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6281",
+            "removed": "VS9153",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6281",
+            "removed": "QF8793",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6281",
+            "removed": "JL9635",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6151",
+            "removed": "BA8846",
+            "route": "HYD -> MAA",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6707",
+            "removed": "BA7964",
+            "route": "HYD -> COK",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6066",
+            "removed": "VS9106",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6066",
+            "removed": "QF5088",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6066",
+            "removed": "JL9613",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6066",
+            "removed": "BA8295",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5174",
+            "removed": "VS8260",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5174",
+            "removed": "BA7988",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9601",
+            "removed": "IX2405",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E7208",
+            "removed": "BA8825",
+            "route": "HYD -> VGA",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E134",
+            "removed": "BA8216",
+            "route": "HYD -> AMD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E714",
+            "removed": "MH5578",
+            "route": "HYD -> VTZ",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6207",
+            "removed": "MH5607",
+            "route": "HYD -> PAT",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6207",
+            "removed": "MH5279",
+            "route": "HYD -> PAT",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E664",
+            "removed": "BA7952",
+            "route": "HYD -> CCU",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E151",
+            "removed": "VS9099",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E151",
+            "removed": "QF5086",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E151",
+            "removed": "JL9607",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E151",
+            "removed": "BA8293",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9571",
+            "removed": "IX2019",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5213",
+            "removed": "VS9125",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "BA276",
+            "removed": "AA6668",
+            "route": "HYD -> LHR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6408",
+            "removed": "MH5606",
+            "route": "HYD -> VTZ",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9928",
+            "removed": "IX2837",
+            "route": "HYD -> VTZ",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "D0154",
+            "removed": "BZ154",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6196",
+            "removed": "VS9119",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6196",
+            "removed": "BA7990",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E413",
+            "removed": "VS9102",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E413",
+            "removed": "QF5029",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E413",
+            "removed": "JL9728",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E707",
+            "removed": "VS9145",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E707",
+            "removed": "QF8778",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E707",
+            "removed": "JL9629",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9573",
+            "removed": "IX2934",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9590",
+            "removed": "IX2370",
+            "route": "HYD -> GAU",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2872",
+            "removed": "LH5522",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2872",
+            "removed": "ET1087",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI1806",
+            "removed": "LH5524",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI1806",
+            "removed": "ET1085",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E709",
+            "removed": "VS9140",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E709",
+            "removed": "QF8776",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E709",
+            "removed": "JL9627",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E709",
+            "removed": "BA8002",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5245",
+            "removed": "VS9127",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "QR1313",
+            "removed": "QR4775",
+            "route": "HYD -> DOH",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "OV736",
+            "removed": "WY5226",
+            "route": "HYD -> MCT",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI8753",
+            "removed": "LH753",
+            "route": "HYD -> FRA",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI8753",
+            "removed": "AC9621",
+            "route": "HYD -> FRA",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "EK2247",
+            "removed": "FZ436",
+            "route": "HYD -> DXB",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5143",
+            "removed": "VS8616",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5143",
+            "removed": "TK7844",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9978",
+            "removed": "IX2645",
+            "route": "HYD -> PNQ",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E706",
+            "removed": "VS9134",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E706",
+            "removed": "QF8772",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E706",
+            "removed": "JL9626",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E706",
+            "removed": "BA8001",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "MH199",
+            "removed": "JL7948",
+            "route": "HYD -> KUL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AF4339",
+            "removed": "EY359",
+            "route": "HYD -> AUH",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6025",
+            "removed": "VS8261",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6025",
+            "removed": "TK7808",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6025",
+            "removed": "QF8792",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6025",
+            "removed": "JL9621",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E949",
+            "removed": "VS9105",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E949",
+            "removed": "QF5030",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E949",
+            "removed": "JL9611",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5057",
+            "removed": "VS9121",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5057",
+            "removed": "TK7842",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2776",
+            "removed": "LO4446",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2776",
+            "removed": "ET1083",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "SQ523",
+            "removed": "VA5653",
+            "route": "HYD -> SIN",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "SQ523",
+            "removed": "NZ3253",
+            "route": "HYD -> SIN",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "SQ523",
+            "removed": "AC5848",
+            "route": "HYD -> SIN",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2699",
+            "removed": "ET1224",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5203",
+            "removed": "VS9133",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5203",
+            "removed": "TK7843",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5203",
+            "removed": "KL3679",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E285",
+            "removed": "VS9100",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E285",
+            "removed": "QF5096",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E285",
+            "removed": "JL9608",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E285",
+            "removed": "BA8294",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E285",
+            "removed": "AF3798",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2876",
+            "removed": "MK8053",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2876",
+            "removed": "LH5277",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2870",
+            "removed": "LH7261",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2870",
+            "removed": "ET4403",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6505",
+            "removed": "VS9114",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6505",
+            "removed": "QF5098",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6505",
+            "removed": "JL9619",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6505",
+            "removed": "AF6455",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E1027",
+            "removed": "QF8759",
+            "route": "HYD -> SIN",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E216",
+            "removed": "BA8217",
+            "route": "HYD -> AMD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9565",
+            "removed": "IX1378",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E890",
+            "removed": "VS9144",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E890",
+            "removed": "TK7805",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E890",
+            "removed": "QF8774",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E890",
+            "removed": "KL4748",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E890",
+            "removed": "JL9625",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E890",
+            "removed": "BA8000",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E890",
+            "removed": "AF3785",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI840",
+            "removed": "LX9861",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E7283",
+            "removed": "BA8824",
+            "route": "HYD -> VGA",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6043",
+            "removed": "VS9149",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6043",
+            "removed": "QF8782",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6043",
+            "removed": "JL9644",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6043",
+            "removed": "AF6056",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5039",
+            "removed": "VS9115",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5039",
+            "removed": "BA7989",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5039",
+            "removed": "AF3325",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6783",
+            "removed": "VS8259",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6783",
+            "removed": "QF5032",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6783",
+            "removed": "JL9624",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9896",
+            "removed": "IX2743",
+            "route": "HYD -> VGA",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2880",
+            "removed": "OZ6393",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2880",
+            "removed": "AC6432",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6727",
+            "removed": "BA8218",
+            "route": "HYD -> AMD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6417",
+            "removed": "VS8533",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6417",
+            "removed": "QF5094",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6417",
+            "removed": "JL9615",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E710",
+            "removed": "VS9136",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E710",
+            "removed": "QF8777",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E710",
+            "removed": "JL9628",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E710",
+            "removed": "AA9214",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5259",
+            "removed": "VS9128",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5259",
+            "removed": "AF3327",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2890",
+            "removed": "SQ4870",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2447",
+            "removed": "SQ4861",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2447",
+            "removed": "LX9873",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9569",
+            "removed": "IX1345",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E314",
+            "removed": "VS9107",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E314",
+            "removed": "QF5092",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E314",
+            "removed": "JL9612",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6372",
+            "removed": "VS9154",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6372",
+            "removed": "QF8794",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6372",
+            "removed": "JL9636",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6372",
+            "removed": "AA9195",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E668",
+            "removed": "BA8845",
+            "route": "HYD -> MAA",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6234",
+            "removed": "BA7962",
+            "route": "HYD -> COK",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2541",
+            "removed": "SQ4851",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9658",
+            "removed": "IX2746",
+            "route": "HYD -> IXB",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E711",
+            "removed": "VS9146",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E711",
+            "removed": "QF8780",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E711",
+            "removed": "JL9631",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E504",
+            "removed": "BA8833",
+            "route": "HYD -> VTZ",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6405",
+            "removed": "VS9111",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6405",
+            "removed": "QF5090",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6405",
+            "removed": "JL9620",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9408",
+            "removed": "IX2819",
+            "route": "HYD -> VTZ",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6915",
+            "removed": "KL4750",
+            "route": "HYD -> IDR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5099",
+            "removed": "VS9118",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E514",
+            "removed": "BA8847",
+            "route": "HYD -> MAA",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6682",
+            "removed": "BA7963",
+            "route": "HYD -> COK",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E409",
+            "removed": "BA8831",
+            "route": "HYD -> VTZ",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6031",
+            "removed": "VS9148",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6031",
+            "removed": "QF8784",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6031",
+            "removed": "JL9632",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5384",
+            "removed": "VS9131",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9575",
+            "removed": "IX2937",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2559",
+            "removed": "NH6934",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9798",
+            "removed": "IX2372",
+            "route": "HYD -> IXR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E7211",
+            "removed": "BA8826",
+            "route": "HYD -> VGA",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E376",
+            "removed": "BA7951",
+            "route": "HYD -> CCU",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6202",
+            "removed": "VS9151",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6202",
+            "removed": "QF8786",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6202",
+            "removed": "JL9634",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E362",
+            "removed": "KL4724",
+            "route": "HYD -> GOI",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9567",
+            "removed": "IX1407",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E875",
+            "removed": "KL4710",
+            "route": "HYD -> CCJ",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E879",
+            "removed": "BA8832",
+            "route": "HYD -> VTZ",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "KL3879",
+            "removed": "EY353",
+            "route": "HYD -> AUH",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6719",
+            "removed": "MH5282",
+            "route": "HYD -> PAT",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6719",
+            "removed": "MH5611",
+            "route": "HYD -> PAT",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E714",
+            "removed": "MH5578",
+            "route": "HYD -> VTZ",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E997",
+            "removed": "KL4704",
+            "route": "HYD -> BDQ",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9573",
+            "removed": "IX2934",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6281",
+            "removed": "VS9153",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6281",
+            "removed": "QF8793",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6281",
+            "removed": "JL9635",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6151",
+            "removed": "BA8846",
+            "route": "HYD -> MAA",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6707",
+            "removed": "BA7964",
+            "route": "HYD -> COK",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6066",
+            "removed": "VS9106",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6066",
+            "removed": "QF5088",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6066",
+            "removed": "JL9613",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6066",
+            "removed": "BA8295",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5174",
+            "removed": "VS8260",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5174",
+            "removed": "BA7988",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9601",
+            "removed": "IX2405",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E7208",
+            "removed": "BA8825",
+            "route": "HYD -> VGA",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E134",
+            "removed": "BA8216",
+            "route": "HYD -> AMD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6408",
+            "removed": "MH5606",
+            "route": "HYD -> VTZ",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6408",
+            "removed": "KL4746",
+            "route": "HYD -> VTZ",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6207",
+            "removed": "MH5279",
+            "route": "HYD -> PAT",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6207",
+            "removed": "MH5606",
+            "route": "HYD -> PAT",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E664",
+            "removed": "BA7952",
+            "route": "HYD -> CCU",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E151",
+            "removed": "VS9099",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E151",
+            "removed": "QF5086",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E151",
+            "removed": "JL9607",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E151",
+            "removed": "BA8293",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9571",
+            "removed": "IX2019",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5213",
+            "removed": "VS9125",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "BA276",
+            "removed": "AA6668",
+            "route": "HYD -> LHR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6646",
+            "removed": "KL4716",
+            "route": "HYD -> CJB",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E752",
+            "removed": "KL4718",
+            "route": "HYD -> COK",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E243",
+            "removed": "KL4736",
+            "route": "HYD -> MAA",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9928",
+            "removed": "IX2837",
+            "route": "HYD -> VTZ",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9770",
+            "removed": "IX2715",
+            "route": "HYD -> VGA",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5209",
+            "removed": "KL4538",
+            "route": "HYD -> AMD",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6196",
+            "removed": "VS9119",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6196",
+            "removed": "BA7990",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E413",
+            "removed": "VS9102",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E413",
+            "removed": "QF5029",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E413",
+            "removed": "KL3707",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E413",
+            "removed": "JL9655",
+            "route": "HYD -> BLR",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E707",
+            "removed": "VS9145",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E707",
+            "removed": "QF8778",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E707",
+            "removed": "JL9629",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E179",
+            "removed": "KL4728",
+            "route": "HYD -> LKO",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E928",
+            "removed": "KL4742",
+            "route": "HYD -> STV",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5278",
+            "removed": "KL4744",
+            "route": "HYD -> TRV",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9590",
+            "removed": "IX2370",
+            "route": "HYD -> GAU",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E6494",
+            "removed": "KL4714",
+            "route": "HYD -> CCU",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E815",
+            "removed": "KL4752",
+            "route": "HYD -> JAI",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2872",
+            "removed": "LH5522",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI2872",
+            "removed": "ET1087",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI1806",
+            "removed": "LH5524",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E709",
+            "removed": "VS9140",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E709",
+            "removed": "QF8776",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E709",
+            "removed": "JL9627",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E709",
+            "removed": "BA8002",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5245",
+            "removed": "VS9127",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E351",
+            "removed": "KL4740",
+            "route": "HYD -> PNQ",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "QR1313",
+            "removed": "QR4775",
+            "route": "HYD -> DOH",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "OV736",
+            "removed": "WY5226",
+            "route": "HYD -> MCT",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI8753",
+            "removed": "LH753",
+            "route": "HYD -> FRA",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI8753",
+            "removed": "AC9621",
+            "route": "HYD -> FRA",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "EK2247",
+            "removed": "FZ436",
+            "route": "HYD -> DXB",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5143",
+            "removed": "VS8616",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5143",
+            "removed": "TK7844",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E5143",
+            "removed": "KL3695",
+            "route": "HYD -> BOM",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "AI9978",
+            "removed": "IX2645",
+            "route": "HYD -> PNQ",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E706",
+            "removed": "VS9134",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E706",
+            "removed": "QF8772",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E706",
+            "removed": "KL3809",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E706",
+            "removed": "JL9626",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "6E706",
+            "removed": "BA8001",
+            "route": "HYD -> DEL",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "KL874",
+            "removed": "DL9547",
+            "route": "HYD -> AMS",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "KL874",
+            "removed": "AF6689",
+            "route": "HYD -> AMS",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "TG330",
+            "removed": "NH5988",
+            "route": "HYD -> BKK",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "TG330",
+            "removed": "AC7444",
+            "route": "HYD -> BKK",
+            "reason": "codeshare duplicate"
+        },
+        {
+            "kept": "MH199",
+            "removed": "JL7948",
+            "route": "HYD -> KUL",
+            "reason": "codeshare duplicate"
+        }
+    ]
+}

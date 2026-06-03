@@ -19,7 +19,7 @@ from services.service import FlightService
 
 flight_service = FlightService()
 from core.database import DatabaseManager
-from models.models import AirlineModel, AirportModel, UserModel, FlightStatusHistory, GateModel, GateAssignmentModel
+from models.models import AirlineModel, AirportModel, UserModel, FlightStatusHistory, GateModel, GateAssignmentModel, OperationalAlertModel
 from services.auth_service import AuthService
 from utils.status_updater import status_update_loop
 
@@ -27,6 +27,7 @@ from controllers.auth_controller import router as auth_router
 from controllers.airport_controller import router as airport_router
 from controllers.flight_controller import router as flight_router
 from controllers.analytics_controller import router as analytics_router
+from controllers.alert_controller import router as alert_router
 
 
 # ── Seed Data ────────────────────────────────────────────────────
@@ -151,6 +152,34 @@ def verify_timestamp_schema(db: DatabaseManager):
     print("[App] Timestamp schema verified: healthy.")
 
 
+def verify_makeup_area_schema(db: DatabaseManager):
+    """
+    Diagnostic check: Ensure makeup_area column exists in flights table.
+
+    makeup_area is used for DEPARTURE BHS operations — it represents the
+    Beumer BHS make-up/sorting zone (e.g. M1, M2, M3) where bags are
+    sorted and loaded onto the aircraft before departure.
+
+    If the column is missing (e.g. on an existing DB before this migration),
+    it is added automatically via ALTER TABLE — matching the pattern of
+    verify_delay_schema() and verify_timestamp_schema().
+
+    Equivalent SQL migration:
+        ALTER TABLE flights ADD COLUMN makeup_area VARCHAR(10) NULL;
+    """
+    from sqlalchemy import inspect, text
+    inspector = inspect(db.engine)
+    columns = [c["name"] for c in inspector.get_columns("flights")]
+
+    with db.engine.connect() as conn:
+        if "makeup_area" not in columns:
+            print("[Migration] Adding 'makeup_area' column to 'flights' table...")
+            conn.execute(text("ALTER TABLE flights ADD COLUMN makeup_area VARCHAR(10) NULL"))
+            conn.commit()
+            print("[Migration] 'makeup_area' column added successfully.")
+    print("[App] Departure BHS (make-up area) schema verified: healthy.")
+
+
 def seed_gates_and_assignments(db: DatabaseManager):
     """
     Scans all existing flights, seeds the gates table for any existing unique gates,
@@ -236,6 +265,7 @@ async def lifespan(app: FastAPI):
     verify_carousel_schema(db)
     verify_delay_schema(db)
     verify_timestamp_schema(db)
+    verify_makeup_area_schema(db)
 
     # Verify flight_status_history table exists (auto-created by create_tables above)
     from sqlalchemy import inspect as sa_inspect
@@ -319,6 +349,7 @@ app.include_router(auth_router)
 app.include_router(airport_router)
 app.include_router(flight_router)
 app.include_router(analytics_router)
+app.include_router(alert_router)
 
 
 # ── Users Endpoint (Admin Only) ───────────────────────────────────────────────

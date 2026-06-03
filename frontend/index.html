@@ -1,905 +1,712 @@
 <!DOCTYPE html>
+
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beumer Group — Flight Management System</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Beumer Group — Flight Management System</title>
+<link href="/static/style.css?v=1.0.1" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
-
-    <!-- ══════════════════════════════════════
+<!-- ══════════════════════════════════════
      SHARED NAVBAR
 ════════════════════════════════════════ -->
-    <nav class="navbar hidden" id="main-navbar">
-        <div class="nav-logo" onclick="showPage('landing')">
-            <img src="/static/logo_dark_bg.png" alt="Beumer Group">
-        </div>
-        <div class="nav-right">
-            <span class="nav-link hidden" id="nav-analytics-link" onclick="showPage('analytics')">Analytics</span>
-            <span class="nav-link active-link" onclick="showPage('airports')">Airports</span>
-            <span class="nav-link hidden" id="nav-register-link" onclick="showPage('register')">Register User</span>
-
-            <!-- User profile pill — clicking opens a dropdown with account actions -->
-            <div class="nav-user-wrap" id="nav-user-wrap">
-                <div class="nav-user" id="nav-user-pill" onclick="toggleUserPillMenu(event)" title="Account options"
-                    style="cursor:pointer;user-select:none">
-                    <span id="nav-fullname"></span>
-                    <span class="role-badge" id="nav-role-badge"></span>
-                    <span class="nav-pill-caret" id="nav-pill-caret">&#9662;</span>
-                </div>
-                <!-- Dropdown menu (shown only when open) -->
-                <div class="nav-user-menu" id="nav-user-menu">
-                    <!-- Change Password — shown for staff and viewer only -->
-                    <div class="nav-user-menu-item hidden" id="nav-changepw-item" onclick="openChangePwModal()">
+<nav class="navbar hidden" id="main-navbar">
+<div class="nav-logo" onclick="showPage('landing')">
+<img alt="Beumer Group" src="/static/logo_dark_bg.png"/>
+</div>
+<div class="nav-right">
+<span class="nav-link hidden" id="nav-analytics-link" onclick="showPage('analytics')">Analytics</span>
+<span class="nav-link active-link" onclick="showPage('airports')">Airports</span>
+<span class="nav-link hidden" id="nav-register-link" onclick="showPage('register')">Register User</span>
+<!-- User profile pill — clicking opens a dropdown with account actions -->
+<div class="nav-user-wrap" id="nav-user-wrap">
+<div class="nav-user" id="nav-user-pill" onclick="toggleUserPillMenu(event)" style="cursor:pointer;user-select:none" title="Account options">
+<span id="nav-fullname"></span>
+<span class="role-badge" id="nav-role-badge"></span>
+<span class="nav-pill-caret" id="nav-pill-caret">▾</span>
+</div>
+<!-- Dropdown menu (shown only when open) -->
+<div class="nav-user-menu" id="nav-user-menu">
+<!-- Change Password — shown for staff and viewer only -->
+<div class="nav-user-menu-item hidden" id="nav-changepw-item" onclick="openChangePwModal()">
                         Change Password
                     </div>
-                    <!-- Admin sees their role indicator instead -->
-                    <div class="nav-user-menu-item" id="nav-admin-info" style="display:none"
-                        onclick="showPage('admin-profile')">
+<!-- Admin sees their role indicator instead -->
+<div class="nav-user-menu-item" id="nav-admin-info" onclick="showPage('admin-profile')" style="display:none">
                         Admin Account
                     </div>
-                </div>
-            </div>
-
-            <button class="btn-logout" onclick="handleLogout()">Logout</button>
-        </div>
-    </nav>
-
-    <!-- ══════════════════════════════════════
+</div>
+</div>
+<button class="btn-logout" onclick="handleLogout()">Logout</button>
+</div>
+</nav>
+<!-- ══════════════════════════════════════
      PAGE: LANDING
 ════════════════════════════════════════ -->
-    <div id="page-landing" class="page">
-        <div class="landing-left">
-            <div class="landing-logo">
-                <img src="/static/logo_raw_white.png" alt="Beumer Group" style="height:80px;object-fit:contain;">
-            </div>
-            <h1 class="landing-title">Flight Management<br>System</h1>
-            <button class="btn-enter" onclick="showPage('login')">Enter system &rarr;</button>
-        </div>
-        <div class="landing-right">
-            <img src="/static/airport_hero.png" alt="Airport Terminal">
-        </div>
-    </div>
-
-    <!-- ══════════════════════════════════════
+<div class="page" id="page-landing">
+<div class="landing-left">
+<div class="landing-logo">
+<img alt="Beumer Group" src="/static/logo_raw_white.png" style="height:80px;object-fit:contain;"/>
+</div>
+<h1 class="landing-title">Flight Management<br/>System</h1>
+<button class="btn-enter" onclick="showPage('login')">Enter system →</button>
+</div>
+<div class="landing-right">
+<img alt="Airport Terminal" src="/static/airport_hero.png"/>
+</div>
+</div>
+<!-- ══════════════════════════════════════
      PAGE: LOGIN
 ════════════════════════════════════════ -->
-    <div id="page-login" class="page">
-        <div class="login-card">
-            <div class="login-logo">
-                <img src="/static/logo_dark_bg.png" alt="Beumer Group">
-            </div>
-            <h2>Flight Management System</h2>
-            <p>Sign in to your account</p>
-            <div class="login-error" id="login-error"></div>
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" id="login-username" placeholder="Enter your username" autofocus>
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="login-password" placeholder="Enter your password"
-                    onkeydown="if(event.key==='Enter')handleLogin()">
-            </div>
-            <button class="btn-primary" id="login-btn" onclick="handleLogin()">Sign In</button>
-            <p style="text-align:center;margin-top:16px;font-size:13px;color:var(--text3)">
-                <a onclick="showPage('landing')" style="color:var(--cyan);cursor:pointer">← Back to home</a>
-            </p>
-        </div>
-    </div>
-
-    <!-- ══════════════════════════════════════
+<div class="page" id="page-login">
+<div class="login-card">
+<div class="login-logo">
+<img alt="Beumer Group" src="/static/logo_dark_bg.png"/>
+</div>
+<h2>Flight Management System</h2>
+<p>Sign in to your account</p>
+<div class="login-error" id="login-error"></div>
+<div class="form-group">
+<label>Username</label>
+<input autofocus="" id="login-username" placeholder="Enter your username" type="text"/>
+</div>
+<div class="form-group">
+<label>Password</label>
+<input id="login-password" onkeydown="if(event.key==='Enter')handleLogin()" placeholder="Enter your password" type="password"/>
+</div>
+<button class="btn-primary" id="login-btn" onclick="handleLogin()">Sign In</button>
+<p style="text-align:center;margin-top:16px;font-size:13px;color:var(--text3)">
+<a onclick="showPage('landing')" style="color:var(--cyan);cursor:pointer">← Back to home</a>
+</p>
+</div>
+</div>
+<!-- ══════════════════════════════════════
      PAGE: AIRPORTS
 ════════════════════════════════════════ -->
-    <div id="page-airports" class="page">
-        <div class="page-container">
-            <div class="page-header">
-                <h1>Select an <span>Airport</span></h1>
-                <p>Choose an airport to view and manage flights</p>
-            </div>
-            <div class="airport-grid" id="airports-grid"></div>
-        </div>
-        <footer class="footer">
-            <p>Beumer Group — Flight Management System &copy; 2026</p>
-            <p class="footer-sub">Powered by FastAPI &middot; RabbitMQ &middot; MySQL</p>
-        </footer>
-    </div>
-
-    <!-- ══════════════════════════════════════
+<div class="page" id="page-airports">
+<div class="page-container">
+<div class="page-header">
+<h1>Welcome to <span>Rajiv Gandhi International Airport</span></h1>
+<p>Hyderabad • Select an Airline to view and manage flights</p>
+</div>
+<div class="airport-grid" id="airports-grid"></div>
+</div>
+<footer class="footer">
+<p>Beumer Group — Flight Management System © 2026</p>
+<p class="footer-sub">Powered by FastAPI · RabbitMQ · MySQL</p>
+</footer>
+</div>
+<!-- ══════════════════════════════════════
      PAGE: ANALYTICS
 ════════════════════════════════════════ -->
-    <div id="page-analytics" class="page">
-        <div class="page-container">
-            <div class="page-header dash-header">
-                <div>
-                    <h1>Operations <span>Dashboard</span></h1>
-                    <p>Enterprise command center &amp; live intelligence</p>
-                </div>
-                <div class="dash-meta">
-                    <span class="dash-live-dot"></span>
-                    <span id="dash-last-updated" class="dash-updated-label">Connecting…</span>
-                </div>
-            </div>
+<div class="page" id="page-analytics">
+<div class="page-container">
+<div class="page-header dash-header">
+<div>
+<h1>Operations <span>Dashboard</span></h1>
+<p>From Gate to Carousel — Complete Flight Operations Visibility</p>
+</div>
+<div class="dash-meta">
+<span class="dash-live-dot"></span>
+<span class="dash-updated-label" id="dash-last-updated">Connecting…</span>
+</div>
+</div>
+<!-- KPI Cards -->
+<div class="kpi-grid" id="analytics-kpis">
+<!-- injected by renderKPIs() -->
+</div>
+<!-- Charts row -->
+<div class="analytics-row">
+<div class="analytics-card">
+<h3 class="card-section-title">
+<span class="card-icon">🍩</span> Flight Status Distribution
+                    </h3>
+<div class="chart-wrapper">
+<canvas id="statusChart"></canvas>
+</div>
+</div>
+<div class="analytics-card">
+<h3 class="card-section-title">
+<span class="card-icon">📊</span> Flights per Airline
+                    </h3>
+<div class="chart-wrapper">
+<canvas id="airlineChart"></canvas>
+</div>
+</div>
 
-            <!-- KPI Cards -->
-            <div class="kpi-grid" id="analytics-kpis">
-                <!-- injected by renderKPIs() -->
-            </div>
 
-            <!-- Charts row -->
-            <div class="analytics-row">
-                <div class="analytics-card">
-                    <h3 class="card-section-title">
-                        <span class="card-icon">🍩</span> Flight Status Distribution
+<div class="analytics-card">
+<h3 class="card-section-title">
+<span class="card-icon">🏛️</span> Flights per Terminal
                     </h3>
-                    <div class="chart-wrapper">
-                        <canvas id="statusChart"></canvas>
-                    </div>
-                </div>
-                <div class="analytics-card">
-                    <h3 class="card-section-title">
-                        <span class="card-icon">📊</span> Flights per Airline
+<div class="chart-wrapper">
+<canvas id="terminalChart"></canvas>
+</div>
+</div>
+<div class="analytics-card">
+<h3 class="card-section-title">
+<span class="card-icon">🚧</span> Gate Infrastructure Status
                     </h3>
-                    <div class="chart-wrapper">
-                        <canvas id="airlineChart"></canvas>
-                    </div>
-                </div>
-                <div class="analytics-card">
-                    <h3 class="card-section-title">
-                        <span class="card-icon">🏢</span> Active Flights by Airport
+<div id="gate-infrastructure-summary" style="height:260px; display:flex; flex-direction:column; justify-content:center; gap:20px; padding: 10px;">
+<!-- injected dynamically by script.js -->
+</div>
+</div>
+<div class="analytics-card">
+<h3 class="card-section-title">
+<span class="card-icon">✈️</span> Arrival vs Departure Traffic Analysis
                     </h3>
-                    <div class="chart-wrapper">
-                        <canvas id="airportChart"></canvas>
-                    </div>
-                </div>
-                <div class="analytics-card">
-                    <h3 class="card-section-title">
-                        <span class="card-icon">💡</span> Alert Reason Distribution
-                    </h3>
-                    <div class="chart-wrapper">
-                        <canvas id="alertReasonChart"></canvas>
-                    </div>
-                </div>
-                <div class="analytics-card">
-                    <h3 class="card-section-title">
-                        <span class="card-icon">⏱️</span> Top Delayed Flights
-                    </h3>
-                    <div id="top-delayed-flights-list" class="alerts-scroll" style="height:260px; overflow-y:auto; padding-top:8px;"></div>
-                </div>
-                <div class="analytics-card">
-                    <h3 class="card-section-title">
-                        <span class="card-icon">⚠️</span> Delay Severity Summary
-                    </h3>
-                    <div id="delay-severity-summary" style="height:260px; display:flex; flex-direction:column; justify-content:center; gap:16px;"></div>
-                </div>
-                <div class="analytics-card">
-                    <h3 class="card-section-title">
-                        <span class="card-icon">🏛️</span> Flights per Terminal
-                    </h3>
-                    <div class="chart-wrapper">
-                        <canvas id="terminalChart"></canvas>
-                    </div>
-                </div>
-                <div class="analytics-card">
-                    <h3 class="card-section-title">
-                        <span class="card-icon">🚧</span> Gate Infrastructure Status
-                    </h3>
-                    <div id="gate-infrastructure-summary" style="height:260px; display:flex; flex-direction:column; justify-content:center; gap:20px; padding: 10px;">
-                        <!-- injected dynamically by script.js -->
-                    </div>
-                </div>
-                <div class="analytics-card">
-                    <h3 class="card-section-title">
-                        <span class="card-icon">📈</span> Peak Traffic Analysis
-                    </h3>
-                    <div class="chart-wrapper">
-                        <canvas id="trafficChart"></canvas>
-                    </div>
-                </div>
-            </div>
+<div class="chart-wrapper">
+<canvas id="trafficChart"></canvas>
+</div>
+</div>
 
-            <!-- Alerts + Email row -->
-            <div class="analytics-row-bottom">
-                <div class="analytics-card">
-                    <h3 class="card-section-title">
-                        <span class="card-icon">🚨</span> Live Operational Alerts
+<div class="analytics-card">
+<h3 class="card-section-title">
+<span class="card-icon">🧳</span> Carousel Utilization
+                    </h3>
+<p class="card-hint" style="margin-top:-10px; margin-bottom:10px;">Current baggage carousel workload distribution</p>
+<div class="chart-wrapper">
+<canvas id="carouselChart"></canvas>
+</div>
+</div>
+
+</div>
+<!-- Alerts + Email row -->
+<div class="analytics-row-bottom">
+<div class="analytics-card">
+<h3 class="card-section-title">
+<span class="card-icon">🚨</span> Live Operational Alerts
                         <span class="alerts-count-badge" id="alerts-count-badge"></span>
+</h3>
+<div class="alerts-scroll" id="operational-alerts-list"></div>
+</div>
+<div class="analytics-card">
+<h3 class="card-section-title">
+<span class="card-icon">📧</span> Batch Email Monitor
                     </h3>
-                    <div id="operational-alerts-list" class="alerts-scroll"></div>
-                </div>
-                <div class="analytics-card">
-                    <h3 class="card-section-title">
-                        <span class="card-icon">📧</span> Batch Email Monitor
-                    </h3>
-                    <p class="card-hint">worker.py must be running for emails to send</p>
-                    <div id="email-batches-container"></div>
-                    
-                    <!-- System Integration Status Section -->
-                    <div class="email-system-status" style="margin-top:20px; border-top:1px dashed var(--gray2); padding-top:16px; display:flex; flex-direction:column; gap:12px;">
-                        <h4 style="font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin:0 0 4px 0;">
-                            System Integration Status
-                        </h4>
-                        <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; color:var(--text2);">
-                            <span style="display:flex; align-items:center; gap:6px;">
-                                <span style="width:8px; height:8px; background:#10b981; border-radius:50%; box-shadow:0 0 8px #10b981; display:inline-block;"></span>
-                                SMTP Gateway
-                            </span>
-                            <span style="color:#10b981; font-weight:700;">CONNECTED</span>
-                        </div>
-                        <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; color:var(--text2);">
-                            <span style="display:flex; align-items:center; gap:6px;">
-                                <span style="width:8px; height:8px; background:#10b981; border-radius:50%; box-shadow:0 0 8px #10b981; display:inline-block;"></span>
-                                RabbitMQ Broker
-                            </span>
-                            <span style="color:#10b981; font-weight:700;">ONLINE</span>
-                        </div>
-                        <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; color:var(--text2);">
-                            <span style="display:flex; align-items:center; gap:6px;">
-                                <span style="width:8px; height:8px; background:#3b82f6; border-radius:50%; box-shadow:0 0 8px #3b82f6; display:inline-block;"></span>
-                                Background Worker
-                            </span>
-                            <span style="color:#3b82f6; font-weight:700;">IDLE</span>
-                        </div>
-                        <div style="margin-top:8px;">
-                            <button id="trigger-test-email-btn" onclick="triggerTestEmailBatch()" style="width:100%; padding:10px; background:linear-gradient(135deg, var(--cyan) 0%, var(--teal) 100%); color:#fff; border:none; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 4px 12px rgba(13, 148, 136, 0.2); transition:transform 0.1s, box-shadow 0.1s; display:flex; align-items:center; justify-content:center; gap:6px;">
-                                📧 Trigger Manual Batch Sync
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <footer class="footer">
-            <p>Beumer Group — Flight Management System &copy; 2026</p>
-            <p class="footer-sub">Auto-refreshing every 5 seconds &middot; FastAPI &middot; RabbitMQ &middot; OpenSky
+<p class="card-hint">worker.py must be running for emails to send</p>
+<div id="email-batches-container"></div>
+<!-- System Integration Status Section — Redesigned -->
+<div class="sys-status-block">
+<!-- Section Header -->
+<div class="sys-status-header">
+<div class="sys-status-pulse-ring"></div>
+<div>
+<h4 class="sys-status-title">System Integration Status</h4>
+<p class="sys-status-subtitle">Real-time health of backend services</p>
+</div>
+</div>
+<!-- Status Rows -->
+<div class="sys-status-rows">
+<div class="sys-status-row">
+<span class="sys-status-label">
+<span class="sys-dot sys-dot-green"></span>
+<span class="sys-service-icon">📡</span>
+                                    SMTP Gateway
+                                </span>
+<span class="sys-badge sys-badge-green">CONNECTED</span>
+</div>
+<div class="sys-status-row">
+<span class="sys-status-label">
+<span class="sys-dot sys-dot-green"></span>
+<span class="sys-service-icon">🐇</span>
+                                    RabbitMQ Broker
+                                </span>
+<span class="sys-badge sys-badge-green">ONLINE</span>
+</div>
+<div class="sys-status-row">
+<span class="sys-status-label">
+<span class="sys-dot sys-dot-blue"></span>
+<span class="sys-service-icon">⚙️</span>
+                                    Background Worker
+                                </span>
+<span class="sys-badge sys-badge-blue">IDLE</span>
+</div>
+</div>
+<!-- Divider with label -->
+<div class="sys-verify-divider">
+<span>Verify System Health</span>
+</div>
+<!-- What this button does — info box -->
+<div class="sys-verify-info">
+<div class="sys-verify-info-icon">💡</div>
+<p>Click the button below to send a <strong>live test email</strong> to the admin inbox. If you receive it, <strong>all systems are fully operational</strong>. If not, check your SMTP credentials in <code>.env</code>.</p>
+</div>
+<!-- Premium CTA Button -->
+<button class="sys-verify-btn" id="trigger-test-email-btn" onclick="triggerTestEmailBatch()" title="Sends a diagnostic email to verify all backend services are connected and working">
+<span class="sys-verify-btn-icon">📧</span>
+<span class="sys-verify-btn-text">
+<span class="sys-verify-btn-main">Send Diagnostic Email</span>
+<span class="sys-verify-btn-sub">Tap to verify full system connectivity</span>
+</span>
+<span class="sys-verify-btn-arrow">→</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<footer class="footer">
+<p>Beumer Group — Flight Management System © 2026</p>
+<p class="footer-sub">Auto-refreshing every 5 seconds · FastAPI · RabbitMQ · OpenSky
             </p>
-        </footer>
-    </div>
-
-    <!-- ══════════════════════════════════════
+</footer>
+</div>
+<!-- ══════════════════════════════════════
      PAGE: REGISTER
 ════════════════════════════════════════ -->
-    <div id="page-register" class="page">
-        <div class="page-container">
-            <button class="btn-back" onclick="showPage('airports')">← Back to Airports</button>
-            <div class="page-header">
-                <h1>Register <span>New User</span></h1>
-                <p>Create accounts for staff and viewers. Credentials are emailed automatically.</p>
-            </div>
-            <div class="register-card">
-                <h2>User Details</h2>
-                <div id="reg-success" class="msg-box msg-success"></div>
-                <div id="reg-error" class="msg-box msg-error"></div>
-                <div class="form-grid">
-                    <div class="form-group"><label>Full Name</label><input type="text" id="r-fullname"
-                            placeholder="e.g. Rahul Sharma"></div>
-                    <div class="form-group"><label>Email Address</label><input type="email" id="r-email"
-                            placeholder="user@company.com"></div>
-                    <div class="form-group"><label>Username</label><input type="text" id="r-username"
-                            placeholder="e.g. rahul_staff"></div>
-                    <div class="form-group"><label>Role</label>
-                        <select id="r-role" onchange="toggleAirportField()">
-                            <option value="viewer">Viewer (Read Only)</option>
-                            <option value="staff">Staff (Read + Create)</option>
-                            <option value="admin">Admin (Full Access)</option>
-                        </select>
-                    </div>
-                    <div class="form-group" id="r-airport-group"><label>Assigned Airport</label>
-                        <select id="r-airport">
-                            <option value="">Select Airport…</option>
-                        </select>
-                    </div>
-                    <div class="form-group"><label>Password</label><input type="password" id="r-password"
-                            placeholder="Create a password"></div>
-                    <div class="form-group"><label>Confirm Password</label><input type="password" id="r-confirm"
-                            placeholder="Repeat password"></div>
-                </div>
-                <div
-                    style="margin-top:16px;padding:12px 16px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;font-size:13px;color:#0369a1;margin-bottom:16px">
+<div class="page" id="page-register">
+<div class="page-container">
+<button class="btn-back" onclick="showPage('airports')">← Back to Airports</button>
+<div class="page-header">
+<h1>Register <span>New User</span></h1>
+<p>Create accounts for staff and viewers. Credentials are emailed automatically.</p>
+</div>
+<div class="register-card">
+<h2>User Details</h2>
+<div class="msg-box msg-success" id="reg-success"></div>
+<div class="msg-box msg-error" id="reg-error"></div>
+<div class="form-grid">
+<div class="form-group"><label>Full Name</label><input id="r-fullname" placeholder="e.g. Rahul Sharma" type="text"/></div>
+<div class="form-group"><label>Email Address</label><input id="r-email" placeholder="user@company.com" type="email"/></div>
+<div class="form-group"><label>Username</label><input id="r-username" placeholder="e.g. rahul_staff" type="text"/></div>
+<div class="form-group"><label>Role</label>
+<select id="r-role" onchange="toggleAirportField()">
+<option value="viewer">Viewer (Read Only)</option>
+<option value="staff">Staff (Read + Create)</option>
+<option value="admin">Admin (Full Access)</option>
+</select>
+</div>
+<div class="form-group" id="r-airport-group"><label>Assigned Airport</label>
+<select id="r-airport">
+<option value="">Select Airport…</option>
+</select>
+</div>
+<div class="form-group"><label>Password</label><input id="r-password" placeholder="Create a password" type="password"/></div>
+<div class="form-group"><label>Confirm Password</label><input id="r-confirm" placeholder="Repeat password" type="password"/></div>
+</div>
+<div style="margin-top:16px;padding:12px 16px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;font-size:13px;color:#0369a1;margin-bottom:16px">
                     An email with login credentials will be sent automatically after registration.
                 </div>
-                <button class="btn-primary" id="register-btn" onclick="handleRegister()">Register &amp; Send
+<button class="btn-primary" id="register-btn" onclick="handleRegister()">Register &amp; Send
                     Email</button>
-            </div>
-            <div class="users-table-card">
-                <h2>Registered Users</h2>
-                <div style="overflow:visible;margin-top:16px">
-                    <table class="plain-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Airport</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="users-tbody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <footer class="footer">
-            <p>Beumer Group — Flight Management System &copy; 2026</p>
-        </footer>
-    </div>
-
-    <!-- ══════════════════════════════════════
+</div>
+<div class="users-table-card">
+<h2>Registered Users</h2>
+<div style="overflow:visible;margin-top:16px">
+<table class="plain-table">
+<thead>
+<tr>
+<th>Name</th>
+<th>Username</th>
+<th>Email</th>
+<th>Role</th>
+<th>Airport</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="users-tbody"></tbody>
+</table>
+</div>
+</div>
+</div>
+<footer class="footer">
+<p>Beumer Group — Flight Management System © 2026</p>
+</footer>
+</div>
+<!-- ══════════════════════════════════════
      PAGE: FLIGHTS
 ════════════════════════════════════════ -->
-    <div id="page-flights" class="page">
-        <div class="page-container">
-            <div class="breadcrumb">
-                <a onclick="showPage('airports')">Airports</a>
-                <span>›</span>
-                <span id="bc-airport">Airport</span>
-            </div>
-            <div class="page-header">
-                <h1 id="flight-page-title">Flights</h1>
-                <p id="flight-page-sub"></p>
-                <div id="airline-breadcrumb" style="font-weight:500;color:var(--text2);margin-top:8px;font-size:14px;">
-                </div>
-            </div>
+<div class="page" id="page-flights">
+<div class="page-container">
+<div class="breadcrumb">
+<a onclick="showPage('airports')">Airports</a>
+<span>›</span>
+<span id="bc-airport">Airport</span>
+</div>
+<div class="page-header">
+<h1 id="flight-page-title">Flights</h1>
+<p id="flight-page-sub"></p>
+<div id="airline-breadcrumb" style="font-weight:500;color:var(--text2);margin-top:8px;font-size:14px;">
+</div>
+</div>
+<div class="category-grid">
+<div class="category-card active" data-type="arrival" onclick="setCategory('arrival',this)">
+<div class="cat-icon">🛬</div>
+<h3>Arriving Flights</h3>
+<p>Incoming flights</p>
+</div>
+<div class="category-card" data-type="departure" onclick="setCategory('departure',this)">
+<div class="cat-icon">🛫</div>
+<h3>Departing Flights</h3>
+<p>Outgoing flights</p>
+</div>
 
-            <div class="category-grid">
-                <div class="category-card active" data-type="arrival" onclick="setCategory('arrival',this)">
-                    <div class="cat-icon">🛬</div>
-                    <h3>Arriving Flights</h3>
-                    <p>Incoming flights</p>
-                </div>
-                <div class="category-card" data-type="departure" onclick="setCategory('departure',this)">
-                    <div class="cat-icon">🛫</div>
-                    <h3>Departing Flights</h3>
-                    <p>Outgoing flights</p>
-                </div>
-                <div class="category-card" data-type="info" onclick="setCategory('info',this)">
-                    <div class="cat-icon">ℹ️</div>
-                    <h3>Airline Info</h3>
-                    <p>5 airlines</p>
-                </div>
-            </div>
+</div>
 
-            <div id="airline-info-section" class="hidden">
-                <div style="margin-bottom:16px;display:flex;justify-content:flex-end;">
-                    <button class="btn-primary" onclick="clearAirlineFilter()" style="padding:8px 16px;">All
-                        Airlines</button>
-                </div>
-                <div class="airline-info-grid">
-                    <div class="airline-info-card" onclick="selectAirline(event,'IndiGo')" style="cursor:pointer;">
-                        <div class="big-badge badge-6E">6E</div>
-                        <h3>IndiGo</h3>
-                        <p id="indigo-stats">India's largest airline</p>
-                    </div>
-                    <div class="airline-info-card" onclick="selectAirline(event,'Akasa Air')" style="cursor:pointer;">
-                        <div class="big-badge badge-QP">QP</div>
-                        <h3>Akasa Air</h3>
-                        <p id="akasa-stats">New low-cost carrier</p>
-                    </div>
-                    <div class="airline-info-card" onclick="selectAirline(event,'Emirates')" style="cursor:pointer;">
-                        <div class="big-badge badge-EK">EK</div>
-                        <h3>Emirates</h3>
-                        <p id="emirates-stats">Dubai-based carrier</p>
-                    </div>
-                    <div class="airline-info-card" onclick="selectAirline(event,'Air India')" style="cursor:pointer;">
-                        <div class="big-badge badge-AI">AI</div>
-                        <h3>Air India</h3>
-                        <p id="airindia-stats">India's flag carrier</p>
-                    </div>
-                    <div class="airline-info-card" onclick="selectAirline(event,'Vistara')" style="cursor:pointer;">
-                        <div class="big-badge badge-UK">UK</div>
-                        <h3>Vistara</h3>
-                        <p id="vistara-stats">Premium full-service</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="flight-board-section">
-                <div class="stats-bar">
-                    <div class="stat-card" data-status="ALL" onclick="filterByStatus('ALL')"><span class="stat-number"
-                            id="stat-total">0</span><span class="stat-label">Total</span></div>
-                    <div class="stat-card" data-status="Arrived" onclick="filterByStatus('Arrived')"><span
-                            class="stat-number" id="stat-arrived">0</span><span class="stat-label">Arrived</span></div>
-                    <div class="stat-card" data-status="Boarding" onclick="filterByStatus('Boarding')"><span
-                            class="stat-number" id="stat-boarding">0</span><span class="stat-label">Boarding</span>
-                    </div>
-                    <div class="stat-card" data-status="Scheduled" onclick="filterByStatus('Scheduled')"><span
-                            class="stat-number" id="stat-scheduled">0</span><span class="stat-label">Scheduled</span>
-                    </div>
-                    <div class="stat-card" data-status="Delayed" onclick="filterByStatus('Delayed')"><span
-                            class="stat-number" id="stat-delayed">0</span><span class="stat-label">Delayed</span></div>
-                </div>
-                <div class="controls-bar">
-                    <div class="terminal-tabs">
-                        <button class="tab-btn active" onclick="setTerminal('ALL',this)">All</button>
-                        <button class="tab-btn" onclick="setTerminal('T1',this)">T1</button>
-                        <button class="tab-btn" onclick="setTerminal('T2',this)">T2</button>
-                        <button class="tab-btn" onclick="setTerminal('T3',this)">T3</button>
-                    </div>
-                    <div class="filters">
-                        <div class="filter-group">
-                            <label>Airline</label>
-                            <select id="airline-filter" onchange="activeAirline=this.value;renderBoard()">
-                                <option value="ALL">All Airlines</option>
-                                <option value="6E">IndiGo (6E)</option>
-                                <option value="QP">Akasa Air (QP)</option>
-                                <option value="EK">Emirates (EK)</option>
-                                <option value="AI">Air India (AI)</option>
-                                <option value="UK">Vistara (UK)</option>
-                            </select>
-                        </div>
-                        <button class="btn-sync" id="btn-sync-live" onclick="syncLiveFlights()">↻ Sync Live</button>
-                        <button class="btn-add hidden" id="btn-add-flight" onclick="toggleForm()">+ Add Flight</button>
-                    </div>
-                </div>
-
-                <div id="add-flight-form" class="form-section hidden">
-                    <h2>Add New Flight</h2>
-                    <div class="form-grid-flight">
-                        <div class="form-field"><label>Flight Number</label><input type="text" id="f-number"
-                                placeholder="e.g. 6E-3001"></div>
-                        <div class="form-field"><label>Airline</label>
-                            <select id="f-airline">
-                                <option value="">Select</option>
-                                <option value="6E">IndiGo (6E)</option>
-                                <option value="QP">Akasa Air (QP)</option>
-                                <option value="EK">Emirates (EK)</option>
-                                <option value="AI">Air India (AI)</option>
-                                <option value="UK">Vistara (UK)</option>
-                            </select>
-                        </div>
-                        <div class="form-field"><label>Origin</label><input type="text" id="f-origin"
-                                placeholder="e.g. Delhi (DEL)"></div>
-                        <div class="form-field"><label>Destination</label><input type="text" id="f-destination"
-                                placeholder="e.g. Mumbai (BOM)"></div>
-                        <div class="form-field"><label>Departure</label><input type="time" id="f-departure"></div>
-                        <div class="form-field"><label>Arrival</label><input type="time" id="f-arrival"></div>
-                        <div class="form-field"><label>Gate</label><input type="text" id="f-gate"
-                                placeholder="e.g. G12"></div>
-                        <div class="form-field"><label>Terminal</label>
-                            <select id="f-terminal">
-                                <option value="">Select</option>
-                                <option value="T1">T1</option>
-                                <option value="T2">T2</option>
-                                <option value="T3">T3</option>
-                            </select>
-                        </div>
-                        <div class="form-field"><label>Status</label>
-                            <select id="f-status">
-                                <option value="Scheduled">Scheduled</option>
-                                <option value="Boarding">Boarding</option>
-                                <option value="Departed">Departed</option>
-                                <option value="Arrived">Arrived</option>
-                                <option value="Delayed">Delayed</option>
-                                <option value="Cancelled">Cancelled</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-actions">
-                        <button class="btn-submit" onclick="submitFlight()">Add Flight</button>
-                        <button class="btn-cancel-form" onclick="toggleForm()">Cancel</button>
-                    </div>
-                </div>
-
-                <div class="table-wrapper" id="table-wrapper">
-                    <table class="flights-table">
-                        <thead>
-                            <tr>
-                                <th>Flight</th>
-                                <th>Airline</th>
-                                <th>Route</th>
-                                <th>Departure</th>
-                                <th>Arrival</th>
-                                <th>Gate</th>
-                                <th>Terminal</th>
-                                <th>Carousel</th>
-                                <th>Status</th>
-                                <th id="actions-th" class="cell-actions">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="flights-tbody"></tbody>
-                    </table>
-                </div>
-                <div id="empty-state" class="empty-state hidden">
-                    <div class="empty-icon">🛬</div>
-                    <h3>No flights found</h3>
-                    <p>No flights match the current filters. Try syncing live data.</p>
-                </div>
-            </div>
-        </div>
-        <footer class="footer">
-            <p>Beumer Group — Flight Management System &copy; 2026</p>
-            <p class="footer-sub">Data refreshes every 5 seconds</p>
-        </footer>
-    </div>
-
-    <!-- ══════════════════════════════════════
+<div id="flight-board-section">
+<div class="stats-bar">
+<div class="stat-card" data-status="ALL" onclick="filterByStatus('ALL')"><span class="stat-number" id="stat-total">0</span><span class="stat-label">Total</span></div>
+<div class="stat-card" data-status="Arrived" onclick="filterByStatus('Arrived')"><span class="stat-number" id="stat-arrived">0</span><span class="stat-label">Arrived</span></div>
+<div class="stat-card" data-status="Boarding" onclick="filterByStatus('Boarding')"><span class="stat-number" id="stat-boarding">0</span><span class="stat-label">Boarding</span>
+</div>
+<div class="stat-card" data-status="Scheduled" onclick="filterByStatus('Scheduled')"><span class="stat-number" id="stat-scheduled">0</span><span class="stat-label">Scheduled</span>
+</div>
+<div class="stat-card" data-status="Delayed" onclick="filterByStatus('Delayed')"><span class="stat-number" id="stat-delayed">0</span><span class="stat-label">Delayed</span></div>
+</div>
+<div class="controls-bar">
+<div class="terminal-tabs">
+<button class="tab-btn active" onclick="setTerminal('ALL',this)">All</button>
+<button class="tab-btn" onclick="setTerminal('T1',this)">T1</button>
+<button class="tab-btn" onclick="setTerminal('T2',this)">T2</button>
+<button class="tab-btn" onclick="setTerminal('T3',this)">T3</button>
+</div>
+<div class="filters">
+<button class="btn-sync" id="btn-sync-live" onclick="syncLiveFlights()">↻ Sync Live</button>
+<button class="btn-add hidden" id="btn-add-flight" onclick="toggleForm()">+ Add Flight</button>
+</div>
+</div>
+<div class="form-section hidden" id="add-flight-form">
+<h2>Add New Flight</h2>
+<div class="form-grid-flight">
+<div class="form-field"><label>Flight Number</label><input id="f-number" placeholder="e.g. 6E-3001" type="text"/></div>
+<div class="form-field"><label>Airline</label>
+<select id="f-airline">
+<option value="">Select</option>
+<option value="6E">IndiGo (6E)</option>
+<option value="QP">Akasa Air (QP)</option>
+<option value="EK">Emirates (EK)</option>
+<option value="AI">Air India (AI)</option>
+<option value="UK">Vistara (UK)</option>
+</select>
+</div>
+<div class="form-field"><label>Origin</label><input id="f-origin" placeholder="e.g. Delhi (DEL)" type="text"/></div>
+<div class="form-field"><label>Destination</label><input id="f-destination" placeholder="e.g. Mumbai (BOM)" type="text"/></div>
+<div class="form-field"><label>Departure</label><input id="f-departure" type="time"/></div>
+<div class="form-field"><label>Arrival</label><input id="f-arrival" type="time"/></div>
+<div class="form-field"><label>Gate</label><input id="f-gate" placeholder="e.g. G12" type="text"/></div>
+<div class="form-field"><label>Terminal</label>
+<select id="f-terminal">
+<option value="">Select</option>
+<option value="T1">T1</option>
+<option value="T2">T2</option>
+<option value="T3">T3</option>
+</select>
+</div>
+<div class="form-field"><label>Status</label>
+<select id="f-status">
+<option value="Scheduled">Scheduled</option>
+<option value="Boarding">Boarding</option>
+<option value="Departed">Departed</option>
+<option value="Arrived">Arrived</option>
+<option value="Delayed">Delayed</option>
+<option value="Cancelled">Cancelled</option>
+</select>
+</div>
+</div>
+<div class="form-actions">
+<button class="btn-submit" onclick="submitFlight()">Add Flight</button>
+<button class="btn-cancel-form" onclick="toggleForm()">Cancel</button>
+</div>
+</div>
+<div class="table-wrapper" id="table-wrapper">
+<table class="flights-table">
+<thead id="flights-thead">
+<!-- Headers are injected dynamically by renderBoard() based on flight type -->
+</thead>
+<tbody id="flights-tbody"></tbody>
+</table>
+</div>
+<div class="empty-state hidden" id="empty-state">
+<div class="empty-icon">🛬</div>
+<h3>No flights found</h3>
+<p>No flights match the current filters. Try syncing live data.</p>
+</div>
+</div>
+</div>
+<footer class="footer">
+<p>Beumer Group — Flight Management System © 2026</p>
+<p class="footer-sub">Data refreshes every 5 seconds</p>
+</footer>
+</div>
+<!-- ══════════════════════════════════════
      PAGE: USER EDIT
 ════════════════════════════════════════ -->
-    <div id="page-user-edit" class="page">
-        <div class="page-container">
-            <button class="btn-back" id="user-edit-back-btn" onclick="showPage('register')">← Back to Users</button>
-
-            <div class="page-header">
-                <h1>Edit <span id="ue-header-name">User</span></h1>
-                <p id="ue-header-sub">Manage user profile, password, airport assignment and account status.</p>
-            </div>
-
-            <!-- ── Row: Profile Info + Change Password ── -->
-            <div class="ue-row">
-
-                <!-- User Info Card -->
-                <div class="ue-card">
-                    <div class="ue-card-header">
-                        <span class="ue-card-icon"></span>
-                        <h2>User Information</h2>
-                    </div>
-                    <div id="ue-msg-info" class="msg-box"></div>
-                    <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" id="ue-fullname" placeholder="Full name">
-                    </div>
-                    <div class="form-group">
-                        <label>Email Address</label>
-                        <input type="email" id="ue-email" placeholder="email@company.com">
-                    </div>
-                    <div class="form-group">
-                        <label>Username</label>
-                        <input type="text" id="ue-username" placeholder="username" disabled
-                            style="background:#f8f9fc;color:#718096;">
-                    </div>
-                    <div class="form-group">
-                        <label>Role</label>
-                        <select id="ue-role">
-                            <option value="viewer">Viewer (Read Only)</option>
-                            <option value="staff">Staff (Read + Create)</option>
-                            <option value="admin">Admin (Full Access)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Current Airport</label>
-                        <input type="text" id="ue-current-airport" placeholder="—" disabled
-                            style="background:#f8f9fc;color:#718096;">
-                    </div>
-                    <div id="ue-status-badge-wrap" style="margin-bottom:16px">
-                        <span id="ue-status-badge" class="ue-status-badge"></span>
-                    </div>
-                    <button class="btn-ue-save" id="ue-save-btn" onclick="saveUserInfo()">Save Changes</button>
-                </div>
-
-                <!-- Change Password Card -->
-                <div class="ue-card">
-                    <div class="ue-card-header">
-                        <span class="ue-card-icon"></span>
-                        <h2>Change Password</h2>
-                    </div>
-                    <div id="ue-msg-pw" class="msg-box"></div>
-                    <p class="ue-hint">Set a new password for this user. They will be notified via email.</p>
-                    <div class="form-group">
-                        <label>New Password</label>
-                        <input type="password" id="ue-new-password" placeholder="Enter new password">
-                    </div>
-                    <div class="form-group">
-                        <label>Confirm Password</label>
-                        <input type="password" id="ue-confirm-password" placeholder="Repeat new password">
-                    </div>
-                    <button class="btn-ue-secondary" onclick="changeUserPassword()">
+<div class="page" id="page-user-edit">
+<div class="page-container">
+<button class="btn-back" id="user-edit-back-btn" onclick="showPage('register')">← Back to Users</button>
+<div class="page-header">
+<h1>Edit <span id="ue-header-name">User</span></h1>
+<p id="ue-header-sub">Manage user profile, password, airport assignment and account status.</p>
+</div>
+<!-- ── Row: Profile Info + Change Password ── -->
+<div class="ue-row">
+<!-- User Info Card -->
+<div class="ue-card">
+<div class="ue-card-header">
+<span class="ue-card-icon"></span>
+<h2>User Information</h2>
+</div>
+<div class="msg-box" id="ue-msg-info"></div>
+<div class="form-group">
+<label>Full Name</label>
+<input id="ue-fullname" placeholder="Full name" type="text"/>
+</div>
+<div class="form-group">
+<label>Email Address</label>
+<input id="ue-email" placeholder="email@company.com" type="email"/>
+</div>
+<div class="form-group">
+<label>Username</label>
+<input disabled="" id="ue-username" placeholder="username" style="background:#f8f9fc;color:#718096;" type="text"/>
+</div>
+<div class="form-group">
+<label>Role</label>
+<select id="ue-role">
+<option value="viewer">Viewer (Read Only)</option>
+<option value="staff">Staff (Read + Create)</option>
+<option value="admin">Admin (Full Access)</option>
+</select>
+</div>
+<div class="form-group">
+<label>Current Airport</label>
+<input disabled="" id="ue-current-airport" placeholder="—" style="background:#f8f9fc;color:#718096;" type="text"/>
+</div>
+<div id="ue-status-badge-wrap" style="margin-bottom:16px">
+<span class="ue-status-badge" id="ue-status-badge"></span>
+</div>
+<button class="btn-ue-save" id="ue-save-btn" onclick="saveUserInfo()">Save Changes</button>
+</div>
+<!-- Change Password Card -->
+<div class="ue-card">
+<div class="ue-card-header">
+<span class="ue-card-icon"></span>
+<h2>Change Password</h2>
+</div>
+<div class="msg-box" id="ue-msg-pw"></div>
+<p class="ue-hint">Set a new password for this user. They will be notified via email.</p>
+<div class="form-group">
+<label>New Password</label>
+<input id="ue-new-password" placeholder="Enter new password" type="password"/>
+</div>
+<div class="form-group">
+<label>Confirm Password</label>
+<input id="ue-confirm-password" placeholder="Repeat new password" type="password"/>
+</div>
+<button class="btn-ue-secondary" onclick="changeUserPassword()">
                         Update Password
                     </button>
-                    <div class="ue-divider"></div>
-                    <p class="ue-hint">Or send a system-generated password to the user's email:</p>
-                    <button class="btn-ue-outline" onclick="resetPasswordFromEdit()">
+<div class="ue-divider"></div>
+<p class="ue-hint">Or send a system-generated password to the user's email:</p>
+<button class="btn-ue-outline" onclick="resetPasswordFromEdit()">
                         Send Reset Email
                     </button>
-                </div>
-            </div>
-
-            <!-- ── Row: Change Airport + Danger Zone ── -->
-            <div class="ue-row">
-
-                <!-- Change Airport Card -->
-                <div class="ue-card">
-                    <div class="ue-card-header">
-                        <span class="ue-card-icon"></span>
-                        <h2>Change Assigned Airport</h2>
-                    </div>
-                    <div id="ue-msg-airport" class="msg-box"></div>
-                    <p class="ue-hint">Reassign this user to a different airport. Admins are not scoped to any airport.
+</div>
+</div>
+<!-- ── Row: Change Airport + Danger Zone ── -->
+<div class="ue-row">
+<!-- Change Airport Card -->
+<div class="ue-card">
+<div class="ue-card-header">
+<span class="ue-card-icon"></span>
+<h2>Change Assigned Airport</h2>
+</div>
+<div class="msg-box" id="ue-msg-airport"></div>
+<p class="ue-hint">Reassign this user to a different airport. Admins are not scoped to any airport.
                     </p>
-                    <div class="form-group">
-                        <label>Select Airport</label>
-                        <select id="ue-airport-select">
-                            <option value="">— All Airports (Admin) —</option>
-                        </select>
-                    </div>
-                    <button class="btn-ue-secondary" onclick="changeUserAirport()">
+<div class="form-group">
+<label>Select Airport</label>
+<select id="ue-airport-select">
+<option value="">— All Airports (Admin) —</option>
+</select>
+</div>
+<button class="btn-ue-secondary" onclick="changeUserAirport()">
                         Update Airport
                     </button>
-                </div>
-
-                <!-- Danger Zone Card -->
-                <div class="ue-card ue-danger-card">
-                    <div class="ue-card-header">
-                        <span class="ue-card-icon"></span>
-                        <h2>Account Actions</h2>
-                    </div>
-                    <p class="ue-hint">These actions affect the user's access immediately.</p>
-
-                    <div class="ue-action-row">
-                        <div>
-                            <strong id="ue-deactivate-label">Deactivate User</strong>
-                            <p class="ue-hint" style="margin:4px 0 0">Revokes login access without deleting the account.
+</div>
+<!-- Danger Zone Card -->
+<div class="ue-card ue-danger-card">
+<div class="ue-card-header">
+<span class="ue-card-icon"></span>
+<h2>Account Actions</h2>
+</div>
+<p class="ue-hint">These actions affect the user's access immediately.</p>
+<div class="ue-action-row">
+<div>
+<strong id="ue-deactivate-label">Deactivate User</strong>
+<p class="ue-hint" style="margin:4px 0 0">Revokes login access without deleting the account.
                             </p>
-                        </div>
-                        <button class="btn-ue-deactivate" id="ue-deactivate-btn" onclick="toggleUserDeactivate()">
+</div>
+<button class="btn-ue-deactivate" id="ue-deactivate-btn" onclick="toggleUserDeactivate()">
                             Deactivate
                         </button>
-                    </div>
-
-                    <div class="ue-divider"></div>
-
-                    <div class="ue-action-row">
-                        <div>
-                            <strong style="color:var(--danger)">Delete User</strong>
-                            <p class="ue-hint" style="margin:4px 0 0">Permanently removes the account. Cannot be undone.
+</div>
+<div class="ue-divider"></div>
+<div class="ue-action-row">
+<div>
+<strong style="color:var(--danger)">Delete User</strong>
+<p class="ue-hint" style="margin:4px 0 0">Permanently removes the account. Cannot be undone.
                             </p>
-                        </div>
-                        <button class="btn-ue-delete" onclick="deleteUserFromEdit()">Delete</button>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-        <footer class="footer">
-            <p>Beumer Group — Flight Management System &copy; 2026</p>
-        </footer>
-    </div>
-
-
-    <!-- ══════════════════════════════════════
+</div>
+<button class="btn-ue-delete" onclick="deleteUserFromEdit()">Delete</button>
+</div>
+</div>
+</div>
+</div>
+<footer class="footer">
+<p>Beumer Group — Flight Management System © 2026</p>
+</footer>
+</div>
+<!-- ══════════════════════════════════════
      PAGE: ADMIN PROFILE
 ════════════════════════════════════════ -->
-    <div id="page-admin-profile" class="page">
-        <div class="page-container">
-            <div class="page-header">
-                <h1>Admin Account</h1>
-                <p>Manage your administrator profile and security credentials.</p>
-            </div>
-
-            <div class="ue-row">
-                <!-- Admin Info Card -->
-                <div class="ue-card">
-                    <div class="ue-card-header"
-                        style="display:flex; justify-content:space-between; align-items:center;">
-                        <h2>Admin Information</h2>
-                        <button class="btn-ue-save" id="admin-edit-btn" onclick="toggleAdminEditMode(true)"
-                            style="width:auto; padding:6px 12px; font-size:12px; margin:0;">Edit Profile</button>
-                    </div>
-                    <div id="admin-msg-profile" class="msg-box"></div>
-                    <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" id="admin-fullname" disabled
-                            style="background:#f8f9fc;color:#718096;font-weight:500">
-                    </div>
-                    <div class="form-group">
-                        <label>Username</label>
-                        <input type="text" id="admin-username" disabled
-                            style="background:#f8f9fc;color:#718096;font-family:var(--mono)">
-                    </div>
-                    <div class="form-group">
-                        <label>Email Address</label>
-                        <input type="email" id="admin-email" disabled style="background:#f8f9fc;color:#718096;">
-                    </div>
-                    <div class="form-group">
-                        <label>Role</label>
-                        <input type="text" value="System Administrator" disabled
-                            style="background:#f8f9fc;color:#718096;font-weight:600">
-                    </div>
-
-                    <hr style="border:0;border-top:1px solid #edf2f7;margin:16px 0;">
-
-                    <div class="form-group">
-                        <label>Account Created Date</label>
-                        <input type="text" id="admin-created-at" disabled
-                            style="background:#f8f9fc;color:#718096;font-size:13px">
-                    </div>
-                    <div class="form-group">
-                        <label>Last Login Time</label>
-                        <input type="text" id="admin-last-login" disabled
-                            style="background:#f8f9fc;color:#718096;font-size:13px">
-                    </div>
-                    <div class="form-group">
-                        <label>Last Password Changed</label>
-                        <input type="text" id="admin-last-password-change" disabled
-                            style="background:#f8f9fc;color:#718096;font-size:13px">
-                    </div>
-
-                    <div id="admin-profile-actions" style="display:none;gap:10px;margin-top:16px;">
-                        <button class="btn-ue-save" onclick="saveAdminProfile()" style="margin:0;">Save Changes</button>
-                        <button class="btn-ue-save" onclick="toggleAdminEditMode(false)"
-                            style="background:#edf2f7;color:#4a5568;border:1px solid #cbd5e0;margin:0;">Cancel</button>
-                    </div>
-                </div>
-
-                <!-- Change Password Card -->
-                <div class="ue-card">
-                    <div class="ue-card-header">
-                        <h2>Change Password</h2>
-                    </div>
-                    <div id="admin-msg-pw" class="msg-box"></div>
-                    <div class="form-group">
-                        <label>Current Password</label>
-                        <input type="password" id="admin-current-password" placeholder="Enter current password">
-                    </div>
-                    <div class="form-group">
-                        <label>New Password</label>
-                        <input type="password" id="admin-new-password" placeholder="At least 8 characters">
-                    </div>
-                    <div class="form-group">
-                        <label>Confirm Password</label>
-                        <input type="password" id="admin-confirm-password" placeholder="Repeat new password">
-                    </div>
-                    <p style="font-size:12px;color:var(--text3);margin-bottom:16px;">
+<div class="page" id="page-admin-profile">
+<div class="page-container">
+<div class="page-header">
+<h1>Admin Account</h1>
+<p>Manage your administrator profile and security credentials.</p>
+</div>
+<div class="ue-row">
+<!-- Admin Info Card -->
+<div class="ue-card">
+<div class="ue-card-header" style="display:flex; justify-content:space-between; align-items:center;">
+<h2>Admin Information</h2>
+<button class="btn-ue-save" id="admin-edit-btn" onclick="toggleAdminEditMode(true)" style="width:auto; padding:6px 12px; font-size:12px; margin:0;">Edit Profile</button>
+</div>
+<div class="msg-box" id="admin-msg-profile"></div>
+<div class="form-group">
+<label>Full Name</label>
+<input disabled="" id="admin-fullname" style="background:#f8f9fc;color:#718096;font-weight:500" type="text"/>
+</div>
+<div class="form-group">
+<label>Username</label>
+<input disabled="" id="admin-username" style="background:#f8f9fc;color:#718096;font-family:var(--mono)" type="text"/>
+</div>
+<div class="form-group">
+<label>Email Address</label>
+<input disabled="" id="admin-email" style="background:#f8f9fc;color:#718096;" type="email"/>
+</div>
+<div class="form-group">
+<label>Role</label>
+<input disabled="" style="background:#f8f9fc;color:#718096;font-weight:600" type="text" value="System Administrator"/>
+</div>
+<hr style="border:0;border-top:1px solid #edf2f7;margin:16px 0;"/>
+<div class="form-group">
+<label>Account Created Date</label>
+<input disabled="" id="admin-created-at" style="background:#f8f9fc;color:#718096;font-size:13px" type="text"/>
+</div>
+<div class="form-group">
+<label>Last Login Time</label>
+<input disabled="" id="admin-last-login" style="background:#f8f9fc;color:#718096;font-size:13px" type="text"/>
+</div>
+<div class="form-group">
+<label>Last Password Changed</label>
+<input disabled="" id="admin-last-password-change" style="background:#f8f9fc;color:#718096;font-size:13px" type="text"/>
+</div>
+<div id="admin-profile-actions" style="display:none;gap:10px;margin-top:16px;">
+<button class="btn-ue-save" onclick="saveAdminProfile()" style="margin:0;">Save Changes</button>
+<button class="btn-ue-save" onclick="toggleAdminEditMode(false)" style="background:#edf2f7;color:#4a5568;border:1px solid #cbd5e0;margin:0;">Cancel</button>
+</div>
+</div>
+<!-- Change Password Card -->
+<div class="ue-card">
+<div class="ue-card-header">
+<h2>Change Password</h2>
+</div>
+<div class="msg-box" id="admin-msg-pw"></div>
+<div class="form-group">
+<label>Current Password</label>
+<input id="admin-current-password" placeholder="Enter current password" type="password"/>
+</div>
+<div class="form-group">
+<label>New Password</label>
+<input id="admin-new-password" placeholder="At least 8 characters" type="password"/>
+</div>
+<div class="form-group">
+<label>Confirm Password</label>
+<input id="admin-confirm-password" placeholder="Repeat new password" type="password"/>
+</div>
+<p style="font-size:12px;color:var(--text3);margin-bottom:16px;">
                         Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one
                         number, and one special character.
                     </p>
-                    <button class="btn-ue-save" id="btn-admin-pw" onclick="changeAdminPassword()">Update
+<button class="btn-ue-save" id="btn-admin-pw" onclick="changeAdminPassword()">Update
                         Password</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ══════════════════════════════════════════════════════
+</div>
+</div>
+</div>
+</div>
+<!-- ══════════════════════════════════════════════════════
      MODAL: CHANGE PASSWORD
      Available to all authenticated users via the nav-user pill dropdown.
      Validates current password server-side before updating.
 ════════════════════════════════════════════════════════════ -->
-    <div id="modal-changepw" class="cpw-overlay" onclick="closeCpwModalOnBackdrop(event)">
-        <div class="cpw-modal" role="dialog" aria-modal="true" aria-labelledby="cpw-title" id="cpw-modal-box">
-
-            <!-- Modal header -->
-            <div class="cpw-header">
-                <div class="cpw-header-left">
-                    <div>
-                        <h2 id="cpw-title">Change Password</h2>
-                        <p>Verify your current password, then set a new one.</p>
-                    </div>
-                </div>
-                <button class="cpw-close" onclick="closeChangePwModal()" title="Close">&times;</button>
-            </div>
-
-            <!-- Feedback message bar (success / error) -->
-            <div id="cpw-msg" class="cpw-msg" style="display:none"></div>
-
-            <!-- Form fields -->
-            <div class="cpw-body">
-                <div class="form-group">
-                    <label>Current Password</label>
-                    <input type="password" id="cpw-current" placeholder="Enter your current password"
-                        onkeydown="if(event.key==='Enter')submitChangePw()">
-                </div>
-                <div class="form-group">
-                    <label>New Password</label>
-                    <input type="password" id="cpw-new" placeholder="At least 6 characters"
-                        oninput="updatePwStrength(this.value)" onkeydown="if(event.key==='Enter')submitChangePw()">
-                </div>
-                <div class="form-group">
-                    <label>Confirm New Password</label>
-                    <input type="password" id="cpw-confirm" placeholder="Repeat new password"
-                        onkeydown="if(event.key==='Enter')submitChangePw()">
-                </div>
-
-                <!-- Password strength meter (shown once user starts typing) -->
-                <div class="cpw-strength-wrap" id="cpw-strength-wrap" style="display:none">
-                    <div class="cpw-strength-bar">
-                        <div class="cpw-strength-fill" id="cpw-strength-fill"></div>
-                    </div>
-                    <span class="cpw-strength-label" id="cpw-strength-label"></span>
-                </div>
-            </div>
-
-            <!-- Modal footer: Cancel + Submit -->
-            <div class="cpw-footer">
-                <button class="cpw-btn-cancel" onclick="closeChangePwModal()">Cancel</button>
-                <button class="cpw-btn-save" id="cpw-submit-btn" onclick="submitChangePw()">
+<div class="cpw-overlay" id="modal-changepw" onclick="closeCpwModalOnBackdrop(event)">
+<div aria-labelledby="cpw-title" aria-modal="true" class="cpw-modal" id="cpw-modal-box" role="dialog">
+<!-- Modal header -->
+<div class="cpw-header">
+<div class="cpw-header-left">
+<div>
+<h2 id="cpw-title">Change Password</h2>
+<p>Verify your current password, then set a new one.</p>
+</div>
+</div>
+<button class="cpw-close" onclick="closeChangePwModal()" title="Close">×</button>
+</div>
+<!-- Feedback message bar (success / error) -->
+<div class="cpw-msg" id="cpw-msg" style="display:none"></div>
+<!-- Form fields -->
+<div class="cpw-body">
+<div class="form-group">
+<label>Current Password</label>
+<input id="cpw-current" onkeydown="if(event.key==='Enter')submitChangePw()" placeholder="Enter your current password" type="password"/>
+</div>
+<div class="form-group">
+<label>New Password</label>
+<input id="cpw-new" oninput="updatePwStrength(this.value)" onkeydown="if(event.key==='Enter')submitChangePw()" placeholder="At least 6 characters" type="password"/>
+</div>
+<div class="form-group">
+<label>Confirm New Password</label>
+<input id="cpw-confirm" onkeydown="if(event.key==='Enter')submitChangePw()" placeholder="Repeat new password" type="password"/>
+</div>
+<!-- Password strength meter (shown once user starts typing) -->
+<div class="cpw-strength-wrap" id="cpw-strength-wrap" style="display:none">
+<div class="cpw-strength-bar">
+<div class="cpw-strength-fill" id="cpw-strength-fill"></div>
+</div>
+<span class="cpw-strength-label" id="cpw-strength-label"></span>
+</div>
+</div>
+<!-- Modal footer: Cancel + Submit -->
+<div class="cpw-footer">
+<button class="cpw-btn-cancel" onclick="closeChangePwModal()">Cancel</button>
+<button class="cpw-btn-save" id="cpw-submit-btn" onclick="submitChangePw()">
                     Update Password
                 </button>
-            </div>
-        </div>
-    </div>
+</div>
+</div>
+</div>
+<div class="cpw-overlay" id="edit-modal" onclick="if(event.target.id==='edit-modal')closeEditModal()">
+<div class="cpw-modal">
+<div class="cpw-header">
+<div class="cpw-header-left">
+<div>
+<h2>Edit Flight</h2>
+<p>Update status, gate, and carousel.</p>
+</div>
+</div>
+<button class="cpw-close" onclick="closeEditModal()">×</button>
+</div>
+<div class="cpw-body" id="edit-modal-body"></div>
+<div class="cpw-footer">
+<button class="cpw-btn-cancel" onclick="closeEditModal()">Cancel</button>
+<button class="cpw-btn-save" id="edit-modal-save">Save Changes</button>
+</div>
+</div>
+</div>
+<!-- BHS Message Log Panel (In Analytics) -->
 
-    <div id="edit-modal" class="cpw-overlay" onclick="if(event.target.id==='edit-modal')closeEditModal()">
-        <div class="cpw-modal">
-            <div class="cpw-header">
-                <div class="cpw-header-left">
-                    <div>
-                        <h2>Edit Flight</h2>
-                        <p>Update status, gate, and carousel.</p>
-                    </div>
-                </div>
-                <button class="cpw-close" onclick="closeEditModal()">&times;</button>
-            </div>
-            <div class="cpw-body" id="edit-modal-body"></div>
-            <div class="cpw-footer">
-                <button class="cpw-btn-cancel" onclick="closeEditModal()">Cancel</button>
-                <button class="cpw-btn-save" id="edit-modal-save">Save Changes</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- BHS Message Log Panel (In Analytics) -->
-    <div class="page" id="page-analytics">
-        <div class="page-header">
-            <h1>Analytics & BHS Monitoring</h1>
-            <p>Real-time Baggage Handling System status and flight statistics.</p>
-        </div>
-
-        <div class="bhs-layout">
-            <div class="bhs-main">
-                <!-- Existing Analytics Content would be here or wrapped -->
-                <!-- I'll add the BHS log as a new section -->
-                <div class="bhs-panel">
-                    <div class="panel-header">
-                        <h3>BHS Message Log</h3>
-                        <span class="live-indicator"><span class="dot"></span> Live Feed</span>
-                    </div>
-                    <div class="bhs-table-wrap">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Flight</th>
-                                    <th>Carousel</th>
-                                    <th>Event Status</th>
-                                    <th>Time</th>
-                                </tr>
-                            </thead>
-                            <tbody id="bhs-log-body">
-                                <!-- Populated by script.js -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Rest of analytics content (Charts etc) -->
-        <div class="analytics-grid">
-            <div class="analytics-card">
-                <h3>Flight Status Distribution</h3>
-                <div class="chart-container">
-                    <canvas id="statusChart"></canvas>
-                </div>
-            </div>
-            <div class="analytics-card">
-                <h3>Flights per Airline</h3>
-                <div class="chart-container">
-                    <canvas id="airlineChart"></canvas>
-                </div>
-            </div>
-            <div class="analytics-card">
-                <h3>Airport Comparison</h3>
-                <div class="chart-container">
-                    <canvas id="airportChart"></canvas>
-                </div>
-            </div>
-            <div class="analytics-card" id="operational-alerts-card">
-                <div class="panel-header">
-                    <h3>Live Operational Alerts</h3>
-                    <span class="live-indicator"><span class="dot"></span> Active</span>
-                </div>
-                <div class="alerts-container" id="alerts-container">
-                    <div class="empty-alert">No active operational alerts</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="/static/script.js"></script>
+<script src="/static/script.js?v=1.0.1"></script>
 </body>
-
 </html>

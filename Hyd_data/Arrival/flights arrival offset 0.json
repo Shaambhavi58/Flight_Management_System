@@ -1,0 +1,5259 @@
+{
+    "pagination": {
+        "limit": 100,
+        "offset": 0,
+        "count": 100,
+        "total": 733
+    },
+    "data": [
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Bagdogra",
+                "timezone": "Asia\/Kolkata",
+                "iata": "IXB",
+                "icao": "VEBD",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T18:05:00+00:00",
+                "estimated": "2026-05-28T18:05:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "2",
+                "scheduled": "2026-05-28T20:45:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Air India Express",
+                "iata": "IX",
+                "icao": "AXB"
+            },
+            "flight": {
+                "number": "2893",
+                "iata": "IX2893",
+                "icao": "AXB2893",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "800DB5"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Bagdogra",
+                "timezone": "Asia\/Kolkata",
+                "iata": "IXB",
+                "icao": "VEBD",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T18:05:00+00:00",
+                "estimated": "2026-05-28T18:05:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "2",
+                "scheduled": "2026-05-28T20:45:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Air India",
+                "iata": "AI",
+                "icao": "AIC"
+            },
+            "flight": {
+                "number": "9659",
+                "iata": "AI9659",
+                "icao": "AIC9659",
+                "codeshared": {
+                    "airline_name": "air india express",
+                    "airline_iata": "ix",
+                    "airline_icao": "axb",
+                    "flight_number": "2893",
+                    "flight_iata": "ix2893",
+                    "flight_icao": "axb2893"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "800DB5"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Indira Gandhi International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "DEL",
+                "icao": "VIDP",
+                "terminal": "3",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T18:00:00+00:00",
+                "estimated": "2026-05-28T18:00:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": null,
+                "scheduled": "2026-05-28T20:20:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Air India",
+                "iata": "AI",
+                "icao": "AIC"
+            },
+            "flight": {
+                "number": "2879",
+                "iata": "AI2879",
+                "icao": "AIC2879",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8013B1"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Indira Gandhi International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "DEL",
+                "icao": "VIDP",
+                "terminal": "1",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T17:55:00+00:00",
+                "estimated": "2026-05-28T17:55:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": null,
+                "scheduled": "2026-05-28T20:15:00+00:00",
+                "delay": 10,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "717",
+                "iata": "6E717",
+                "icao": "IGO717",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8018A8"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Bandaranaike International",
+                "timezone": "Asia\/Colombo",
+                "iata": "CMB",
+                "icao": "VCBI",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T17:55:00+00:00",
+                "estimated": "2026-05-28T17:55:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "10",
+                "scheduled": "2026-05-28T19:50:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "SriLankan Airlines",
+                "iata": "UL",
+                "icao": "ALK"
+            },
+            "flight": {
+                "number": "175",
+                "iata": "UL175",
+                "icao": "ALK175",
+                "codeshared": null
+            },
+            "aircraft": null,
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Chhatrapati Shivaji International (Sahar International)",
+                "timezone": "Asia\/Kolkata",
+                "iata": "BOM",
+                "icao": "VABB",
+                "terminal": "2",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T18:00:00+00:00",
+                "estimated": "2026-05-28T18:00:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "4",
+                "scheduled": "2026-05-28T19:35:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Air India",
+                "iata": "AI",
+                "icao": "AIC"
+            },
+            "flight": {
+                "number": "2619",
+                "iata": "AI2619",
+                "icao": "AIC2619",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "800C4B"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Bangalore International Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "BLR",
+                "icao": "VOBL",
+                "terminal": "1",
+                "gate": "17",
+                "delay": null,
+                "scheduled": "2026-05-28T18:35:00+00:00",
+                "estimated": "2026-05-28T18:35:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": null,
+                "scheduled": "2026-05-28T19:45:00+00:00",
+                "delay": 15,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "638",
+                "iata": "6E638",
+                "icao": "IGO638",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8016D6"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Patna",
+                "timezone": "Asia\/Kolkata",
+                "iata": "PAT",
+                "icao": "VEPT",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T18:05:00+00:00",
+                "estimated": "2026-05-28T18:05:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "1",
+                "scheduled": "2026-05-28T20:05:00+00:00",
+                "delay": 5,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "6127",
+                "iata": "6E6127",
+                "icao": "IGO6127",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "80189E"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Jagdalpur",
+                "timezone": "Asia\/Kolkata",
+                "iata": "JGB",
+                "icao": "VEJR",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T16:25:00+00:00",
+                "estimated": "2026-05-28T16:25:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "6",
+                "scheduled": "2026-05-28T17:50:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "7105",
+                "iata": "6E7105",
+                "icao": "IGO7105",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801446"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "cancelled",
+            "departure": {
+                "airport": "Bangalore International Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "BLR",
+                "icao": "VOBL",
+                "terminal": "1",
+                "gate": "17",
+                "delay": null,
+                "scheduled": "2026-05-28T16:30:00+00:00",
+                "estimated": "2026-05-28T16:30:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "7",
+                "scheduled": "2026-05-28T17:45:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Virgin Atlantic",
+                "iata": "VS",
+                "icao": "VIR"
+            },
+            "flight": {
+                "number": "8407",
+                "iata": "VS8407",
+                "icao": "VIR8407",
+                "codeshared": {
+                    "airline_name": "indigo",
+                    "airline_iata": "6e",
+                    "airline_icao": "igo",
+                    "flight_number": "6067",
+                    "flight_iata": "6e6067",
+                    "flight_icao": "igo6067"
+                }
+            },
+            "aircraft": null,
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "cancelled",
+            "departure": {
+                "airport": "Bangalore International Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "BLR",
+                "icao": "VOBL",
+                "terminal": "1",
+                "gate": "17",
+                "delay": null,
+                "scheduled": "2026-05-28T16:30:00+00:00",
+                "estimated": "2026-05-28T16:30:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "7",
+                "scheduled": "2026-05-28T17:45:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Qantas",
+                "iata": "QF",
+                "icao": "QFA"
+            },
+            "flight": {
+                "number": "5091",
+                "iata": "QF5091",
+                "icao": "QFA5091",
+                "codeshared": {
+                    "airline_name": "indigo",
+                    "airline_iata": "6e",
+                    "airline_icao": "igo",
+                    "flight_number": "6067",
+                    "flight_iata": "6e6067",
+                    "flight_icao": "igo6067"
+                }
+            },
+            "aircraft": null,
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "cancelled",
+            "departure": {
+                "airport": "Bangalore International Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "BLR",
+                "icao": "VOBL",
+                "terminal": "1",
+                "gate": "17",
+                "delay": null,
+                "scheduled": "2026-05-28T16:30:00+00:00",
+                "estimated": "2026-05-28T16:30:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "7",
+                "scheduled": "2026-05-28T17:45:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Japan Airlines",
+                "iata": "JL",
+                "icao": "JTL"
+            },
+            "flight": {
+                "number": "9029",
+                "iata": "JL9029",
+                "icao": "JTL9029",
+                "codeshared": {
+                    "airline_name": "indigo",
+                    "airline_iata": "6e",
+                    "airline_icao": "igo",
+                    "flight_number": "6067",
+                    "flight_iata": "6e6067",
+                    "flight_icao": "igo6067"
+                }
+            },
+            "aircraft": null,
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Borjhar",
+                "timezone": "Asia\/Kolkata",
+                "iata": "GAU",
+                "icao": "VEGT",
+                "terminal": "1",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T18:20:00+00:00",
+                "estimated": "2026-05-28T18:20:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "4",
+                "scheduled": "2026-05-28T20:55:00+00:00",
+                "delay": 15,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "287",
+                "iata": "6E287",
+                "icao": "IGO287",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8015E3"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Vijayawada",
+                "timezone": "Asia\/Kolkata",
+                "iata": "VGA",
+                "icao": "VOBZ",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T17:40:00+00:00",
+                "estimated": "2026-05-28T17:40:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": null,
+                "scheduled": "2026-05-28T18:50:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Fly91",
+                "iata": "IC",
+                "icao": "GOA"
+            },
+            "flight": {
+                "number": "3306",
+                "iata": "IC3306",
+                "icao": "GOA3306",
+                "codeshared": null
+            },
+            "aircraft": null,
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Thiruvananthapuram International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "TRV",
+                "icao": "VOTV",
+                "terminal": "1",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T17:55:00+00:00",
+                "estimated": "2026-05-28T17:55:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "1",
+                "scheduled": "2026-05-28T19:35:00+00:00",
+                "delay": 10,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "335",
+                "iata": "6E335",
+                "icao": "IGO335",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "80169D"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Thiruvananthapuram International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "TRV",
+                "icao": "VOTV",
+                "terminal": "1",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T17:55:00+00:00",
+                "estimated": "2026-05-28T17:55:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "1",
+                "scheduled": "2026-05-28T19:35:00+00:00",
+                "delay": 10,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "KLM",
+                "iata": "KL",
+                "icao": "KLM"
+            },
+            "flight": {
+                "number": "4741",
+                "iata": "KL4741",
+                "icao": "KLM4741",
+                "codeshared": {
+                    "airline_name": "indigo",
+                    "airline_iata": "6e",
+                    "airline_icao": "igo",
+                    "flight_number": "335",
+                    "flight_iata": "6e335",
+                    "flight_icao": "igo335"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "80169D"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Madras International (Meenambakkam)",
+                "timezone": "Asia\/Kolkata",
+                "iata": "MAA",
+                "icao": "VOMM",
+                "terminal": "1",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T18:20:00+00:00",
+                "estimated": "2026-05-28T18:20:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "7",
+                "scheduled": "2026-05-28T19:35:00+00:00",
+                "delay": 10,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "562",
+                "iata": "6E562",
+                "icao": "IGO562",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801748"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Amausi",
+                "timezone": "Asia\/Kolkata",
+                "iata": "LKO",
+                "icao": "VILK",
+                "terminal": "3",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T17:45:00+00:00",
+                "estimated": "2026-05-28T17:45:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "3",
+                "scheduled": "2026-05-28T19:55:00+00:00",
+                "delay": 10,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "279",
+                "iata": "6E279",
+                "icao": "IGO279",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801649"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Netaji Subhas Chandra",
+                "timezone": "Asia\/Kolkata",
+                "iata": "CCU",
+                "icao": "VECC",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T17:00:00+00:00",
+                "estimated": "2026-05-28T17:00:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "1",
+                "scheduled": "2026-05-28T19:15:00+00:00",
+                "delay": 10,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "6528",
+                "iata": "6E6528",
+                "icao": "IGO6528",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8016B8"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Chhatrapati Shivaji International (Sahar International)",
+                "timezone": "Asia\/Kolkata",
+                "iata": "BOM",
+                "icao": "VABB",
+                "terminal": "1",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T16:50:00+00:00",
+                "estimated": "2026-05-28T16:50:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "2",
+                "scheduled": "2026-05-28T18:20:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "5228",
+                "iata": "6E5228",
+                "icao": "IGO5228",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801851"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Chhatrapati Shivaji International (Sahar International)",
+                "timezone": "Asia\/Kolkata",
+                "iata": "BOM",
+                "icao": "VABB",
+                "terminal": "1",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T16:50:00+00:00",
+                "estimated": "2026-05-28T16:50:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": null,
+                "scheduled": "2026-05-28T18:20:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Virgin Atlantic",
+                "iata": "VS",
+                "icao": "VIR"
+            },
+            "flight": {
+                "number": "8557",
+                "iata": "VS8557",
+                "icao": "VIR8557",
+                "codeshared": {
+                    "airline_name": "indigo",
+                    "airline_iata": "6e",
+                    "airline_icao": "igo",
+                    "flight_number": "5228",
+                    "flight_iata": "6e5228",
+                    "flight_icao": "igo5228"
+                }
+            },
+            "aircraft": null,
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Bhopal",
+                "timezone": "Asia\/Kolkata",
+                "iata": "BHO",
+                "icao": "VABP",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T17:00:00+00:00",
+                "estimated": "2026-05-28T17:00:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "5",
+                "scheduled": "2026-05-28T19:10:00+00:00",
+                "delay": 10,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "7122",
+                "iata": "6E7122",
+                "icao": "IGO7122",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "800CFB"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Bahrain International",
+                "timezone": "Asia\/Bahrain",
+                "iata": "BAH",
+                "icao": "OBBI",
+                "terminal": null,
+                "gate": "19",
+                "delay": null,
+                "scheduled": "2026-05-28T14:25:00+00:00",
+                "estimated": "2026-05-28T14:25:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": "TM",
+                "gate": "30B",
+                "baggage": "10",
+                "scheduled": "2026-05-28T21:20:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Gulf Air",
+                "iata": "GF",
+                "icao": "GFA"
+            },
+            "flight": {
+                "number": "276",
+                "iata": "GF276",
+                "icao": "GFA276",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8940CE"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Vijayawada",
+                "timezone": "Asia\/Kolkata",
+                "iata": "VGA",
+                "icao": "VOBZ",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T16:55:00+00:00",
+                "estimated": "2026-05-28T16:55:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "5",
+                "scheduled": "2026-05-28T17:55:00+00:00",
+                "delay": 5,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "7214",
+                "iata": "6E7214",
+                "icao": "IGO7214",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801751"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Vijayawada",
+                "timezone": "Asia\/Kolkata",
+                "iata": "VGA",
+                "icao": "VOBZ",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T16:55:00+00:00",
+                "estimated": "2026-05-28T16:55:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "5",
+                "scheduled": "2026-05-28T17:55:00+00:00",
+                "delay": 5,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "British Airways",
+                "iata": "BA",
+                "icao": "BAW"
+            },
+            "flight": {
+                "number": "8828",
+                "iata": "BA8828",
+                "icao": "BAW8828",
+                "codeshared": {
+                    "airline_name": "indigo",
+                    "airline_iata": "6e",
+                    "airline_icao": "igo",
+                    "flight_number": "7214",
+                    "flight_iata": "6e7214",
+                    "flight_icao": "igo7214"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801751"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Tirupati",
+                "timezone": "Asia\/Kolkata",
+                "iata": "TIR",
+                "icao": "VOTP",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T17:15:00+00:00",
+                "estimated": "2026-05-28T17:15:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "6",
+                "scheduled": "2026-05-28T18:40:00+00:00",
+                "delay": 5,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "7558",
+                "iata": "6E7558",
+                "icao": "IGO7558",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "800C6D"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Singapore Changi",
+                "timezone": "Asia\/Singapore",
+                "iata": "SIN",
+                "icao": "WSSS",
+                "terminal": "3",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T20:00:00+00:00",
+                "estimated": "2026-05-28T20:00:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": null,
+                "scheduled": "2026-05-28T22:00:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Singapore Airlines",
+                "iata": "SQ",
+                "icao": "SIA"
+            },
+            "flight": {
+                "number": "522",
+                "iata": "SQ522",
+                "icao": "SIA522",
+                "codeshared": null
+            },
+            "aircraft": null,
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Pondicherry",
+                "timezone": "Asia\/Kolkata",
+                "iata": "PNY",
+                "icao": "VOPC",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T17:30:00+00:00",
+                "estimated": "2026-05-28T17:30:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "5",
+                "scheduled": "2026-05-28T19:20:00+00:00",
+                "delay": 10,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "7146",
+                "iata": "6E7146",
+                "icao": "IGO7146",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "800DB2"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Kolhapur",
+                "timezone": "Asia\/Kolkata",
+                "iata": "KLH",
+                "icao": "VAKP",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T17:25:00+00:00",
+                "estimated": "2026-05-28T17:25:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "6",
+                "scheduled": "2026-05-28T18:50:00+00:00",
+                "delay": 5,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "7564",
+                "iata": "6E7564",
+                "icao": "IGO7564",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801415"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Jodhpur",
+                "timezone": "Asia\/Kolkata",
+                "iata": "JDH",
+                "icao": "VIJO",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T16:45:00+00:00",
+                "estimated": "2026-05-28T16:45:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "7",
+                "scheduled": "2026-05-28T18:50:00+00:00",
+                "delay": 10,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "814",
+                "iata": "6E814",
+                "icao": "IGO814",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "80169C"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Madurai",
+                "timezone": "Asia\/Kolkata",
+                "iata": "IXM",
+                "icao": "VOMD",
+                "terminal": "1",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T17:10:00+00:00",
+                "estimated": "2026-05-28T17:10:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "8",
+                "scheduled": "2026-05-28T18:45:00+00:00",
+                "delay": 10,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "6782",
+                "iata": "6E6782",
+                "icao": "IGO6782",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "80145C"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Jagdalpur",
+                "timezone": "Asia\/Kolkata",
+                "iata": "JGB",
+                "icao": "VEJR",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T15:45:00+00:00",
+                "estimated": "2026-05-28T15:45:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": null,
+                "scheduled": "2026-05-28T17:05:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Alliance Air",
+                "iata": "9I",
+                "icao": "LLR"
+            },
+            "flight": {
+                "number": "886",
+                "iata": "9I886",
+                "icao": "LLR886",
+                "codeshared": null
+            },
+            "aircraft": null,
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Darbhanga Airport",
+                "timezone": null,
+                "iata": "DBR",
+                "icao": "VEDH",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T14:50:00+00:00",
+                "estimated": "2026-05-28T14:50:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "1",
+                "scheduled": "2026-05-28T17:05:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "6417",
+                "iata": "6E6417",
+                "icao": "IGO6417",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8016BA"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Indira Gandhi International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "DEL",
+                "icao": "VIDP",
+                "terminal": "1",
+                "gate": "D7",
+                "delay": null,
+                "scheduled": "2026-05-28T14:45:00+00:00",
+                "estimated": "2026-05-28T14:45:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "3",
+                "scheduled": "2026-05-28T17:05:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Virgin Atlantic",
+                "iata": "VS",
+                "icao": "VIR"
+            },
+            "flight": {
+                "number": "8779",
+                "iata": "VS8779",
+                "icao": "VIR8779",
+                "codeshared": {
+                    "airline_name": "indigo",
+                    "airline_iata": "6e",
+                    "airline_icao": "igo",
+                    "flight_number": "6212",
+                    "flight_iata": "6e6212",
+                    "flight_icao": "igo6212"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801775"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Indira Gandhi International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "DEL",
+                "icao": "VIDP",
+                "terminal": "1",
+                "gate": "D7",
+                "delay": null,
+                "scheduled": "2026-05-28T14:45:00+00:00",
+                "estimated": "2026-05-28T14:45:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "3",
+                "scheduled": "2026-05-28T17:05:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Qantas",
+                "iata": "QF",
+                "icao": "QFA"
+            },
+            "flight": {
+                "number": "8781",
+                "iata": "QF8781",
+                "icao": "QFA8781",
+                "codeshared": {
+                    "airline_name": "indigo",
+                    "airline_iata": "6e",
+                    "airline_icao": "igo",
+                    "flight_number": "6212",
+                    "flight_iata": "6e6212",
+                    "flight_icao": "igo6212"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801775"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Indira Gandhi International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "DEL",
+                "icao": "VIDP",
+                "terminal": "1",
+                "gate": "D7",
+                "delay": null,
+                "scheduled": "2026-05-28T14:45:00+00:00",
+                "estimated": "2026-05-28T14:45:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "3",
+                "scheduled": "2026-05-28T17:05:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Japan Airlines",
+                "iata": "JL",
+                "icao": "JTL"
+            },
+            "flight": {
+                "number": "9213",
+                "iata": "JL9213",
+                "icao": "JTL9213",
+                "codeshared": {
+                    "airline_name": "indigo",
+                    "airline_iata": "6e",
+                    "airline_icao": "igo",
+                    "flight_number": "6212",
+                    "flight_iata": "6e6212",
+                    "flight_icao": "igo6212"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801775"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Cuddapah",
+                "timezone": "Asia\/Kolkata",
+                "iata": "CDP",
+                "icao": "VOCP",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T15:50:00+00:00",
+                "estimated": "2026-05-28T15:50:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "5",
+                "scheduled": "2026-05-28T17:00:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "7097",
+                "iata": "6E7097",
+                "icao": "IGO7097",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "80146E"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Shirdi Airport",
+                "timezone": null,
+                "iata": "SAG",
+                "icao": "VASD",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T15:40:00+00:00",
+                "estimated": "2026-05-28T15:40:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "1",
+                "scheduled": "2026-05-28T16:55:00+00:00",
+                "delay": 10,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "6063",
+                "iata": "6E6063",
+                "icao": "IGO6063",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "80168C"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Chhatrapati Shivaji International (Sahar International)",
+                "timezone": "Asia\/Kolkata",
+                "iata": "BOM",
+                "icao": "VABB",
+                "terminal": "1",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T15:15:00+00:00",
+                "estimated": "2026-05-28T15:15:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "4",
+                "scheduled": "2026-05-28T16:45:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Virgin Atlantic",
+                "iata": "VS",
+                "icao": "VIR"
+            },
+            "flight": {
+                "number": "8561",
+                "iata": "VS8561",
+                "icao": "VIR8561",
+                "codeshared": {
+                    "airline_name": "indigo",
+                    "airline_iata": "6e",
+                    "airline_icao": "igo",
+                    "flight_number": "5386",
+                    "flight_iata": "6e5386",
+                    "flight_icao": "igo5386"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "80180E"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Goa International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "GOI",
+                "icao": "VOGO",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T17:35:00+00:00",
+                "estimated": "2026-05-28T17:35:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": null,
+                "scheduled": "2026-05-28T19:25:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Fly91",
+                "iata": "IC",
+                "icao": "GOA"
+            },
+            "flight": {
+                "number": "2301",
+                "iata": "IC2301",
+                "icao": "GOA2301",
+                "codeshared": null
+            },
+            "aircraft": null,
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Goa International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "GOI",
+                "icao": "VOGO",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T17:20:00+00:00",
+                "estimated": "2026-05-28T17:20:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "5",
+                "scheduled": "2026-05-28T18:35:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "117",
+                "iata": "6E117",
+                "icao": "IGO117",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8015E6"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Indira Gandhi International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "DEL",
+                "icao": "VIDP",
+                "terminal": "1",
+                "gate": "D18",
+                "delay": null,
+                "scheduled": "2026-05-28T13:30:00+00:00",
+                "estimated": "2026-05-28T13:30:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "2",
+                "scheduled": "2026-05-28T15:45:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Qantas",
+                "iata": "QF",
+                "icao": "QFA"
+            },
+            "flight": {
+                "number": "8785",
+                "iata": "QF8785",
+                "icao": "QFA8785",
+                "codeshared": {
+                    "airline_name": "indigo",
+                    "airline_iata": "6e",
+                    "airline_icao": "igo",
+                    "flight_number": "6282",
+                    "flight_iata": "6e6282",
+                    "flight_icao": "igo6282"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8018CA"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Indira Gandhi International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "DEL",
+                "icao": "VIDP",
+                "terminal": "1",
+                "gate": "D18",
+                "delay": null,
+                "scheduled": "2026-05-28T13:30:00+00:00",
+                "estimated": "2026-05-28T13:30:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "2",
+                "scheduled": "2026-05-28T15:45:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Japan Airlines",
+                "iata": "JL",
+                "icao": "JTL"
+            },
+            "flight": {
+                "number": "9215",
+                "iata": "JL9215",
+                "icao": "JTL9215",
+                "codeshared": {
+                    "airline_name": "indigo",
+                    "airline_iata": "6e",
+                    "airline_icao": "igo",
+                    "flight_number": "6282",
+                    "flight_iata": "6e6282",
+                    "flight_icao": "igo6282"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8018CA"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Tirupati",
+                "timezone": "Asia\/Kolkata",
+                "iata": "TIR",
+                "icao": "VOTP",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T15:50:00+00:00",
+                "estimated": "2026-05-28T15:50:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "6",
+                "scheduled": "2026-05-28T17:15:00+00:00",
+                "delay": 5,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "7506",
+                "iata": "6E7506",
+                "icao": "IGO7506",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8015D2"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Srinagar",
+                "timezone": "Asia\/Kolkata",
+                "iata": "SXR",
+                "icao": "VISR",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T15:40:00+00:00",
+                "estimated": "2026-05-28T15:40:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "1",
+                "scheduled": "2026-05-28T18:40:00+00:00",
+                "delay": 15,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "6410",
+                "iata": "6E6410",
+                "icao": "IGO6410",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "800C01"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Singapore Changi",
+                "timezone": "Asia\/Singapore",
+                "iata": "SIN",
+                "icao": "WSSS",
+                "terminal": "2",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T18:55:00+00:00",
+                "estimated": "2026-05-28T18:55:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": null,
+                "scheduled": "2026-05-28T21:00:00+00:00",
+                "delay": 5,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "1028",
+                "iata": "6E1028",
+                "icao": "IGO1028",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8016A3"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Raipur",
+                "timezone": "Asia\/Kolkata",
+                "iata": "RPR",
+                "icao": "VERP",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T15:55:00+00:00",
+                "estimated": "2026-05-28T15:55:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "3",
+                "scheduled": "2026-05-28T17:15:00+00:00",
+                "delay": 10,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "6327",
+                "iata": "6E6327",
+                "icao": "IGO6327",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801427"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Rajahmundry",
+                "timezone": "Asia\/Kolkata",
+                "iata": "RJA",
+                "icao": "VORY",
+                "terminal": "1",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T16:00:00+00:00",
+                "estimated": "2026-05-28T16:00:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "6",
+                "scheduled": "2026-05-28T17:20:00+00:00",
+                "delay": 10,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "7312",
+                "iata": "6E7312",
+                "icao": "IGO7312",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "800CC2"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Mysore",
+                "timezone": "Asia\/Kolkata",
+                "iata": "MYQ",
+                "icao": "VOMY",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T16:15:00+00:00",
+                "estimated": "2026-05-28T16:15:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "6",
+                "scheduled": "2026-05-28T18:05:00+00:00",
+                "delay": 5,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "7141",
+                "iata": "6E7141",
+                "icao": "IGO7141",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801755"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Madras International (Meenambakkam)",
+                "timezone": "Asia\/Kolkata",
+                "iata": "MAA",
+                "icao": "VOMM",
+                "terminal": "1",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T16:10:00+00:00",
+                "estimated": "2026-05-28T16:10:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "2",
+                "scheduled": "2026-05-28T17:25:00+00:00",
+                "delay": 10,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "6158",
+                "iata": "6E6158",
+                "icao": "IGO6158",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8014DE"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Abu Dhabi International",
+                "timezone": "Asia\/Dubai",
+                "iata": "AUH",
+                "icao": "OMAA",
+                "terminal": "A",
+                "gate": "C28",
+                "delay": null,
+                "scheduled": "2026-05-28T14:20:00+00:00",
+                "estimated": "2026-05-28T14:20:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "11",
+                "scheduled": "2026-05-28T19:40:00+00:00",
+                "delay": 25,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Etihad Airways",
+                "iata": "EY",
+                "icao": "ETD"
+            },
+            "flight": {
+                "number": "358",
+                "iata": "EY358",
+                "icao": "ETD358",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "896534"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Vadodara",
+                "timezone": "Asia\/Kolkata",
+                "iata": "BDQ",
+                "icao": "VABO",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T16:30:00+00:00",
+                "estimated": "2026-05-28T16:30:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "1",
+                "scheduled": "2026-05-28T18:10:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "464",
+                "iata": "6E464",
+                "icao": "IGO464",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8016B7"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Vadodara",
+                "timezone": "Asia\/Kolkata",
+                "iata": "BDQ",
+                "icao": "VABO",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T16:30:00+00:00",
+                "estimated": "2026-05-28T16:30:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "1",
+                "scheduled": "2026-05-28T18:10:00+00:00",
+                "delay": 5,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "KLM",
+                "iata": "KL",
+                "icao": "KLM"
+            },
+            "flight": {
+                "number": "4539",
+                "iata": "KL4539",
+                "icao": "KLM4539",
+                "codeshared": {
+                    "airline_name": "indigo",
+                    "airline_iata": "6e",
+                    "airline_icao": "igo",
+                    "flight_number": "464",
+                    "flight_iata": "6e464",
+                    "flight_icao": "igo464"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8015E6"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Vishakhapatnam",
+                "timezone": "Asia\/Kolkata",
+                "iata": "VTZ",
+                "icao": "VOVZ",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T16:35:00+00:00",
+                "estimated": "2026-05-28T16:35:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "3",
+                "scheduled": "2026-05-28T18:00:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Air India Express",
+                "iata": "IX",
+                "icao": "AXB"
+            },
+            "flight": {
+                "number": "2744",
+                "iata": "IX2744",
+                "icao": "AXB2744",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801623"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Vishakhapatnam",
+                "timezone": "Asia\/Kolkata",
+                "iata": "VTZ",
+                "icao": "VOVZ",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T16:35:00+00:00",
+                "estimated": "2026-05-28T16:35:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "3",
+                "scheduled": "2026-05-28T18:00:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Air India",
+                "iata": "AI",
+                "icao": "AIC"
+            },
+            "flight": {
+                "number": "9409",
+                "iata": "AI9409",
+                "icao": "AIC9409",
+                "codeshared": {
+                    "airline_name": "air india express",
+                    "airline_iata": "ix",
+                    "airline_icao": "axb",
+                    "flight_number": "2744",
+                    "flight_iata": "ix2744",
+                    "flight_icao": "axb2744"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801623"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Vishakhapatnam",
+                "timezone": "Asia\/Kolkata",
+                "iata": "VTZ",
+                "icao": "VOVZ",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T16:25:00+00:00",
+                "estimated": "2026-05-28T16:25:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "8",
+                "scheduled": "2026-05-28T17:40:00+00:00",
+                "delay": 10,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "783",
+                "iata": "6E783",
+                "icao": "IGO783",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8015DB"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Chandigarh",
+                "timezone": "Asia\/Kolkata",
+                "iata": "IXC",
+                "icao": "VICG",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T16:30:00+00:00",
+                "estimated": "2026-05-28T16:30:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "2",
+                "scheduled": "2026-05-28T18:55:00+00:00",
+                "delay": 15,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "6254",
+                "iata": "6E6254",
+                "icao": "IGO6254",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8015C6"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Bagdogra",
+                "timezone": "Asia\/Kolkata",
+                "iata": "IXB",
+                "icao": "VEBD",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T16:25:00+00:00",
+                "estimated": "2026-05-28T16:25:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "7",
+                "scheduled": "2026-05-28T18:45:00+00:00",
+                "delay": 10,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "619",
+                "iata": "6E619",
+                "icao": "IGO619",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8013F6"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Chhatrapati Shivaji International (Sahar International)",
+                "timezone": "Asia\/Kolkata",
+                "iata": "BOM",
+                "icao": "VABB",
+                "terminal": "2",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T15:05:00+00:00",
+                "estimated": "2026-05-28T15:05:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "2",
+                "scheduled": "2026-05-28T16:35:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Singapore Airlines",
+                "iata": "SQ",
+                "icao": "SIA"
+            },
+            "flight": {
+                "number": "4849",
+                "iata": "SQ4849",
+                "icao": "SIA4849",
+                "codeshared": {
+                    "airline_name": "air india",
+                    "airline_iata": "ai",
+                    "airline_icao": "aic",
+                    "flight_number": "2531",
+                    "flight_iata": "ai2531",
+                    "flight_icao": "aic2531"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801495"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Chhatrapati Shivaji International (Sahar International)",
+                "timezone": "Asia\/Kolkata",
+                "iata": "BOM",
+                "icao": "VABB",
+                "terminal": "2",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T15:05:00+00:00",
+                "estimated": "2026-05-28T15:05:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "2",
+                "scheduled": "2026-05-28T16:35:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Ethiopian Airlines",
+                "iata": "ET",
+                "icao": "ETH"
+            },
+            "flight": {
+                "number": "1223",
+                "iata": "ET1223",
+                "icao": "ETH1223",
+                "codeshared": {
+                    "airline_name": "air india",
+                    "airline_iata": "ai",
+                    "airline_icao": "aic",
+                    "flight_number": "2531",
+                    "flight_iata": "ai2531",
+                    "flight_icao": "aic2531"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801495"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Indira Gandhi International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "DEL",
+                "icao": "VIDP",
+                "terminal": "1",
+                "gate": "D18",
+                "delay": null,
+                "scheduled": "2026-05-28T13:30:00+00:00",
+                "estimated": "2026-05-28T13:30:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "2",
+                "scheduled": "2026-05-28T15:45:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Virgin Atlantic",
+                "iata": "VS",
+                "icao": "VIR"
+            },
+            "flight": {
+                "number": "8781",
+                "iata": "VS8781",
+                "icao": "VIR8781",
+                "codeshared": {
+                    "airline_name": "indigo",
+                    "airline_iata": "6e",
+                    "airline_icao": "igo",
+                    "flight_number": "6282",
+                    "flight_iata": "6e6282",
+                    "flight_icao": "igo6282"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8018CA"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Goa International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "GOI",
+                "icao": "VOGO",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T16:35:00+00:00",
+                "estimated": "2026-05-28T16:35:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "7",
+                "scheduled": "2026-05-28T17:50:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "374",
+                "iata": "6E374",
+                "icao": "IGO374",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "800C11"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Frankfurt International Airport",
+                "timezone": "Europe\/Berlin",
+                "iata": "FRA",
+                "icao": "EDDF",
+                "terminal": "1",
+                "gate": "Z58",
+                "delay": null,
+                "scheduled": "2026-05-28T13:00:00+00:00",
+                "estimated": "2026-05-28T13:00:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": null,
+                "scheduled": "2026-05-29T01:15:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Lufthansa",
+                "iata": "LH",
+                "icao": "DLH"
+            },
+            "flight": {
+                "number": "752",
+                "iata": "LH752",
+                "icao": "DLH752",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "3C4A21"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Dubai",
+                "timezone": "Asia\/Dubai",
+                "iata": "DXB",
+                "icao": "OMDB",
+                "terminal": "3",
+                "gate": "A23",
+                "delay": null,
+                "scheduled": "2026-05-28T15:00:00+00:00",
+                "estimated": "2026-05-28T15:00:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": "MAIN",
+                "gate": null,
+                "baggage": "12",
+                "scheduled": "2026-05-28T20:10:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Emirates",
+                "iata": "EK",
+                "icao": "UAE"
+            },
+            "flight": {
+                "number": "528",
+                "iata": "EK528",
+                "icao": "UAE528",
+                "codeshared": null
+            },
+            "aircraft": null,
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Indira Gandhi International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "DEL",
+                "icao": "VIDP",
+                "terminal": "1",
+                "gate": "D10",
+                "delay": null,
+                "scheduled": "2026-05-28T16:15:00+00:00",
+                "estimated": "2026-05-28T16:15:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "3",
+                "scheduled": "2026-05-28T18:30:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "6217",
+                "iata": "6E6217",
+                "icao": "IGO6217",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801772"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Indira Gandhi International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "DEL",
+                "icao": "VIDP",
+                "terminal": "3",
+                "gate": "42C",
+                "delay": null,
+                "scheduled": "2026-05-28T16:00:00+00:00",
+                "estimated": "2026-05-28T16:00:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "4",
+                "scheduled": "2026-05-28T18:20:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Air India",
+                "iata": "AI",
+                "icao": "AIC"
+            },
+            "flight": {
+                "number": "2519",
+                "iata": "AI2519",
+                "icao": "AIC2519",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "800C44"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Cochin International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "COK",
+                "icao": "VOCI",
+                "terminal": "1",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T16:05:00+00:00",
+                "estimated": "2026-05-28T16:05:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "2",
+                "scheduled": "2026-05-28T17:35:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "6681",
+                "iata": "6E6681",
+                "icao": "IGO6681",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8015D9"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Cochin International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "COK",
+                "icao": "VOCI",
+                "terminal": "1",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T16:05:00+00:00",
+                "estimated": "2026-05-28T16:05:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "2",
+                "scheduled": "2026-05-28T17:35:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "British Airways",
+                "iata": "BA",
+                "icao": "BAW"
+            },
+            "flight": {
+                "number": "8203",
+                "iata": "BA8203",
+                "icao": "BAW8203",
+                "codeshared": {
+                    "airline_name": "indigo",
+                    "airline_iata": "6e",
+                    "airline_icao": "igo",
+                    "flight_number": "6681",
+                    "flight_iata": "6e6681",
+                    "flight_icao": "igo6681"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8015D9"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Peelamedu",
+                "timezone": "Asia\/Kolkata",
+                "iata": "CJB",
+                "icao": "VOCB",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T16:10:00+00:00",
+                "estimated": "2026-05-28T16:10:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "9",
+                "scheduled": "2026-05-28T17:30:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "764",
+                "iata": "6E764",
+                "icao": "IGO764",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8015E6"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "cancelled",
+            "departure": {
+                "airport": "Bangalore International Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "BLR",
+                "icao": "VOBL",
+                "terminal": "1",
+                "gate": "17",
+                "delay": null,
+                "scheduled": "2026-05-28T16:30:00+00:00",
+                "estimated": "2026-05-28T16:30:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "7",
+                "scheduled": "2026-05-28T17:45:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "6067",
+                "iata": "6E6067",
+                "icao": "IGO6067",
+                "codeshared": null
+            },
+            "aircraft": null,
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Indira Gandhi International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "DEL",
+                "icao": "VIDP",
+                "terminal": "3",
+                "gate": "51",
+                "delay": null,
+                "scheduled": "2026-05-28T12:30:00+00:00",
+                "estimated": "2026-05-28T12:30:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "7",
+                "scheduled": "2026-05-28T14:45:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Ethiopian Airlines",
+                "iata": "ET",
+                "icao": "ETH"
+            },
+            "flight": {
+                "number": "1764",
+                "iata": "ET1764",
+                "icao": "ETH1764",
+                "codeshared": {
+                    "airline_name": "air india",
+                    "airline_iata": "ai",
+                    "airline_icao": "aic",
+                    "flight_number": "2899",
+                    "flight_iata": "ai2899",
+                    "flight_icao": "aic2899"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "800C8F"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Gorakhpur",
+                "timezone": "Asia\/Kolkata",
+                "iata": "GOP",
+                "icao": "VEGK",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T13:50:00+00:00",
+                "estimated": "2026-05-28T13:50:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "2",
+                "scheduled": "2026-05-28T15:50:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "6319",
+                "iata": "6E6319",
+                "icao": "IGO6319",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8016D6"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Tirupati",
+                "timezone": "Asia\/Kolkata",
+                "iata": "TIR",
+                "icao": "VOTP",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T15:25:00+00:00",
+                "estimated": "2026-05-28T15:25:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "9",
+                "scheduled": "2026-05-28T16:30:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Air India",
+                "iata": "AI",
+                "icao": "AIC"
+            },
+            "flight": {
+                "number": "2890",
+                "iata": "AI2890",
+                "icao": "AIC2890",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "800CE8"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Lohegaon",
+                "timezone": "Asia\/Kolkata",
+                "iata": "PNQ",
+                "icao": "VAPO",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T14:50:00+00:00",
+                "estimated": "2026-05-28T14:50:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "7",
+                "scheduled": "2026-05-28T16:05:00+00:00",
+                "delay": 10,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "407",
+                "iata": "6E407",
+                "icao": "IGO407",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8018CF"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Dr. Babasaheb Ambedkar International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "NAG",
+                "icao": "VANP",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T15:25:00+00:00",
+                "estimated": "2026-05-28T15:25:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "5",
+                "scheduled": "2026-05-28T17:10:00+00:00",
+                "delay": 10,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "7526",
+                "iata": "6E7526",
+                "icao": "IGO7526",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "80155E"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Chhatrapati Shivaji International (Sahar International)",
+                "timezone": "Asia\/Kolkata",
+                "iata": "BOM",
+                "icao": "VABB",
+                "terminal": "1",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T15:15:00+00:00",
+                "estimated": "2026-05-28T15:15:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "4",
+                "scheduled": "2026-05-28T16:45:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "5386",
+                "iata": "6E5386",
+                "icao": "IGO5386",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "80180E"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Chhatrapati Shivaji International (Sahar International)",
+                "timezone": "Asia\/Kolkata",
+                "iata": "BOM",
+                "icao": "VABB",
+                "terminal": "2",
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T15:05:00+00:00",
+                "estimated": "2026-05-28T15:05:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "2",
+                "scheduled": "2026-05-28T16:35:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Air India",
+                "iata": "AI",
+                "icao": "AIC"
+            },
+            "flight": {
+                "number": "2531",
+                "iata": "AI2531",
+                "icao": "AIC2531",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801495"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Bangalore International Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "BLR",
+                "icao": "VOBL",
+                "terminal": "2",
+                "gate": "D9",
+                "delay": null,
+                "scheduled": "2026-05-28T14:55:00+00:00",
+                "estimated": "2026-05-28T14:55:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "7",
+                "scheduled": "2026-05-28T16:05:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Air India Express",
+                "iata": "IX",
+                "icao": "AXB"
+            },
+            "flight": {
+                "number": "2051",
+                "iata": "IX2051",
+                "icao": "AXB2051",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801607"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Bangalore International Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "BLR",
+                "icao": "VOBL",
+                "terminal": "2",
+                "gate": "D9",
+                "delay": null,
+                "scheduled": "2026-05-28T14:55:00+00:00",
+                "estimated": "2026-05-28T14:55:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "7",
+                "scheduled": "2026-05-28T16:05:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Air India",
+                "iata": "AI",
+                "icao": "AIC"
+            },
+            "flight": {
+                "number": "9564",
+                "iata": "AI9564",
+                "icao": "AIC9564",
+                "codeshared": {
+                    "airline_name": "air india express",
+                    "airline_iata": "ix",
+                    "airline_icao": "axb",
+                    "flight_number": "2051",
+                    "flight_iata": "ix2051",
+                    "flight_icao": "axb2051"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801607"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Varanasi",
+                "timezone": "Asia\/Kolkata",
+                "iata": "VNS",
+                "icao": "VEBN",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T15:00:00+00:00",
+                "estimated": "2026-05-28T15:00:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "2",
+                "scheduled": "2026-05-28T16:55:00+00:00",
+                "delay": 10,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "6295",
+                "iata": "6E6295",
+                "icao": "IGO6295",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "80160F"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Jharsuguda Airport",
+                "timezone": null,
+                "iata": "JRG",
+                "icao": "VEJH",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T13:50:00+00:00",
+                "estimated": "2026-05-28T13:50:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": null,
+                "scheduled": "2026-05-28T15:35:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Star Air",
+                "iata": "S5",
+                "icao": "SDG"
+            },
+            "flight": {
+                "number": "227",
+                "iata": "S5227",
+                "icao": "SDG227",
+                "codeshared": null
+            },
+            "aircraft": null,
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Kheria",
+                "timezone": "Asia\/Kolkata",
+                "iata": "AGR",
+                "icao": "VIAG",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T13:25:00+00:00",
+                "estimated": "2026-05-28T13:25:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "7",
+                "scheduled": "2026-05-28T15:30:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "6478",
+                "iata": "6E6478",
+                "icao": "IGO6478",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801581"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Kazi Nazrul Islam Airport",
+                "timezone": null,
+                "iata": "RDP",
+                "icao": "VEDG",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T13:10:00+00:00",
+                "estimated": "2026-05-28T13:10:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "1",
+                "scheduled": "2026-05-28T15:10:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "919",
+                "iata": "6E919",
+                "icao": "IGO919",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801411"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Indira Gandhi International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "DEL",
+                "icao": "VIDP",
+                "terminal": "1",
+                "gate": "D7",
+                "delay": null,
+                "scheduled": "2026-05-28T14:45:00+00:00",
+                "estimated": "2026-05-28T14:45:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "3",
+                "scheduled": "2026-05-28T17:05:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "6212",
+                "iata": "6E6212",
+                "icao": "IGO6212",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801775"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Bandaranaike International",
+                "timezone": "Asia\/Colombo",
+                "iata": "CMB",
+                "icao": "VCBI",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T15:00:00+00:00",
+                "estimated": "2026-05-28T15:00:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "10",
+                "scheduled": "2026-05-28T17:00:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "1182",
+                "iata": "6E1182",
+                "icao": "IGO1182",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8015FC"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Netaji Subhas Chandra",
+                "timezone": "Asia\/Kolkata",
+                "iata": "CCU",
+                "icao": "VECC",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T15:00:00+00:00",
+                "estimated": "2026-05-28T15:00:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "7",
+                "scheduled": "2026-05-28T17:10:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "6908",
+                "iata": "6E6908",
+                "icao": "IGO6908",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8016A4"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Sardar Vallabhbhai Patel International Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "AMD",
+                "icao": "VAAH",
+                "terminal": "1",
+                "gate": "1",
+                "delay": null,
+                "scheduled": "2026-05-28T15:00:00+00:00",
+                "estimated": "2026-05-28T15:00:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "7",
+                "scheduled": "2026-05-28T16:45:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "6098",
+                "iata": "6E6098",
+                "icao": "IGO6098",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8016DB"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Mysore",
+                "timezone": "Asia\/Kolkata",
+                "iata": "MYQ",
+                "icao": "VOMY",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T14:20:00+00:00",
+                "estimated": "2026-05-28T14:20:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "6",
+                "scheduled": "2026-05-28T16:00:00+00:00",
+                "delay": 35,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "7048",
+                "iata": "6E7048",
+                "icao": "IGO7048",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801631"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Vijayawada",
+                "timezone": "Asia\/Kolkata",
+                "iata": "VGA",
+                "icao": "VOBZ",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T13:55:00+00:00",
+                "estimated": "2026-05-28T13:55:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "6",
+                "scheduled": "2026-05-28T14:55:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "7206",
+                "iata": "6E7206",
+                "icao": "IGO7206",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8015D1"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Vijayawada",
+                "timezone": "Asia\/Kolkata",
+                "iata": "VGA",
+                "icao": "VOBZ",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T13:55:00+00:00",
+                "estimated": "2026-05-28T13:55:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "6",
+                "scheduled": "2026-05-28T14:55:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "British Airways",
+                "iata": "BA",
+                "icao": "BAW"
+            },
+            "flight": {
+                "number": "8827",
+                "iata": "BA8827",
+                "icao": "BAW8827",
+                "codeshared": {
+                    "airline_name": "indigo",
+                    "airline_iata": "6e",
+                    "airline_icao": "igo",
+                    "flight_number": "7206",
+                    "flight_iata": "6e7206",
+                    "flight_icao": "igo7206"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8015D1"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Indira Gandhi International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "DEL",
+                "icao": "VIDP",
+                "terminal": "1",
+                "gate": "D11",
+                "delay": null,
+                "scheduled": "2026-05-28T11:45:00+00:00",
+                "estimated": "2026-05-28T11:45:00+00:00",
+                "actual": "2026-05-28T12:18:00+00:00",
+                "estimated_runway": "2026-05-28T12:18:00+00:00",
+                "actual_runway": "2026-05-28T12:18:00+00:00"
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "5",
+                "scheduled": "2026-05-28T14:00:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Virgin Atlantic",
+                "iata": "VS",
+                "icao": "VIR"
+            },
+            "flight": {
+                "number": "8774",
+                "iata": "VS8774",
+                "icao": "VIR8774",
+                "codeshared": {
+                    "airline_name": "indigo",
+                    "airline_iata": "6e",
+                    "airline_icao": "igo",
+                    "flight_number": "884",
+                    "flight_iata": "6e884",
+                    "flight_icao": "igo884"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8018A8"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Indira Gandhi International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "DEL",
+                "icao": "VIDP",
+                "terminal": "1",
+                "gate": "D11",
+                "delay": null,
+                "scheduled": "2026-05-28T11:45:00+00:00",
+                "estimated": "2026-05-28T11:45:00+00:00",
+                "actual": "2026-05-28T12:18:00+00:00",
+                "estimated_runway": "2026-05-28T12:18:00+00:00",
+                "actual_runway": "2026-05-28T12:18:00+00:00"
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "5",
+                "scheduled": "2026-05-28T14:00:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Turkish Airlines",
+                "iata": "TK",
+                "icao": "THY"
+            },
+            "flight": {
+                "number": "7806",
+                "iata": "TK7806",
+                "icao": "THY7806",
+                "codeshared": {
+                    "airline_name": "indigo",
+                    "airline_iata": "6e",
+                    "airline_icao": "igo",
+                    "flight_number": "884",
+                    "flight_iata": "6e884",
+                    "flight_icao": "igo884"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8018A8"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Indira Gandhi International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "DEL",
+                "icao": "VIDP",
+                "terminal": "1",
+                "gate": "D11",
+                "delay": null,
+                "scheduled": "2026-05-28T11:45:00+00:00",
+                "estimated": "2026-05-28T11:45:00+00:00",
+                "actual": "2026-05-28T12:18:00+00:00",
+                "estimated_runway": "2026-05-28T12:18:00+00:00",
+                "actual_runway": "2026-05-28T12:18:00+00:00"
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "5",
+                "scheduled": "2026-05-28T14:00:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Qantas",
+                "iata": "QF",
+                "icao": "QFA"
+            },
+            "flight": {
+                "number": "8773",
+                "iata": "QF8773",
+                "icao": "QFA8773",
+                "codeshared": {
+                    "airline_name": "indigo",
+                    "airline_iata": "6e",
+                    "airline_icao": "igo",
+                    "flight_number": "884",
+                    "flight_iata": "6e884",
+                    "flight_icao": "igo884"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8018A8"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Indira Gandhi International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "DEL",
+                "icao": "VIDP",
+                "terminal": "1",
+                "gate": "D11",
+                "delay": null,
+                "scheduled": "2026-05-28T11:45:00+00:00",
+                "estimated": "2026-05-28T11:45:00+00:00",
+                "actual": "2026-05-28T12:18:00+00:00",
+                "estimated_runway": "2026-05-28T12:18:00+00:00",
+                "actual_runway": "2026-05-28T12:18:00+00:00"
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "5",
+                "scheduled": "2026-05-28T14:00:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Japan Airlines",
+                "iata": "JL",
+                "icao": "JTL"
+            },
+            "flight": {
+                "number": "9205",
+                "iata": "JL9205",
+                "icao": "JTL9205",
+                "codeshared": {
+                    "airline_name": "indigo",
+                    "airline_iata": "6e",
+                    "airline_icao": "igo",
+                    "flight_number": "884",
+                    "flight_iata": "6e884",
+                    "flight_icao": "igo884"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8018A8"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Indira Gandhi International",
+                "timezone": "Asia\/Kolkata",
+                "iata": "DEL",
+                "icao": "VIDP",
+                "terminal": "1",
+                "gate": "D11",
+                "delay": null,
+                "scheduled": "2026-05-28T11:45:00+00:00",
+                "estimated": "2026-05-28T11:45:00+00:00",
+                "actual": "2026-05-28T12:18:00+00:00",
+                "estimated_runway": "2026-05-28T12:18:00+00:00",
+                "actual_runway": "2026-05-28T12:18:00+00:00"
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "5",
+                "scheduled": "2026-05-28T14:00:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "British Airways",
+                "iata": "BA",
+                "icao": "BAW"
+            },
+            "flight": {
+                "number": "7999",
+                "iata": "BA7999",
+                "icao": "BAW7999",
+                "codeshared": {
+                    "airline_name": "indigo",
+                    "airline_iata": "6e",
+                    "airline_icao": "igo",
+                    "flight_number": "884",
+                    "flight_iata": "6e884",
+                    "flight_icao": "igo884"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "8018A8"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Gandhinagar Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "ISK",
+                "icao": "VAOZ",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T12:05:00+00:00",
+                "estimated": "2026-05-28T12:05:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "5",
+                "scheduled": "2026-05-28T13:55:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "7137",
+                "iata": "6E7137",
+                "icao": "IGO7137",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": "VT-IYS",
+                "iata": "AT76",
+                "icao": "AT76",
+                "icao24": "801446"
+            },
+            "live": {
+                "updated": "2026-05-28T06:56:00+00:00",
+                "latitude": 20.1322,
+                "longitude": 73.9591,
+                "altitude": 2034.54,
+                "direction": 100,
+                "speed_horizontal": 344.472,
+                "speed_vertical": 0,
+                "is_ground": false
+            }
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "active",
+            "departure": {
+                "airport": "Gorakhpur",
+                "timezone": "Asia\/Kolkata",
+                "iata": "GOP",
+                "icao": "VEGK",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T11:55:00+00:00",
+                "estimated": "2026-05-28T11:55:00+00:00",
+                "actual": "2026-05-28T12:02:00+00:00",
+                "estimated_runway": "2026-05-28T12:02:00+00:00",
+                "actual_runway": "2026-05-28T12:02:00+00:00"
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "1",
+                "scheduled": "2026-05-28T13:55:00+00:00",
+                "delay": null,
+                "estimated": "2026-05-28T13:55:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "2020",
+                "iata": "6E2020",
+                "icao": "IGO2020",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "801503"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Bangalore International Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "BLR",
+                "icao": "VOBL",
+                "terminal": "2",
+                "gate": "D5",
+                "delay": null,
+                "scheduled": "2026-05-28T12:30:00+00:00",
+                "estimated": "2026-05-28T12:30:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "2",
+                "scheduled": "2026-05-28T13:50:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Air India",
+                "iata": "AI",
+                "icao": "AIC"
+            },
+            "flight": {
+                "number": "9572",
+                "iata": "AI9572",
+                "icao": "AIC9572",
+                "codeshared": {
+                    "airline_name": "air india express",
+                    "airline_iata": "ix",
+                    "airline_icao": "axb",
+                    "flight_number": "2819",
+                    "flight_iata": "ix2819",
+                    "flight_icao": "axb2819"
+                }
+            },
+            "aircraft": {
+                "registration": null,
+                "iata": null,
+                "icao": null,
+                "icao24": "800DB5"
+            },
+            "live": null
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "active",
+            "departure": {
+                "airport": "Bamrauli",
+                "timezone": "Asia\/Kolkata",
+                "iata": "IXD",
+                "icao": "VEAB",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T11:40:00+00:00",
+                "estimated": "2026-05-28T11:40:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": "1",
+                "scheduled": "2026-05-28T13:40:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "IndiGo",
+                "iata": "6E",
+                "icao": "IGO"
+            },
+            "flight": {
+                "number": "6819",
+                "iata": "6E6819",
+                "icao": "IGO6819",
+                "codeshared": null
+            },
+            "aircraft": {
+                "registration": "VT-ILO",
+                "iata": "A21N",
+                "icao": "A21N",
+                "icao24": "801427"
+            },
+            "live": {
+                "updated": "2026-05-28T06:55:10+00:00",
+                "latitude": 22.8602,
+                "longitude": 79.4937,
+                "altitude": 10363.2,
+                "direction": 191,
+                "speed_horizontal": 866.736,
+                "speed_vertical": 0,
+                "is_ground": false
+            }
+        },
+        {
+            "flight_date": "2026-05-28",
+            "flight_status": "scheduled",
+            "departure": {
+                "airport": "Frankfurt International Airport",
+                "timezone": "Europe\/Berlin",
+                "iata": "FRA",
+                "icao": "EDDF",
+                "terminal": null,
+                "gate": null,
+                "delay": null,
+                "scheduled": "2026-05-28T10:30:00+00:00",
+                "estimated": "2026-05-28T10:30:00+00:00",
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "arrival": {
+                "airport": "Hyderabad Airport",
+                "timezone": "Asia\/Kolkata",
+                "iata": "HYD",
+                "icao": "VOHS",
+                "terminal": null,
+                "gate": null,
+                "baggage": null,
+                "scheduled": "2026-05-28T23:05:00+00:00",
+                "delay": null,
+                "estimated": null,
+                "actual": null,
+                "estimated_runway": null,
+                "actual_runway": null
+            },
+            "airline": {
+                "name": "Lufthansa",
+                "iata": "LH",
+                "icao": "DLH"
+            },
+            "flight": {
+                "number": "8364",
+                "iata": "LH8364",
+                "icao": "DLH8364",
+                "codeshared": null
+            },
+            "aircraft": null,
+            "live": null
+        }
+    ]
+}

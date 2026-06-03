@@ -49,6 +49,22 @@ def get_available_gates(
         flight_id=flight_id
     )
 
+from pydantic import BaseModel
+class GateStatusUpdateSchema(BaseModel):
+    status: str
+
+@router.patch("/gates/{gate_id}/status")
+def update_gate_status(
+    gate_id: int,
+    payload: GateStatusUpdateSchema,
+    user: dict = Depends(require_staff_or_admin)
+):
+    """
+    Update gate status (e.g., to 'Maintenance' or 'Available').
+    Setting to Maintenance triggers operational alerts for the gate and assigned flights.
+    """
+    return flight_service.update_gate_status(gate_id, payload.status, current_user=user)
+
 
 # ── Airport-scoped flights ────────────────────────────────────────────────────
 

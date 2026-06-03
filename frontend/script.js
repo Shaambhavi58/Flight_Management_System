@@ -413,7 +413,9 @@ async function loadRegisterAirports() {
         const airports = await res.json();
         const sel = document.getElementById('r-airport');
         sel.innerHTML = '<option value="">Select Airport\u2026</option>';
-        airports.forEach(a => {
+        airports
+    .filter(a => a.code === 'HYD')
+    .forEach(a => {
             const opt = document.createElement('option');
             opt.value = a.id;
             opt.textContent = `${a.name} (${a.code})`;
@@ -421,6 +423,32 @@ async function loadRegisterAirports() {
         });
     } catch (err) { console.error(err); }
 }
+
+window.openAirlineOperations = function(airline) {
+    localStorage.removeItem("selectedAirline");
+    localStorage.removeItem("activeAirline");
+    
+    selectedAirline = airline.name;
+    activeAirline = airline.code;
+    localStorage.setItem("selectedAirline", airline.name);
+    localStorage.setItem("activeAirline", airline.code);
+    
+    const storedAirport = localStorage.getItem('selectedAirport');
+    if (storedAirport) {
+        selectedAirport = JSON.parse(storedAirport);
+    }
+    
+    activeCategory = "arrival";
+    activeTerminal = "ALL";
+    activeStatusFilter = "ALL";
+    
+    allFlights = [];
+    window.isFlightsLoading = true;
+    
+    console.log("OPEN AIRLINE:", selectedAirline, activeAirline);
+    
+    showPage('flights');
+};
 
 // ── Airports ──────────────────────────────────────────────────────
 async function loadAirports() {
@@ -441,32 +469,61 @@ async function loadAirports() {
         }
 
         const grid = document.getElementById('airports-grid');
+        if (!grid) return;
         grid.innerHTML = '';
 
-        // Render cards first with a loading placeholder for stats
-        airports.forEach(a => {
+        // Safely extract HYD airport object
+        const hydAirport = airports.find(a => String(a.code || '').trim().toUpperCase() === 'HYD');
+
+        if (!hydAirport) {
+            console.error("HYD Airport not found in airports list");
+            grid.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ef4444; font-weight: bold; background: #fee2e2; border-radius: 8px; border: 1px solid #fecaca;">
+                    Hyderabad (HYD) Airport operational data is currently unavailable. Please contact the administrator.
+                </div>`;
+            return;
+        }
+
+        // Define Hyderabad specific airlines with exact filenames
+        const airlines = [
+            { name: 'IndiGo',            code: '6E',  image: 'indigo.png'           },
+            { name: 'Air India',         code: 'AI',  image: 'airindia.png'         },
+            { name: 'Akasa Air',         code: 'QP',  image: 'akasa.png'            },
+            { name: 'Emirates',          code: 'EK',  image: 'emirates.png'         },
+            { name: 'Qatar Airways',     code: 'QA',  image: 'qatar.png'            },
+            { name: 'Air India Express', code: 'AI1', image: 'airindia express.png' },
+            { name: 'Alliance Air',      code: 'AA1', image: 'allianceair.png'      },
+            { name: 'Fly91',             code: 'F',   image: 'fly91.png'            }
+        ];
+
+        airlines.forEach(a => {
             const card = document.createElement('div');
-            card.className = 'airport-card';
-            card.id = `airport-card-${a.id}`;
+            card.className = 'airport-card airline-selection-card';
+            card.setAttribute("data-airline", a.name);
             card.innerHTML = `
-<div class="airport-card-img-wrapper">
-  <div class="airport-card-img">${AIRPORT_ICONS[a.code] || '✈️'}</div>
-</div>
-<div class="airport-card-body">
-  <span class="airport-code-badge">${a.code}</span>
-  <h3>${a.name}</h3>
-  <p class="text-muted">${a.city}</p>
-</div>`;
+                <div class="airport-card-img-wrapper">
+                    <div class="airport-card-img">
+                        <img src="/static/${a.image}" alt="${a.name}">
+                    </div>
+                </div>
+                <div class="airport-card-body">
+                    <span class="airport-code-badge airline-code-badge">${a.code}</span>
+                    <h3>${a.name}</h3>
+                    <p class="text-muted">Hyderabad Operations</p>
+                </div>
+            `;
+
             card.onclick = () => {
-                selectedAirport = a;
-                localStorage.setItem('selectedAirport', JSON.stringify(a));
-                showPage('flights');
+                localStorage.setItem('selectedAirport', JSON.stringify(hydAirport));
+                window.openAirlineOperations({ name: a.name, code: a.code });
             };
+
             grid.appendChild(card);
         });
 
-
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+        console.error(err); 
+    }
 }
 
 // ── Register ──────────────────────────────────────────────────────
@@ -939,32 +996,30 @@ async function resetPassword(userId, username) {
 
 // ── Flights ───────────────────────────────────────────────────────
 function setupFlightPage() {
+    selectedAirline = localStorage.getItem("selectedAirline");
+    activeAirline = localStorage.getItem("activeAirline") || "ALL";
+    console.log("SETUP PAGE:", selectedAirline, activeAirline);
+
     document.getElementById('bc-airport').textContent = selectedAirport.city;
     document.getElementById('flight-page-title').innerHTML =
         `${selectedAirport.name} <span style="color:var(--cyan);font-size:18px">(${selectedAirport.code})</span>`;
-    document.getElementById('flight-page-sub').textContent =
-        `${selectedAirport.city} — Flight Board`;
+    document.getElementById('flight-page-sub').textContent = selectedAirline
+        ? `${selectedAirport.city} — ${selectedAirline} Operations`
+        : `${selectedAirport.city} — Flight Board`;
     document.getElementById('f-destination').value =
         `${selectedAirport.city} (${selectedAirport.code})`;
 
     document.getElementById('btn-add-flight').classList.toggle('hidden', role === 'viewer');
     document.getElementById('btn-sync-live').classList.toggle('hidden', role !== 'admin');
-    document.getElementById('actions-th').style.display = role !== 'admin' ? 'none' : '';
 
-    // Only reset to arrival on FIRST load (when no activeCategory is set yet)
     if (!activeCategory || activeCategory === 'info') {
         activeCategory = 'arrival';
     }
-    activeTerminal = 'ALL';
-    activeAirline = 'ALL';
-    activeStatusFilter = 'ALL'; // reset stat-card filter on page setup
     document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
     const activeCatEl = document.querySelector(`[data-type="${activeCategory}"]`);
     if (activeCatEl) activeCatEl.classList.add('active');
     document.getElementById('flight-board-section').classList.remove('hidden');
-    document.getElementById('airline-info-section').classList.add('hidden');
     document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
-    document.getElementById('airline-filter').value = 'ALL';
     // Clear any active stat card highlight
     document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active-stat'));
 }
@@ -977,14 +1032,8 @@ function setCategory(type, el) {
     }
     document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
-    if (type === 'info') {
-        document.getElementById('flight-board-section').classList.add('hidden');
-        document.getElementById('airline-info-section').classList.remove('hidden');
-    } else {
-        document.getElementById('flight-board-section').classList.remove('hidden');
-        document.getElementById('airline-info-section').classList.add('hidden');
-        renderBoard();
-    }
+    document.getElementById('flight-board-section').classList.remove('hidden');
+    renderBoard();
 }
 
 function setTerminal(term, btn) {
@@ -1000,84 +1049,16 @@ async function fetchFlights() {
         const res = await fetch(`${API}/airports/${selectedAirport.id}/flights`, { headers: authHeaders() });
         if (res.status === 401) { handleLogout(); return; }
         allFlights = await res.json();
-        updateAllAirlineCards();
-        if (activeCategory !== 'info') {
-            renderBoard();
-            // loadBHSLog(); // Temporarily disabled to prevent 422 spam
-        }
+        window.isFlightsLoading = false;
+        renderBoard();
     } catch (err) {
         console.error(err);
+        window.isFlightsLoading = false;
+        renderBoard();
     }
 }
 
-function updateBreadcrumb() {
-    const bc = document.getElementById('airline-breadcrumb');
-    if (bc) {
-        if (selectedAirline) {
-            bc.innerHTML = `<span onclick="clearAirlineFilter()" style="cursor:pointer;color:var(--primary);text-decoration:underline;font-weight:600;">All Airlines</span> &nbsp;&gt;&nbsp; <span style="color:var(--text1);font-weight:bold;">${selectedAirline}</span>`;
-        } else {
-            bc.innerHTML = `<span style="color:var(--text2);">All Airlines</span>`;
-        }
-    }
-}
-
-function selectAirline(event, airline) {
-    selectedAirline = airline;
-    document.querySelectorAll('.airline-info-card').forEach(c => {
-        c.classList.remove('active');
-    });
-    if (event) event.currentTarget.classList.add('active');
-
-    updateBreadcrumb();
-
-    // If on the info tab, switch to flight board using LAST real tab (not forced arrival)
-    if (activeCategory === 'info') {
-        const targetType = lastFlightCategory; // ✅ restore last arrival/departure tab
-        activeCategory = targetType;
-        document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
-        const targetEl = document.querySelector(`[data-type="${targetType}"]`);
-        if (targetEl) targetEl.classList.add('active');
-        document.getElementById('flight-board-section').classList.remove('hidden');
-        document.getElementById('airline-info-section').classList.add('hidden');
-    }
-    // Always just re-render — do NOT force tab change if already on departure/arrival
-    renderBoard();
-}
-
-function clearAirlineFilter() {
-    selectedAirline = null;
-    document.querySelectorAll('.airline-info-card').forEach(c => {
-        c.classList.remove('active');
-    });
-    updateBreadcrumb();
-    renderBoard();
-}
-
-function updateAllAirlineCards() {
-    const airlineStats = {};
-
-    allFlights.forEach(f => {
-        const airline = f.airline_name;
-        if (!airlineStats[airline]) {
-            airlineStats[airline] = { total: 0, delayed: 0, boarding: 0 };
-        }
-
-        airlineStats[airline].total++;
-        if (f.status === "Delayed") airlineStats[airline].delayed++;
-        if (f.status === "Boarding") airlineStats[airline].boarding++;
-    });
-
-    function updateAirlineCard(id, name) {
-        const stats = airlineStats[name] || { total: 0, delayed: 0, boarding: 0 };
-        document.getElementById(id).innerText = `${stats.total} flights • ${stats.delayed} delayed • ${stats.boarding} boarding`;
-    }
-
-    updateAirlineCard("indigo-stats", "IndiGo");
-    updateAirlineCard("airindia-stats", "Air India");
-    updateAirlineCard("emirates-stats", "Emirates");
-    updateAirlineCard("vistara-stats", "Vistara");
-    updateAirlineCard("akasa-stats", "Akasa Air");
-}
+// Deleted obsolete airline functions
 
 // ── Status-card filter ────────────────────────────────────────────
 // Called when a stat card is clicked. Toggles the status filter and
@@ -1128,7 +1109,24 @@ const IATA_CITY_MAP = {
     'BKK': 'Bangkok',
     'SYD': 'Sydney',
     'LAX': 'Los Angeles',
-    'YYZ': 'Toronto'
+    'YYZ': 'Toronto',
+    'IXB': 'Bagdogra',
+    'MCT': 'Muscat',
+    'IST': 'Istanbul',
+    'ADD': 'Addis Ababa',
+    'CMB': 'Colombo',
+    'JED': 'Jeddah',
+    'TRV': 'Thiruvananthapuram',
+    'VTZ': 'Visakhapatnam',
+    'TIR': 'Tirupati',
+    'VGA': 'Vijayawada',
+    'RJA': 'Rajahmundry',
+    'PAT': 'Patna',
+    'BBI': 'Bhubaneswar',
+    'NAG': 'Nagpur',
+    'RPR': 'Raipur',
+    'CJB': 'Coimbatore'
+
 };
 
 function formatRoute(origin, destination) {
@@ -1177,7 +1175,6 @@ function carouselCell(flight) {
 
     return `<span class="carousel-badge">${carousel}</span>`;
 }
-
 function closeEditModal() {
     const modal = document.getElementById("edit-modal");
     if (modal) {
@@ -1217,31 +1214,69 @@ async function loadBHSLog() {
     }
 }
 
+/**
+ * formatSingleCity(str)
+ * Converts a full airport name like "Indira Gandhi International (DEL)" into
+ * just the clean city label "Delhi (DEL)". Falls back to the raw string if
+ * no IATA code can be extracted.
+ */
+function formatSingleCity(str) {
+    if (!str) return '-';
+    const iataMatch = str.match(/\(([A-Z]{3})\)/);
+    if (!iataMatch) return str;
+    const iata = iataMatch[1];
+    const city = IATA_CITY_MAP[iata] || str.split('(')[0].trim();
+    return `${city} (${iata})`;
+}
+
 function renderBoard() {
-    // 1. Filter by category (arrival / departure)
+    if (window.isFlightsLoading) {
+        const empty = document.getElementById('empty-state');
+        const wrapper = document.getElementById('table-wrapper');
+        const tbody = document.getElementById('flights-tbody');
+        if (empty) empty.classList.add('hidden');
+        if (wrapper) wrapper.style.display = 'block';
+        if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 40px; font-weight: bold; color: var(--text3);">Loading flights...</td></tr>';
+        ['stat-total', 'stat-arrived', 'stat-boarding', 'stat-scheduled', 'stat-delayed'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = '...';
+        });
+        return;
+    }
+
     let filtered = allFlights.filter(f => f.flight_type === activeCategory);
 
-    // 2. Filter by terminal
-    if (activeTerminal !== 'ALL') filtered = filtered.filter(f => f.terminal_number === activeTerminal);
+    if (activeTerminal !== 'ALL') {
+        filtered = filtered.filter(f => f.terminal_number === activeTerminal);
+    }
 
-    // 3. Filter by dropdown airline
-    if (activeAirline !== 'ALL') filtered = filtered.filter(f => f.airline_code === activeAirline);
+    console.log("RENDER FILTER CODE:", activeAirline);
 
-    // 4. Filter by clicked airline info card
-    if (selectedAirline) filtered = filtered.filter(f => f.airline_name === selectedAirline);
+    if (activeAirline && activeAirline !== 'ALL') {
+        const targetCode = String(activeAirline).toUpperCase();
+        filtered = filtered.filter(f => f.airline_code && String(f.airline_code).toUpperCase() === targetCode);
+    }
 
-    // 5. Sort flights by departure time chronologically
-    filtered.sort((a, b) => a.departure_time.localeCompare(b.departure_time));
+    console.log("FILTERED SAMPLE:", filtered.slice(0, 3));
 
-    // Update stat card counts BEFORE applying the status filter so totals are never broken.
-    // Counts always reflect all flights for the current category/terminal/airline selection.
+    const isArrival = activeCategory === 'arrival';
+
+    filtered.sort((a, b) => {
+        const timeA = isArrival ? (a.arrival_time || '') : (a.departure_time || '');
+        const timeB = isArrival ? (b.arrival_time || '') : (b.departure_time || '');
+        return timeA.localeCompare(timeB);
+    });
+
     document.getElementById('stat-total').textContent = filtered.length;
-    document.getElementById('stat-arrived').textContent = filtered.filter(f => f.status.toLowerCase() === 'arrived').length;
-    document.getElementById('stat-boarding').textContent = filtered.filter(f => f.status.toLowerCase() === 'boarding').length;
-    document.getElementById('stat-scheduled').textContent = filtered.filter(f => f.status.toLowerCase() === 'scheduled').length;
-    document.getElementById('stat-delayed').textContent = filtered.filter(f => f.status.toLowerCase() === 'delayed').length;
+    document.getElementById('stat-arrived').textContent =
+        filtered.filter(f => f.status.toLowerCase() === 'arrived').length;
+    document.getElementById('stat-boarding').textContent =
+        filtered.filter(f => f.status.toLowerCase() === 'boarding').length;
+    document.getElementById('stat-scheduled').textContent =
+        filtered.filter(f => f.status.toLowerCase() === 'scheduled').length;
+    document.getElementById('stat-delayed').textContent =
+        filtered.filter(f => f.status.toLowerCase() === 'delayed').length;
 
-    // 6. Apply status card filter (case-insensitive) — AFTER counting totals
     if (activeStatusFilter !== 'ALL') {
         const target = activeStatusFilter.toLowerCase();
         filtered = filtered.filter(f => f.status.toLowerCase() === target);
@@ -1252,19 +1287,6 @@ function renderBoard() {
     const wrapper = document.getElementById('table-wrapper');
 
     if (filtered.length === 0) {
-        // Customise empty-state message when a status filter is active
-        const emptyIcon = empty.querySelector('.empty-icon');
-        const emptyTitle = empty.querySelector('h3');
-        const emptyDesc = empty.querySelector('p');
-        if (activeStatusFilter !== 'ALL') {
-            if (emptyIcon) emptyIcon.textContent = '🔍';
-            if (emptyTitle) emptyTitle.textContent = 'No flights found';
-            if (emptyDesc) emptyDesc.textContent = `No flights found for status "${activeStatusFilter}". Try a different filter.`;
-        } else {
-            if (emptyIcon) emptyIcon.textContent = '🛬';
-            if (emptyTitle) emptyTitle.textContent = 'No flights found';
-            if (emptyDesc) emptyDesc.textContent = 'No flights match the current filters. Try syncing live data.';
-        }
         empty.classList.remove('hidden');
         wrapper.style.display = 'none';
     } else {
@@ -1272,43 +1294,132 @@ function renderBoard() {
         wrapper.style.display = 'block';
     }
 
+    const showActions = role === 'admin' || role === 'staff';
+    const actionsHeader = showActions ? `<th class="cell-actions">Actions</th>` : '';
+    const thead = document.getElementById('flights-thead');
+
+    if (isArrival) {
+        thead.innerHTML = `
+        <tr>
+            <th>Flight</th>
+            <th>Airline</th>
+            <th>Origin</th>
+            <th>Arrival</th>
+            <th>Terminal</th>
+            <th>Carousel</th>
+            <th>Status</th>
+            ${actionsHeader}
+        </tr>`;
+    } else {
+        thead.innerHTML = `
+        <tr>
+            <th>Flight</th>
+            <th>Airline</th>
+            <th>Destination</th>
+            <th>Departure</th>
+            <th>Gate</th>
+            <th>Terminal</th>
+            <th>Make-Up Area</th>
+            <th>Status</th>
+            ${actionsHeader}
+        </tr>`;
+    }
+
     tbody.innerHTML = '';
+
     filtered.forEach(f => {
         const tr = document.createElement('tr');
-        let actions = '';
+        tr.dataset.flightId = f.id; // used by viewFlight() to scroll & highlight
 
-        if (role === 'admin' || role === 'staff') {
+        const terminalDisplay = f.terminal_number || '-';
+        const terminalBadge = terminalDisplay !== '-'
+            ? `<span class="terminal-badge terminal-${terminalDisplay}">${terminalDisplay}</span>`
+            : `<span class="carousel-na">-</span>`;
+
+        let rowHtml = '';
+
+        const airlineHtml = `
+            <td class="cell-airline-info">
+                <div class="cell-airline">
+                    <span class="airline-badge badge-${f.airline_code}">${f.airline_code}</span>
+                    ${f.airline_name}
+                </div>
+            </td>`;
+
+        let actions = '';
+        if (showActions) {
             if (role === 'admin') {
                 actions = `
-                    <td class="cell-actions">
-                        <div class="action-container">
-                            <button class="action-btn btn-edit" onclick="editFlight(${f.id})">Edit</button>
-                            <button class="action-btn btn-delete" onclick="deleteFlight(${f.id})">Delete</button>
-                        </div>
-                    </td>`;
-            } else if (role === 'staff') {
+                <td class="cell-actions">
+                    <div class="action-container">
+                        <button class="action-btn btn-edit" onclick="editFlight(${f.id})">Edit</button>
+                        <button class="action-btn btn-delete" onclick="deleteFlight(${f.id})">Delete</button>
+                    </div>
+                </td>`;
+            } else {
                 actions = `
-                    <td class="cell-actions">
-                        <div class="action-container">
-                            <button class="action-btn btn-edit" onclick="editFlight(${f.id})">Edit</button>
-                        </div>
-                    </td>`;
+                <td class="cell-actions">
+                    <div class="action-container">
+                        <button class="action-btn btn-edit" onclick="editFlight(${f.id})">Edit</button>
+                    </div>
+                </td>`;
             }
         }
 
-        tr.innerHTML = `
-  <td class="cell-flight">${f.flight_number}</td>
-  <td class="cell-airline-info"><div class="cell-airline"><span class="airline-badge badge-${f.airline_code}">${f.airline_code}</span>${f.airline_name}</div></td>
-  <td class="cell-route">${formatRoute(f.origin, f.destination)}</td>
-  <td class="cell-time">${f.departure_time}</td>
-  <td class="cell-time">${f.arrival_time}</td>
-  <td class="cell-gate">${f.gate_number}</td>
-  <td class="cell-terminal-info"><span class="terminal-badge terminal-${f.terminal_number}">${f.terminal_number}</span></td>
-  <td class="cell-carousel">${carouselCell(f)}</td>
-  <td class="cell-status">${renderStatusCell(f)}</td>
-  ${actions}`;
+        if (isArrival) {
+            const originClean = formatSingleCity(f.origin);
+            const carousel = f.carousel_number || getCarousel(f.flight_number, f.terminal_number);
+
+            rowHtml = `
+                <td class="cell-flight">${f.flight_number}</td>
+                ${airlineHtml}
+                <td class="cell-route">${originClean}</td>
+                <td class="cell-time">${f.arrival_time || '-'}</td>
+                <td class="cell-terminal-info">${terminalBadge}</td>
+                <td class="cell-carousel">
+                    <span class="carousel-badge">${carousel}</span>
+                </td>
+                <td class="cell-status">${renderStatusCell(f)}</td>
+                ${actions}`;
+        } else {
+            const destClean = formatSingleCity(f.destination);
+            const gateDisplay = f.gate_number || '-';
+            const makeupArea = f.makeup_area || '-';
+
+            rowHtml = `
+                <td class="cell-flight">${f.flight_number}</td>
+                ${airlineHtml}
+                <td class="cell-route">${destClean}</td>
+                <td class="cell-time">${f.departure_time || '-'}</td>
+                <td class="cell-gate">${gateDisplay}</td>
+                <td class="cell-terminal-info">${terminalBadge}</td>
+                <td class="cell-carousel">
+                    <span class="makeup-badge">${makeupArea}</span>
+                </td>
+                <td class="cell-status">${renderStatusCell(f)}</td>
+                ${actions}`;
+        }
+
+        tr.innerHTML = rowHtml;
         tbody.appendChild(tr);
     });
+
+    // ── viewFlight() highlight ─────────────────────────────────────
+    if (pendingHighlightFlightId) {
+        const targetRow = tbody.querySelector(`tr[data-flight-id="${pendingHighlightFlightId}"]`);
+        if (targetRow) {
+            pendingHighlightFlightId = null;
+            setTimeout(() => {
+                targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                targetRow.classList.add('flight-highlight');
+                setTimeout(() => targetRow.classList.remove('flight-highlight'), 4000);
+            }, 120);
+        } else {
+            // Flight not visible under current filters — will be cleared after one attempt
+            pendingHighlightFlightId = null;
+            showToast('Flight not found or no longer active.', 'error');
+        }
+    }
 }
 
 function renderStatusCell(f) {
@@ -1735,9 +1846,11 @@ function showToast(msg, type) {
 let statusChartInstance  = null;
 let airlineChartInstance = null;
 let airportChartInstance = null;
-let alertReasonChart = null;
+
 let terminalChartInstance = null;
 let trafficChartInstance = null;
+let pendingHighlightFlightId = null; // set by viewFlight() — consumed by renderBoard()
+let carouselChartInstance = null;
 
 async function triggerTestEmailBatch() {
     const btn = document.getElementById('trigger-test-email-btn');
@@ -1773,7 +1886,7 @@ async function triggerTestEmailBatch() {
 async function loadAnalytics() {
     // Show a loading placeholder in the KPI grid on the first render
     const kpiGrid = document.getElementById('analytics-kpis');
-    if (kpiGrid && !kpiGrid.innerHTML.trim()) {
+    if (kpiGrid && (!kpiGrid.innerHTML.trim() || kpiGrid.innerHTML.includes('Failed to load dashboard'))) {
         kpiGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text3);">Loading operational data…</div>';
     }
 
@@ -1804,7 +1917,7 @@ async function loadAnalytics() {
             fetchedFlights = await flightRes.json();
             // Verification log for operational data integrity
             console.log("Live analytics source", fetchedFlights.filter(f => f.status === "Delayed"));
-            renderOperationalAlerts(fetchedFlights);
+            renderOperationalAlerts(data.live_alerts);
             renderTopDelayedFlights(fetchedFlights);
             renderDelaySeveritySummary(fetchedFlights);
         }
@@ -1819,8 +1932,9 @@ async function loadAnalytics() {
             renderTerminalChart(data.terminal_distribution); // doughnut: terminal breakdown
             renderGateInfrastructure(data.gate_distribution); // progress bars: gate health
             renderTrafficChart(data.hourly_traffic);       // bar: hourly traffic peaks
+            renderCarouselChart(data.carousel_utilization); // horizontal bar: carousel utilization
             if (fetchedFlights.length > 0) {
-                renderAlertReasonChart(fetchedFlights);
+                // Future use
             }
         } else {
             // Chart.js CDN failed to load — show a fallback message
@@ -1830,33 +1944,52 @@ async function loadAnalytics() {
             });
         }
     } catch (err) {
-        // Show error in the KPI grid so the dashboard doesn't silently break
         console.error('[Analytics]', err);
-        if (kpiGrid) kpiGrid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ef4444;">Failed to load dashboard: ${err.message}</div>`;
+        if (kpiGrid && (!kpiGrid.innerHTML.trim() || kpiGrid.innerHTML.includes('Loading operational data'))) {
+            kpiGrid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ef4444;">Failed to load dashboard: ${err.message}</div>`;
+        } else {
+            if (typeof showToast === 'function') {
+                showToast('Failed to sync analytics data. Retrying...', 'error');
+            }
+        }
     }
 }
-
 function renderKPIs(kpis) {
     const grid = document.getElementById('analytics-kpis');
-    if (!grid) return;
+    if (!grid || !kpis) return;
 
-    // Define KPI card metadata — icon, label, value from API, and accent color
+    // Check if grid already has the cards rendered to prevent flicker
+    const existingCards = grid.querySelectorAll('.kpi-card');
+    if (existingCards.length === 11) {
+        const values = grid.querySelectorAll('.kpi-value');
+        if (kpis.total_flights !== undefined) values[0].textContent = kpis.total_flights;
+        if (kpis.active_flights !== undefined) values[1].textContent = kpis.active_flights;
+        if (kpis.delayed_flights !== undefined) values[2].textContent = kpis.delayed_flights;
+        if (kpis.boarding_flights !== undefined) values[3].textContent = kpis.boarding_flights;
+        if (kpis.scheduled_flights !== undefined) values[4].textContent = kpis.scheduled_flights;
+        if (kpis.cancelled_flights !== undefined) values[5].textContent = kpis.cancelled_flights;
+        if (kpis.arrived_flights !== undefined) values[6].textContent = kpis.arrived_flights;
+        if (kpis.departure_flights !== undefined) values[7].textContent = kpis.departure_flights;
+        if (kpis.active_carousels !== undefined) values[8].textContent = kpis.active_carousels;
+        if (kpis.avg_delay_duration !== undefined) values[9].textContent = `${kpis.avg_delay_duration} min`;
+        if (kpis.on_time_percentage !== undefined) values[10].textContent = `${kpis.on_time_percentage}%`;
+        return;
+    }
+
     const cards = [
-        { icon: '✈️',  label: 'Total Flights',   value: kpis.total_flights,   color: '#0f3460' },
-        { icon: '🟢',  label: 'Active Flights',  value: kpis.active_flights,  color: '#0ea5e9' },
-        { icon: '⚠️',  label: 'Delayed Flights', value: kpis.delayed_flights, color: '#f59e0b' },
-        { icon: '🛫',  label: 'Boarding Flights',value: kpis.boarding_flights, color: '#10b981' },
-        { icon: '✅',  label: 'Arrived Flights', value: kpis.arrived_flights,  color: '#065f46' },
-        { icon: '🏢',  label: 'Active Airlines', value: kpis.active_airlines,  color: '#6366f1' },
-        { icon: '⏱️',  label: 'On-Time %',       value: `${kpis.on_time_percentage}%`, color: '#3b82f6' },
-        { icon: '⏳',  label: 'Avg Delay Duration', value: `${kpis.avg_delay_duration} min`, color: '#ec4899' },
-        { icon: '📅',  label: 'Scheduled Flights', value: kpis.scheduled_flights, color: '#6b7280' },
-        { icon: '❌',  label: 'Cancelled Flights', value: kpis.cancelled_flights, color: '#ef4444' },
-        { icon: '🧳',  label: 'Active Carousels',  value: kpis.active_carousels,  color: '#8b5cf6' },
-        { icon: '🗺️',  label: 'Active Airports',   value: kpis.active_airports,   color: '#0d9488' },
+        { icon: '✈️',  label: 'Total Flights', value: kpis.total_flights ?? '...', color: '#0f3460' },
+        { icon: '🟢',  label: 'Active Flights', value: kpis.active_flights ?? '...', color: '#0ea5e9' },
+        { icon: '⚠️',  label: 'Delayed Flights', value: kpis.delayed_flights ?? '...', color: '#f59e0b' },
+        { icon: '📢',  label: 'Boarding Flights', value: kpis.boarding_flights ?? '...', color: '#10b981' },
+        { icon: '📅',  label: 'Scheduled Flights', value: kpis.scheduled_flights ?? '...', color: '#6b7280' },
+        { icon: '❌',  label: 'Cancelled Flights', value: kpis.cancelled_flights ?? '...', color: '#ef4444' },
+        { icon: '✅',  label: 'Arrived Flights', value: kpis.arrived_flights ?? '...', color: '#065f46' },
+        { icon: '🛫',  label: 'Departure Flights', value: kpis.departure_flights ?? '...', color: '#0ea5e9' },
+        { icon: '🧳',  label: 'Active Carousels', value: kpis.active_carousels ?? '...', color: '#8b5cf6' },
+        { icon: '⏳',  label: 'Avg Delay Duration', value: kpis.avg_delay_duration !== undefined ? `${kpis.avg_delay_duration} min` : '...', color: '#ec4899' },
+        { icon: '🎯',  label: 'On-Time %', value: kpis.on_time_percentage !== undefined ? `${kpis.on_time_percentage}%` : '...', color: '#3b82f6' },
     ];
 
-    // Render each card as a styled div with a CSS custom property for the accent border color
     grid.innerHTML = cards.map(c => `
         <div class="kpi-card" style="--kpi-accent:${c.color}">
             <span class="kpi-icon">${c.icon}</span>
@@ -1922,117 +2055,157 @@ function getAlertClass(reason, status) {
   return "alert-operational";
 }
 
-function renderOperationalAlerts(flights) {
+function renderOperationalAlerts(alertsData) {
     const container = document.getElementById("operational-alerts-list");
     if (!container) return;
 
-    const flightData = Array.isArray(flights) ? flights : [];
-    
-    const gateChangeAlerts = [];
-    const delayedAlerts = [];
-    const cancelledAlerts = [];
-    const boardingAlerts = [];
-    const arrivedAlerts = [];
-    const seen = new Set();
-
-    const reasonDescriptions = {
-        "Weather":      "Adverse weather conditions",
-        "Technical":    "Aircraft technical inspection in progress",
-        "ATC":          "Air traffic control slot restriction",
-        "Crew":         "Crew availability and shift compliance",
-        "Security":     "Security screening and clearance delay",
-        "Late Arrival": "Inbound aircraft arrived behind schedule",
-        "Operational":  "Ground handling operational constraint"
-    };
-
-    function getAlertTime(f) {
-        if (f.status === "Arrived") return f.arrival_time || "Time unavailable";
-        return f.departure_time || "Time unavailable";
+    if (!alertsData || alertsData.length === 0) {
+        container.innerHTML = '<div class="empty-alert">No active operational alerts</div>';
+        return;
     }
 
-    flightData.forEach(f => {
-        const key = `${f.flight_number}:${f.status}`;
-
-        // 1. Capture gate change alerts immediately
-        if (f.gate_changed) {
-            const gateKey = `${f.flight_number}:gate-change`;
-            if (!seen.has(gateKey)) {
-                seen.add(gateKey);
-                gateChangeAlerts.push({
-                    id: f.id,
-                    type: "alert-gate-change",
-                    title: `${f.flight_number} Gate Changed`,
-                    subtitle: `${getAlertTime(f)} • Gate changed to ${f.gate_number} (was ${f.previous_gate || '—'})`
-                });
-            }
+    const html = alertsData.map(a => {
+        let buttonsHtml = '';
+        
+        let viewBtn = '';
+        if (a.flight_id) {
+            viewBtn = `<button class="ops-btn ops-btn-view" onclick="viewFlight(${a.flight_id})" title="View Flight">View Flight</button>`;
+        } else {
+            viewBtn = `<button class="ops-btn ops-btn-view" disabled title="No Flight Attached">View Flight</button>`;
         }
 
-        if (seen.has(key)) return;
-
-        const time = getAlertTime(f);
-
-        if (f.status === "Delayed") {
-            seen.add(key);
-            const rawDelay = stableDelayReason(f);
-            const description = reasonDescriptions[rawDelay] || rawDelay;
-            const mins = f.delay_minutes;
-            const timeStr = (mins && mins > 0) ? `${time} (+${mins} min)` : time;
-            
-            delayedAlerts.push({
-                type: getAlertClass(rawDelay, f.status),
-                title: `${f.flight_number} Delayed`,
-                subtitle: `${timeStr} • ${description} • Gate ${f.gate_number || '—'}`
-            });
-        } else if (f.status === "Cancelled") {
-            seen.add(key);
-            cancelledAlerts.push({
-                type: getAlertClass("", f.status),
-                title: `${f.flight_number} Cancelled`,
-                subtitle: `${time} • Operational disruption • Gate ${f.gate_number || '—'}`
-            });
-        } else if (f.status === "Boarding") {
-            seen.add(key);
-            boardingAlerts.push({
-                type: getAlertClass("", f.status),
-                title: `${f.flight_number} Boarding`,
-                subtitle: `${time} • Gate ${f.gate_number} • Final call`
-            });
-        } else if (f.status === "Arrived" && f.carousel_number) {
-            seen.add(key);
-            arrivedAlerts.push({
-                type: getAlertClass("", f.status),
-                title: `${f.flight_number} Arrived`,
-                subtitle: `${time} • Baggage at Carousel ${f.carousel_number}`
-            });
+        if (a.status === 'New') {
+            buttonsHtml = `
+                ${viewBtn}
+                <button class="ops-btn ops-btn-ack" onclick="acknowledgeAlert(event, ${a.id})" title="Acknowledge">Acknowledge</button>
+                <button class="ops-btn ops-btn-res" onclick="resolveAlert(event, ${a.id})" title="Resolve">Resolve</button>
+                <button class="ops-btn ops-btn-dis" onclick="dismissAlert(event, ${a.id})" title="Dismiss">Dismiss</button>
+            `;
+        } else if (a.status === 'Acknowledged') {
+            buttonsHtml = `
+                ${viewBtn}
+                <button class="ops-btn ops-btn-res" onclick="resolveAlert(event, ${a.id})" title="Resolve">Resolve</button>
+                <button class="ops-btn ops-btn-dis" onclick="dismissAlert(event, ${a.id})" title="Dismiss">Dismiss</button>
+            `;
         }
-    });
 
-    // Create a balanced mix (Gate change alerts first, then all delays + Limited others)
-    const displayAlerts = [
-        ...gateChangeAlerts,
-        ...delayedAlerts,
-        ...boardingAlerts.slice(0, 3),
-        ...cancelledAlerts.slice(0, 3),
-        ...arrivedAlerts.slice(0, 2)
-    ];
-
-    const html = displayAlerts.map(a => {
-        let clearBtnHtml = "";
-        if (a.type === "alert-gate-change" && a.id) {
-            clearBtnHtml = `<button class="clear-alert-btn" onclick="clearGateAlertFromFeed(event, ${a.id})" title="Dismiss Alert">✕</button>`;
+        let alertClass = 'alert-info';
+        const typeLower = (a.alert_type || '').toLowerCase();
+        if (typeLower.includes('delay') || typeLower.includes('maintenance')) {
+            alertClass = 'alert-warning';
+        } else if (typeLower.includes('cancel')) {
+            alertClass = 'alert-danger';
+        } else if (typeLower.includes('gate') || typeLower.includes('carousel')) {
+            alertClass = 'alert-gate-change';
         }
+
+        const badgeClass = a.status === 'Acknowledged' ? 'ops-badge-ack' : 'ops-badge-new';
+        const badgeText = a.status === 'Acknowledged' ? 'ACKNOWLEDGED' : 'NEW';
+
         return `
-            <div class="ops-alert ${a.type}" style="display:flex; justify-content:space-between; align-items:center; width:100%; box-sizing:border-box;">
-                <div class="ops-alert-content" style="flex:1;">
-                    <div class="ops-alert-title">${a.title}</div>
-                    <div class="ops-alert-subtitle">${a.subtitle}</div>
+            <div class="ops-alert ${alertClass}">
+                <div class="ops-alert-main">
+                    <div class="ops-alert-header">
+                        <span class="ops-alert-title">${a.flight_number || 'Gate Alert'}</span>
+                        <span class="ops-badge ${badgeClass}">${badgeText}</span>
+                    </div>
+                    <div class="ops-alert-subtitle">${a.message}</div>
                 </div>
-                ${clearBtnHtml}
+                <div class="ops-alert-actions">
+                    ${buttonsHtml}
+                </div>
             </div>
         `;
     }).join("");
 
-    container.innerHTML = html || '<div class="empty-alert">No active operational alerts</div>';
+    container.innerHTML = html;
+}
+
+// ── viewFlight ─────────────────────────────────────────────────────────────
+// Navigates from an operational alert directly to the matching flight row on
+// the Flight Board, then scrolls to it and highlights it for 4 seconds.
+async function viewFlight(flightId) {
+    console.log('Opening flight:', flightId);
+
+    if (!flightId) {
+        showToast('No flight ID associated with this alert.', 'error');
+        return;
+    }
+
+    // Ensure an airport context is available (analytics is HYD-only)
+    if (!selectedAirport) {
+        const stored = localStorage.getItem('selectedAirport');
+        if (stored) {
+            try { selectedAirport = JSON.parse(stored); } catch (e) { /* ignore */ }
+        }
+        if (!selectedAirport) {
+            showToast('Please select an airport first.', 'error');
+            showPage('airports');
+            return;
+        }
+    }
+
+    // Pre-clear all filters so the flight will be visible after renderBoard()
+    activeTerminal = 'ALL';
+    activeAirline = 'ALL';
+    activeStatusFilter = 'ALL';
+    selectedAirline = null;
+
+    // Pre-set the correct tab (arrival / departure) if the flight is already cached
+    const cached = allFlights.find(f => f.id === flightId);
+    if (cached) {
+        activeCategory = cached.flight_type; // 'arrival' | 'departure'
+    }
+
+    // Store the ID so renderBoard() can highlight the row once it renders
+    pendingHighlightFlightId = flightId;
+
+    // Navigate — showPage('flights') calls setupFlightPage() then fetchFlights()
+    // setupFlightPage() only resets activeCategory when it is null/'info', so the
+    // value we set above is preserved when the flight type was already known.
+    showPage('flights');
+}
+
+async function acknowledgeAlert(event, alertId) {
+    event.stopPropagation();
+    console.log("Alert action:", "acknowledge", alertId);
+    try {
+        const res = await fetch(`${API}/alerts/${alertId}/acknowledge`, { method: 'PATCH', headers: authHeaders() });
+        console.log("Response status:", res.status);
+        if (!res.ok) throw new Error('Failed to acknowledge');
+        showToast('Alert acknowledged', 'success');
+        if (typeof loadAnalytics === 'function') {
+            await loadAnalytics();
+        }
+    } catch (err) { showToast(err.message, 'error'); }
+}
+
+async function resolveAlert(event, alertId) {
+    event.stopPropagation();
+    console.log("Alert action:", "resolve", alertId);
+    try {
+        const res = await fetch(`${API}/alerts/${alertId}/resolve`, { method: 'PATCH', headers: authHeaders() });
+        console.log("Response status:", res.status);
+        if (!res.ok) throw new Error('Failed to resolve');
+        showToast('Alert resolved', 'success');
+        if (typeof loadAnalytics === 'function') {
+            await loadAnalytics();
+        }
+    } catch (err) { showToast(err.message, 'error'); }
+}
+
+async function dismissAlert(event, alertId) {
+    event.stopPropagation();
+    console.log("Alert action:", "dismiss", alertId);
+    try {
+        const res = await fetch(`${API}/alerts/${alertId}/dismiss`, { method: 'PATCH', headers: authHeaders() });
+        console.log("Response status:", res.status);
+        if (!res.ok) throw new Error('Failed to dismiss');
+        showToast('Alert dismissed', 'success');
+        if (typeof loadAnalytics === 'function') {
+            await loadAnalytics();
+        }
+    } catch (err) { showToast(err.message, 'error'); }
 }
 
 async function clearGateAlertFromFeed(event, flightId) {
@@ -2259,10 +2432,12 @@ function renderGateInfrastructure(data) {
     const container = document.getElementById('gate-infrastructure-summary');
     if (!container) return;
 
-    const total = data.total || 0;
-    const available = data.available || 0;
-    const occupied = data.occupied || 0;
-    const maintenance = data.maintenance || 0;
+    const total = data.total_gates || 0;
+    const available = data.available_gates || 0;
+    const occupied = data.occupied_gates || 0;
+    const maintenance = data.maintenance_gates || 0;
+
+    console.log("Gate Infrastructure API response:", data);
 
     const availPct = total > 0 ? Math.round((available / total) * 100) : 0;
     const occPct = total > 0 ? Math.round((occupied / total) * 100) : 0;
@@ -2300,27 +2475,47 @@ function renderGateInfrastructure(data) {
 }
 
 function renderTrafficChart(data) {
+    if (!data) return;
     const ctx = document.getElementById('trafficChart');
     if (!ctx) return;
 
     if (trafficChartInstance) { trafficChartInstance.destroy(); trafficChartInstance = null; }
 
+    const labels = data.map(d => d.interval);
+    const arrivals = data.map(d => d.arrivals);
+    const departures = data.map(d => d.departures);
+
     trafficChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: data.map(d => d.interval),
-            datasets: [{
-                label: 'Departures',
-                data: data.map(d => d.count),
-                backgroundColor: '#3b82f6', // cobalt blue
-                borderRadius: 4,
-                borderSkipped: false
-            }]
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Departures',
+                    data: departures,
+                    backgroundColor: '#3b82f6', // cobalt blue
+                    borderRadius: 4,
+                    borderSkipped: false
+                },
+                {
+                    label: 'Arrivals',
+                    data: arrivals,
+                    backgroundColor: '#10b981', // green
+                    borderRadius: 4,
+                    borderSkipped: false
+                }
+            ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
+            plugins: { 
+                legend: { 
+                    display: true,
+                    position: 'bottom',
+                    labels: { font: { size: 10, family: 'Inter, sans-serif' } }
+                } 
+            },
             scales: {
                 x: { grid: { display: false }, ticks: { font: { size: 9, family: 'Inter, sans-serif' } } },
                 y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 9 } } }
@@ -2328,77 +2523,46 @@ function renderTrafficChart(data) {
         }
     });
 }
+function renderCarouselChart(data) {
+    if (!data) return;
+    const ctx = document.getElementById('carouselChart');
+    if (!ctx) return;
 
+    if (carouselChartInstance) { carouselChartInstance.destroy(); carouselChartInstance = null; }
 
+    const labels = data.map(d => d.carousel);
+    const values = data.map(d => d.assigned_flights);
 
-function getAlertCategory(f) {
-  const reason = String(f.delay_reason || "").toLowerCase();
-  const status = String(f.status || "").toLowerCase();
-
-  if (reason.includes("weather")) return "Weather";
-  if (reason.includes("security")) return "Security";
-  if (reason.includes("crew")) return "Crew";
-  if (reason.includes("technical")) return "Technical";
-  if (reason.includes("air traffic") || reason.includes("atc")) return "ATC";
-  if (reason.includes("ground")) return "Ground Handling";
-  if (reason.includes("baggage")) return "Baggage";
-  if (reason.includes("runway")) return "Runway";
-  if (status === "boarding") return "Boarding";
-  if (status === "cancelled") return "Cancelled";
-  if (status === "arrived") return "Arrived";
-  return "Operational";
-}
-
-function renderAlertReasonChart(flights) {
-  const canvas = document.getElementById("alertReasonChart");
-  if (!canvas) return;
-
-  const counts = {};
-
-  flights.forEach(f => {
-    if (!["Delayed", "Boarding", "Cancelled", "Arrived"].includes(f.status)) return;
-    const category = getAlertCategory(f);
-    counts[category] = (counts[category] || 0) + 1;
-  });
-
-  const labels = Object.keys(counts);
-  const values = Object.values(counts);
-
-  if (alertReasonChart) {
-    alertReasonChart.destroy();
-  }
-
-  alertReasonChart = new Chart(canvas, {
-    type: "doughnut",
-    data: {
-      labels,
-      datasets: [{
-        data: values,
-        backgroundColor: [
-          "#3b82f6",
-          "#ef4444",
-          "#8b5cf6",
-          "#f97316",
-          "#6366f1",
-          "#22c55e",
-          "#06b6d4",
-          "#f59e0b",
-          "#64748b",
-          "#10b981"
-        ]
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: "bottom"
+    carouselChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Assigned Flights',
+                data: values,
+                backgroundColor: '#8b5cf6',
+                borderRadius: 4
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
         }
-      }
-    }
-  });
+    });
 }
+
+
+
 
 function renderTopDelayedFlights(flights) {
     const container = document.getElementById("top-delayed-flights-list");

@@ -47,9 +47,7 @@ def get_dashboard_data(user: dict = Depends(require_staff_or_admin)):
         # Bar chart: how many flights each airline has today
         "airline_flights": analytics_service.get_flights_per_airline(),
 
-        # Horizontal bar: which airports have the most active traffic right now
-        "airport_comparison": analytics_service.get_airport_comparison(),
-
+        
         # Live alert feed: most recent Delayed and Boarding events
         "live_alerts": analytics_service.get_live_alerts(),
 
@@ -64,6 +62,9 @@ def get_dashboard_data(user: dict = Depends(require_staff_or_admin)):
 
         # Hourly traffic breakdown
         "hourly_traffic": analytics_service.get_hourly_traffic(),
+
+        # Carousel workload distribution
+        "carousel_utilization": analytics_service.get_carousel_utilization(),
     }
 
 
